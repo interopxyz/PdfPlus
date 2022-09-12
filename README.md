@@ -7,7 +7,7 @@ PDF Plus is a simple plugin for grasshopper 3d that lets you compose geometry, i
 
 [Download Plugin at Food4Rhino](https://www.food4rhino.com/en/app/pdf-plus)
 
-![definition](https://user-images.githubusercontent.com/25797596/159039702-3cf6c90c-bdee-4e42-a12f-5b6313b9b709.png)
+![definition](https://user-images.githubusercontent.com/25797596/189573026-bedd1222-1522-40d7-9341-5c975b3d14a0.png)
 
 ## Learn More
 
