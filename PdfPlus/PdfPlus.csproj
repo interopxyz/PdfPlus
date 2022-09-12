@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DD85E2C9-0312-4415-A8D0-4CC46BABA9F7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PdfPlus</RootNamespace>
+    <AssemblyName>PdfPlus</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Eto, Version=2.5.0.0, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
+      <HintPath>packages\RhinoCommon.6.35.21222.17001\lib\net45\Eto.dll</HintPath>
+    </Reference>
+    <Reference Include="GH_IO, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=6a29997d2e6b4f97, processorArchitecture=MSIL">
+      <HintPath>packages\Grasshopper.6.35.21222.17001\lib\net45\GH_IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Grasshopper, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=dda4f5ec2cd80803, processorArchitecture=MSIL">
+      <HintPath>packages\Grasshopper.6.35.21222.17001\lib\net45\Grasshopper.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.Charting.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="Rhino.UI, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
+      <HintPath>packages\RhinoCommon.6.35.21222.17001\lib\net45\Rhino.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="RhinoCommon, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
+      <HintPath>packages\RhinoCommon.6.35.21222.17001\lib\net45\RhinoCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\Document.cs" />
+    <Compile Include="Classes\Font.cs" />
+    <Compile Include="Classes\Graphic.cs" />
+    <Compile Include="Classes\Page.cs" />
+    <Compile Include="Classes\Shape.cs" />
+    <Compile Include="Components\Contents\GH_Pdf_Shape_AddImage.cs" />
+    <Compile Include="Components\Contents\GH_Pdf_Shape_AddImagePt.cs" />
+    <Compile Include="Components\Contents\GH_Pdf_Shape_AddTextBox.cs" />
+    <Compile Include="Components\Contents\GH_Pdf_Shape_AddTextPt.cs" />
+    <Compile Include="Components\Contents\GH_Pdf_Shape_EditFont.cs" />
+    <Compile Include="Components\Contents\GH_Pdf_Shape_EditGraphics.cs" />
+    <Compile Include="Components\Documents\GH_Pdf_Doc_Add.cs" />
+    <Compile Include="Components\Documents\GH_Pdf_Doc_Save.cs" />
+    <Compile Include="Components\Pages\GH_Pdf_Page_Add.cs" />
+    <Compile Include="Components\Pages\GH_Pdf_Page_AddContents.cs" />
+    <Compile Include="Components\Pages\GH_Pdf_Page_AddImperial.cs" />
+    <Compile Include="Components\Pages\GH_Pdf_Page_AddMetric.cs" />
+    <Compile Include="Components\Pages\GH_Pdf_Page_AddRectangle.cs" />
+    <Compile Include="Components\Pages\GH_Pdf_Page_Deconstruct.cs" />
+    <Compile Include="PdfPlusInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\Constants.cs" />
+    <Compile Include="Utilities\Enums.cs" />
+    <Compile Include="Utilities\PdfExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PdfPlus-24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PdfPlus-16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-Geometry-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-Text-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-Image-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-AddContent-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-AddContent2-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Imperial-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Metric-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document_Add-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document_Save2-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document_Save-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Explode-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-AddContent-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-Font-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-AddContent4-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-TextPt-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Content-ImagePt-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Boundary-01.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
+Erase "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FallbackCulture>en-US</FallbackCulture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartProgram>C:\Program Files\Rhino 6\System\Rhino.exe</StartProgram>
+    <StartArguments>
+    </StartArguments>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <Import Project="packages\RhinoCommon.6.35.21222.17001\build\net45\RhinoCommon.targets" Condition="Exists('packages\RhinoCommon.6.35.21222.17001\build\net45\RhinoCommon.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\RhinoCommon.6.35.21222.17001\build\net45\RhinoCommon.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\RhinoCommon.6.35.21222.17001\build\net45\RhinoCommon.targets'))" />
+    <Error Condition="!Exists('packages\Grasshopper.6.35.21222.17001\build\net45\Grasshopper.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Grasshopper.6.35.21222.17001\build\net45\Grasshopper.targets'))" />
+  </Target>
+  <Import Project="packages\Grasshopper.6.35.21222.17001\build\net45\Grasshopper.targets" Condition="Exists('packages\Grasshopper.6.35.21222.17001\build\net45\Grasshopper.targets')" />
+</Project>
