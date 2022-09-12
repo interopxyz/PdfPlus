@@ -17,7 +17,7 @@ namespace PdfPlus.Components.Contents
         public GH_Pdf_Shape_EditFont()
           : base("Shape Font", "Shp Font",
               "Edit basic Font properties",
-              Constants.ShortName, Constants.SubPage)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 

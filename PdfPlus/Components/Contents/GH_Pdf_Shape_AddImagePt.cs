@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Contents
         public GH_Pdf_Shape_AddImagePt()
           : base("Image Point", "Img Pt",
               "Create an Image Shape at a point location",
-              Constants.ShortName, Constants.SubPage)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 
@@ -33,7 +33,7 @@ namespace PdfPlus.Components.Contents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Image", "I", "The image to display", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Image", "I", "The (bitmap) image to display", GH_ParamAccess.item);
             pManager.AddPointParameter("Location", "L", "The location of the text", GH_ParamAccess.item);
         }
 

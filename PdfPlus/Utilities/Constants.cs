@@ -44,6 +44,16 @@ namespace PdfPlus
 
         #region 
 
+        public static string WritePage
+        {
+            get { return "Write PDF"; }
+        }
+
+        public static string ReadPage
+        {
+            get { return "Read PDF"; }
+        }
+
         public static Descriptor Shape
         {
             get { return new Descriptor("Shape", "Sh", "PDF Shape", "PDF Shape", "PDF Shapes"); }

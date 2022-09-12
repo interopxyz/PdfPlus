@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Pages
         public GH_Pdf_Page_AddContents()
           : base("Set Contents", "Content",
               "Add text, image, or geometric based shapes to a PDF Page.",
-              Constants.ShortName, Constants.SubPage)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 

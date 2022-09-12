@@ -14,7 +14,7 @@ namespace PdfPlus.Components.Documents
         public GH_Pdf_Doc_Save()
           : base("Save Document", "Save Doc",
               "Save the PDF Document to a file",
-              Constants.ShortName, Constants.SubDoc)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 
@@ -32,11 +32,11 @@ namespace PdfPlus.Components.Documents
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
-            pManager.AddTextParameter("Folder Path", "F", "The path to the workbook", GH_ParamAccess.item);
+            pManager.AddTextParameter("Directory", "D", "The directory to save the Document.", GH_ParamAccess.item);
             pManager[1].Optional = true;
-            pManager.AddTextParameter("File Name", "N", "The Workbook name", GH_ParamAccess.item);
+            pManager.AddTextParameter("File Name", "N", "The Document name to save.", GH_ParamAccess.item);
             pManager[2].Optional = true;
-            pManager.AddBooleanParameter("Save", "_S", "Toggle to true to save the Document", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("Save", "_S", "Toggle to true to save the Document.", GH_ParamAccess.item, false);
             pManager[3].Optional = true;
         }
 
@@ -45,7 +45,7 @@ namespace PdfPlus.Components.Documents
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddTextParameter("FilePath", "P", "The full filepath to the saved file", GH_ParamAccess.item);
+            pManager.AddTextParameter("File Path", "P", "The full file path to the saved file.", GH_ParamAccess.item);
         }
 
         /// <summary>

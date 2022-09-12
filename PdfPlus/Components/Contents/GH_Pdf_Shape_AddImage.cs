@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Contents
         public GH_Pdf_Shape_AddImage()
           : base("Image Frame", "Img Frame",
               "Create an Image Shape within a rectangular boundary",
-              Constants.ShortName, Constants.SubPage)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 
@@ -33,8 +33,8 @@ namespace PdfPlus.Components.Contents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Image", "I", "The image to display", GH_ParamAccess.item);
-            pManager.AddRectangleParameter("Boundary", "B", "The boundary of the text", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Image", "I", "The (bitmap) image to display", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The boundary of the image", GH_ParamAccess.item);
         }
 
         /// <summary>

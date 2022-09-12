@@ -17,7 +17,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Doc_Add()
           : base("Add Document", "Doc",
               "Create a new PDF Document",
-              Constants.ShortName, Constants.SubDoc)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 

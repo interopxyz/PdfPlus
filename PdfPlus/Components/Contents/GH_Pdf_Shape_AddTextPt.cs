@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Contents
         public GH_Pdf_Shape_AddTextPt()
           : base("Text Point", "Txt Pt",
               "Create a Text Shape at a point location",
-              Constants.ShortName, Constants.SubPage)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 
@@ -34,7 +34,7 @@ namespace PdfPlus.Components.Contents
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddPointParameter("Location", "L", "The location of the text", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text box", GH_ParamAccess.item);
+            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
         }
 
         /// <summary>

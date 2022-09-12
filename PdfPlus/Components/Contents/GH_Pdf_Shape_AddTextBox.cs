@@ -17,7 +17,7 @@ namespace PdfPlus.Components.Contents
         public GH_Pdf_Shape_AddTextBox()
           : base("Text Box", "Txt Box",
               "Create a Text Shape within a rectangular boundary",
-              Constants.ShortName, Constants.SubPage)
+              Constants.ShortName, Constants.WritePage)
         {
         }
 
@@ -35,7 +35,7 @@ namespace PdfPlus.Components.Contents
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddRectangleParameter("Boundary", "B", "The boundary of the text", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text box", GH_ParamAccess.item);
+            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Alignment", "A", "The paragraph alignment", GH_ParamAccess.item,0);
             pManager[2].Optional = true;
 
