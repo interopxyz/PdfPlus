@@ -46,7 +46,7 @@ namespace PdfPlus
 
         public static string WritePage
         {
-            get { return "Write PDF"; }
+            get { return "PDF"; }
         }
 
         public static string ReadPage
