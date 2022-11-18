@@ -13,6 +13,7 @@ namespace PdfPlus
     {
         #region members
 
+        public PageLayouts PageLayout = PageLayouts.Single;
         protected pdf.PdfDocument baseObject = new pdf.PdfDocument();
 
         protected List<Page> pages = new List<Page>();
@@ -29,6 +30,7 @@ namespace PdfPlus
         public Document(Document document)
         {
             this.baseObject = (pdf.PdfDocument)document.baseObject.Clone();
+            this.PageLayout = document.PageLayout;
             foreach(Page page in document.pages)
             {
                 this.pages.Add(new Page(page));
@@ -54,6 +56,7 @@ namespace PdfPlus
             get { return (pdf.PdfDocument)baseObject.Clone(); }
         }
 
+
         #endregion
 
         #region methods
@@ -61,6 +64,8 @@ namespace PdfPlus
         public void Save(string filepath)
         {
             this.baseObject = new pdf.PdfDocument();
+            this.baseObject.PageLayout = this.PageLayout.ToPdf();
+            
             foreach (Page page in this.pages)
             {
                 this.baseObject = page.AddToDocument(this.baseObject);

@@ -124,6 +124,15 @@
   <data name="PdfPlus_24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PdfPlus-24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PDF_Border_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PDF_Border-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PDF_ChartData_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PDF_ChartData-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PDF_Chart_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PDF_Chart-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Pdf_Content_AddContent2_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Content-AddContent2-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -157,6 +166,9 @@
   <data name="Pdf_Document_Save_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Document_Save-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PDF_Link_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PDF_Link-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Pdf_Page_AddContent4_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Page-AddContent4-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -177,5 +189,8 @@
   </data>
   <data name="Pdf_Page_Metric_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Page-Metric-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PDF_PieGraph_01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PDF_PieGraph-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

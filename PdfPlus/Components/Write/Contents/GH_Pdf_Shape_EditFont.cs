@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Contents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Shape_EditFont : GH_Component
     {
@@ -26,7 +26,7 @@ namespace PdfPlus.Components.Contents
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.senary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>
@@ -66,24 +66,43 @@ namespace PdfPlus.Components.Contents
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+
+            Font font = new Font();
+
             IGH_Goo goo = null;
             if (!DA.GetData(0, ref goo)) return;
             Shape shape = null;
-            if (!goo.TryGetShape(ref shape)) return;
+            bool isShape = goo.TryGetShape(ref shape);
+            if (isShape) font = shape.Font;
+
+            DataSet data = null;
+            bool isData = goo.CastTo<DataSet>(out data);
+            if (isData) data = new DataSet(data);
+            if (isData) font = data.Font;
 
             string family = "Arial";
-            if (DA.GetData(1, ref family)) shape.FontFamily= family;
+            if (DA.GetData(1, ref family)) font.Family = family;
 
             double size = 10.0;
-            if (DA.GetData(2, ref size)) shape.FontSize = size;
+            if (DA.GetData(2, ref size)) font.Size = size;
 
             Sd.Color color = Sd.Color.Black;
-            if (DA.GetData(3, ref color)) shape.FontColor = color;
+            if (DA.GetData(3, ref color)) font.Color = color;
 
             int style = 0;
-            if (DA.GetData(4, ref style)) shape.Style = (FontStyle)style;
+            if (DA.GetData(4, ref style)) font.Style = (FontStyle)style;
 
-            DA.SetData(0, shape);
+            if (isShape)
+            {
+                shape.Font = font;
+                DA.SetData(0, shape);
+            }
+
+            if (isData)
+            {
+                data.Font = font;
+                DA.SetData(0, data);
+            }
         }
 
         /// <summary>

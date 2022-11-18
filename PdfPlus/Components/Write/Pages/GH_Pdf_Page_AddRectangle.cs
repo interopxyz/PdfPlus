@@ -4,7 +4,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Pages
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Page_AddRectangle : GH_Component
     {
@@ -31,7 +31,7 @@ namespace PdfPlus.Components.Pages
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddRectangleParameter("Boundary", "B", "The page boundary in Points", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The page rectangular boundary in Points", GH_ParamAccess.item);
         }
 
         /// <summary>

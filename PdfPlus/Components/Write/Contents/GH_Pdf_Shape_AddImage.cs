@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Contents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Shape_AddImage : GH_Component
     {
@@ -33,8 +33,8 @@ namespace PdfPlus.Components.Contents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Image", "I", "The (bitmap) image to display", GH_ParamAccess.item);
-            pManager.AddRectangleParameter("Boundary", "B", "The boundary of the image", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Image", "I", "The System.Drawing.Bitmap or Image Filepath to display", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
         }
 
         /// <summary>

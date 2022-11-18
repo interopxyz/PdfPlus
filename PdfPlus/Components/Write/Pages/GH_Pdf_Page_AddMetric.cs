@@ -35,11 +35,19 @@ namespace PdfPlus.Components
             pManager[0].Optional = true;
             pManager.AddIntegerParameter("Type", "T", "A standard Metric A series paper size", GH_ParamAccess.item, 4);
             pManager[1].Optional = true;
+            pManager.AddIntegerParameter("Orientation", "O", "Set the portrait or landscape orientation of the page", GH_ParamAccess.item,0);
+            pManager[2].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
             foreach (SizesA value in Enum.GetValues(typeof(SizesA)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
+            }
+
+            Param_Integer paramB = (Param_Integer)pManager[2];
+            foreach (PageOrientation value in Enum.GetValues(typeof(PageOrientation)))
+            {
+                paramB.AddNamedValue(value.ToString(), (int)value);
             }
         }
 
@@ -65,6 +73,9 @@ namespace PdfPlus.Components
 
             Plane plane = Plane.WorldXY;
             if (DA.GetData(0, ref plane)) page.Frame = new Plane(plane);
+
+            int orient = 0;
+            if (DA.GetData(2, ref orient)) page.Orientation = (PageOrientation)orient;
 
             DA.SetData(0, page);
             DA.SetData(1, page.Boundary);

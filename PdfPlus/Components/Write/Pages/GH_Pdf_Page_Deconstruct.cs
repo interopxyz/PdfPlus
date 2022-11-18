@@ -3,7 +3,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Pages
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Page_Deconstruct : GH_Component
     {

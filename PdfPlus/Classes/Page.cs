@@ -18,6 +18,7 @@ namespace PdfPlus
 
         protected Pf.PdfPage baseObject = new Pf.PdfPage();
         protected Pd.XGraphics graph = null;
+
         public Units Unit = Units.Millimeter;
         public Rg.Plane Frame = Rg.Plane.WorldXY;
 
@@ -34,16 +35,18 @@ namespace PdfPlus
 
         public Page(Page page)
         {
-            foreach(Shape shape in page.shapes)
+            if (page != null)
             {
-                this.shapes.Add(new Shape(shape));
+                foreach (Shape shape in page.shapes)
+                {
+                    this.shapes.Add(new Shape(shape));
+                }
+
+                this.Unit = page.Unit;
+                this.Frame = new Rg.Plane(page.Frame);
+                this.graph = page.graph;
+                this.baseObject = (Pf.PdfPage)page.baseObject.Clone();
             }
-            this.Unit = page.Unit;
-
-            this.Frame = new Rg.Plane(page.Frame);
-
-            this.graph = page.graph;
-            this.baseObject = (Pf.PdfPage)page.baseObject.Clone();
         }
 
         public Page(Units unit, double width, double height)
@@ -51,7 +54,7 @@ namespace PdfPlus
             this.Unit = unit;
             this.Width = width;
             this.Height = height;
-            
+
         }
 
         public Page(SizesA size)
@@ -98,9 +101,58 @@ namespace PdfPlus
             get { return new Rg.Rectangle3d(this.Frame, this.baseObject.Width.Point, this.baseObject.Height.Point); }
         }
 
+        public virtual PageOrientation Orientation
+        {
+            set { 
+                if(value!= PageOrientation.Default) this.baseObject.Orientation = value.ToPdf(); 
+            }
+        }
+
+        public virtual Rg.Rectangle3d ArtBox
+        {
+            get { return this.baseObject.ArtBox.ToRhino(); }
+            set { this.baseObject.ArtBox = value.ToPdfRect(this.Frame); }
+        }
+
+        public virtual Rg.Rectangle3d BleedBox
+        {
+            get { return this.baseObject.BleedBox.ToRhino(); }
+            set { this.baseObject.BleedBox = value.ToPdfRect(this.Frame); }
+        }
+
+        public virtual Rg.Rectangle3d CropBox
+        {
+            get { return this.baseObject.CropBox.ToRhino(); }
+            set { this.baseObject.CropBox = value.ToPdfRect(this.Frame); }
+
+        }
+
+        public virtual Rg.Rectangle3d TrimBox
+        {
+            get { return this.baseObject.TrimBox.ToRhino(); }
+            set { this.baseObject.TrimBox = value.ToPdfRect(this.Frame); }
+
+        }
+
         #endregion
 
         #region methods
+
+        public void AddHyperLink(Rg.Rectangle3d boundary, string hyperlink)
+        {
+            //this.baseObject.AddDocumentLink(boundary.ToPdfRect(), 1);
+            this.baseObject.AddWebLink(boundary.ToPdfRect(this.Frame), hyperlink);
+        }
+
+        public void AddFileLink(Rg.Rectangle3d boundary, string filename)
+        {
+            this.baseObject.AddFileLink(boundary.ToPdfRect(this.Frame), filename);
+        }
+
+        public void AddPageLink(Rg.Rectangle3d boundary, int page)
+        {
+            this.baseObject.AddDocumentLink(boundary.ToPdfRect(this.Frame), page);
+        }
 
         public Pf.PdfDocument AddToDocument(Pf.PdfDocument document)
         {
@@ -114,7 +166,7 @@ namespace PdfPlus
             graph = Pd.XGraphics.FromPdfPage(this.baseObject);
             foreach (Shape shape in shapes)
             {
-                shape.Render(graph);
+                shape.Render(graph,this);
             }
             graph.Dispose();
         }
@@ -135,7 +187,7 @@ namespace PdfPlus
 
         public override string ToString()
         {
-            return "Page " + Math.Round(this.Width,2)+ Unit.Abbreviation() + "," + Math.Round(this.Height,2) + Unit.Abbreviation();
+            return "Page " + Math.Round(this.Width, 2) + Unit.Abbreviation() + "," + Math.Round(this.Height, 2) + Unit.Abbreviation();
         }
 
         #endregion

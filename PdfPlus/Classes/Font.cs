@@ -45,10 +45,56 @@ namespace PdfPlus
             this.Color = color;
         }
 
+
         #endregion
 
         #region properties
 
+        public virtual bool IsBold
+        {
+            get {
+                bool isBold = false;
+                if (this.Style == FontStyle.Bold)isBold = true;
+                if (this.Style == FontStyle.BoldItalic) isBold = true;
+
+                return isBold;
+                } 
+            }
+        
+
+    public virtual bool IsItalic
+    {
+        get
+        {
+            bool isItalic = false;
+            if (this.Style == FontStyle.Italic) isItalic = true;
+            if (this.Style == FontStyle.BoldItalic) isItalic = true;
+
+            return isItalic;
+        }
+        }
+
+        public virtual bool IsStrikeout
+        {
+            get
+            {
+                bool isStrikeout = false;
+                if (this.Style == FontStyle.Strikeout) isStrikeout = true;
+
+                return isStrikeout;
+            }
+        }
+
+        public virtual bool IsUnderlined
+        {
+            get
+            {
+                bool isUnderlined = false;
+                if (this.Style == FontStyle.Underline) isUnderlined = true;
+
+                return isUnderlined;
+            }
+        }
 
 
         #endregion

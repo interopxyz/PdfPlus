@@ -1,21 +1,21 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Contents
 {
-    public class GH_Pdf_Shape_AddTextPt : GH_Component
+    public class GH_Pdf_Shape_Link : GH_Component
     {
+
+        string[] descriptions = new string[] { "The hyperlink to link to", "The document name to link to", "The page index (integer only) to link to" };
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
+        /// Initializes a new instance of the GH_Pdf_Shape_Link class.
         /// </summary>
-        public GH_Pdf_Shape_AddTextPt()
-          : base("Text Point", "Txt Pt",
-              "Create a Text Shape at a point location",
+        public GH_Pdf_Shape_Link()
+          : base("Link Region", "Link",
+              "Create a link to a document, hyperlink, or page within a rectangular boundary",
               Constants.ShortName, Constants.WritePage)
         {
         }
@@ -33,8 +33,17 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Target", "T", "The target of the link", GH_ParamAccess.item, 0);
+            pManager[0].Optional = true;
+            pManager.AddTextParameter("Link", "L", descriptions[0], GH_ParamAccess.item,"");
+            pManager[1].Optional = true;
+            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
+
+            Param_Integer paramA = (Param_Integer)pManager[0];
+            foreach (Shape.LinkTypes value in Enum.GetValues(typeof(Shape.LinkTypes)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -51,15 +60,18 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Point3d location = new Point3d();
-            if (!DA.GetData(0, ref location)) return;
+            int type = 0;
+            if (!DA.GetData(0, ref type)) return;
 
-            string content = string.Empty;
-            if (!DA.GetData(1, ref content)) return;
+            string link = "";
+            if (!DA.GetData(1, ref link)) return;
 
-            Shape text = new Shape(content, location, new Font());
+            Rectangle3d boundary = new Rectangle3d();
+            if (!DA.GetData(2, ref boundary)) return;
 
-            DA.SetData(0, text);
+            Shape shape = new Shape(link, boundary, (Shape.LinkTypes)type);
+
+            DA.SetData(0, shape);
         }
 
         /// <summary>
@@ -71,7 +83,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Content_TextPt_01;
+                return Properties.Resources.PDF_Link_01;
             }
         }
 
@@ -80,7 +92,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("81f60353-b223-4c36-b46e-588733aadcac"); }
+            get { return new Guid("413ae7fd-0b46-4c15-b17c-dffedbe7f6c9"); }
         }
     }
 }

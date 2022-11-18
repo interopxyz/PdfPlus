@@ -1,5 +1,4 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -8,14 +7,14 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_AddTextPt : GH_Component
+    public class GH_Pdf_Shape_GraphData : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
+        /// Initializes a new instance of the GH_Pdf_Shape_GraphData class.
         /// </summary>
-        public GH_Pdf_Shape_AddTextPt()
-          : base("Text Point", "Txt Pt",
-              "Create a Text Shape at a point location",
+        public GH_Pdf_Shape_GraphData()
+          : base("Graph Data", "Data",
+              "Compile data points into a Data Set",
               Constants.ShortName, Constants.WritePage)
         {
         }
@@ -25,7 +24,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.septenary; }
         }
 
         /// <summary>
@@ -33,8 +32,13 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Values", "V", "A list of numeric values", GH_ParamAccess.list);
+            pManager.AddColourParameter("Colors", "C", "Optional list of colors corresponding to the values", GH_ParamAccess.list);
+            pManager[1].Optional = true;
+            pManager.AddBooleanParameter("Label", "L", "If true, the datapoints will be labeled", GH_ParamAccess.item,true);
+            pManager[2].Optional = true;
+            pManager.AddTextParameter("Title", "T", "An optional name for the series", GH_ParamAccess.item);
+            pManager[3].Optional = true;
         }
 
         /// <summary>
@@ -42,7 +46,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter("DataSet", "Ds", "A PDF Plus Data Object", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,15 +55,21 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Point3d location = new Point3d();
-            if (!DA.GetData(0, ref location)) return;
+            List<double> values = new List<double>();
+            if (!DA.GetDataList(0, values)) return;
 
-            string content = string.Empty;
-            if (!DA.GetData(1, ref content)) return;
+            DataSet dataSet = new DataSet(values);
 
-            Shape text = new Shape(content, location, new Font());
+            List<Sd.Color> colors = new List<Sd.Color>();
+            if (DA.GetDataList(1, colors)) dataSet.Colors = colors;
 
-            DA.SetData(0, text);
+            bool label = true;
+            if (DA.GetData(2, ref label)) dataSet.LabelData = label;
+
+            string title = string.Empty;
+            if (DA.GetData(3, ref title)) dataSet.Title = title;
+
+            DA.SetData(0,dataSet);
         }
 
         /// <summary>
@@ -71,7 +81,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Content_TextPt_01;
+                return Properties.Resources.PDF_ChartData_01;
             }
         }
 
@@ -80,7 +90,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("81f60353-b223-4c36-b46e-588733aadcac"); }
+            get { return new Guid("926bd11c-44fc-4a6e-8b7c-ebcc7e7e82f9"); }
         }
     }
 }
