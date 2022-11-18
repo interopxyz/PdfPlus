@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Contents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Shape_EditGraphics : GH_Component
     {
@@ -60,22 +60,41 @@ namespace PdfPlus.Components.Contents
         {
             IGH_Goo goo = null;
             if (!DA.GetData(0, ref goo)) return;
+
+            Graphic graphic = new Graphic();
+
             Shape shape = null;
-            if (!goo.TryGetShape(ref shape)) return;
+            bool isShape = goo.TryGetShape(ref shape);
+            if(isShape)graphic = shape.Graphic;
+
+            DataSet data = null;
+            bool isData = goo.CastTo<DataSet>(out data);
+            if (isData) data = new DataSet(data);
+            if (isData) graphic = data.Graphic;
 
             Sd.Color fill = Sd.Color.Black;
-            if (DA.GetData(1, ref fill)) shape.FillColor = fill;
+            if (DA.GetData(1, ref fill)) graphic.Color = fill;
 
             Sd.Color stroke = Sd.Color.Black;
-            if (DA.GetData(2, ref stroke)) shape.StrokeColor = stroke;
+            if (DA.GetData(2, ref stroke)) graphic.Stroke = stroke;
 
             double weight = 1.0;
-            if (DA.GetData(3, ref weight)) shape.StrokeWeight = weight;
+            if (DA.GetData(3, ref weight)) graphic.Weight = weight;
 
             string pattern = "1.0,2.0";
-            if (DA.GetData(4, ref pattern)) shape.SetPattern(pattern);
+            if (DA.GetData(4, ref pattern)) graphic.SetPattern(pattern);
 
-            DA.SetData(0, shape);
+            if (isShape)
+            {
+                shape.Graphic = graphic;
+                DA.SetData(0, shape);
+            }
+
+            if (isData)
+            {
+                data.Graphic = graphic;
+                DA.SetData(0, data);
+            }
         }
 
         /// <summary>

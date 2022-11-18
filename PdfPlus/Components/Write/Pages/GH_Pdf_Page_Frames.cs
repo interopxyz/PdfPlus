@@ -1,21 +1,18 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_AddContents : GH_Component
+    public class GH_Pdf_Page_Frames : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
+        /// Initializes a new instance of the GH_Pdf_Page_Frames class.
         /// </summary>
-        public GH_Pdf_Page_AddContents()
-          : base("Set Contents", "Content",
-              "Add text, image, or geometric based shapes to a PDF Page.",
+        public GH_Pdf_Page_Frames()
+          : base("Page Boundaries", "Boundaries",
+              "Get or modify the boundaries of a page",
               Constants.ShortName, Constants.WritePage)
         {
         }
@@ -34,8 +31,14 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
-            pManager.AddGenericParameter("Content", "C", "Shapes, Text, or Geometry to add to the document", GH_ParamAccess.list);
+            pManager.AddRectangleParameter("Art Box", "A", "The art box of the page", GH_ParamAccess.item);
             pManager[1].Optional = true;
+            pManager.AddRectangleParameter("Bleed Box", "B", "The bleed box of the page", GH_ParamAccess.item);
+            pManager[2].Optional = true;
+            pManager.AddRectangleParameter("Crop Box", "C", "The crop box of the page",GH_ParamAccess.item);
+            pManager[3].Optional = true;
+            pManager.AddRectangleParameter("Trim Box", "T", "The trim box of the page", GH_ParamAccess.item);
+            pManager[4].Optional = true;
         }
 
         /// <summary>
@@ -44,6 +47,10 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Art Box", "A", "The art box of the page", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Bleed Box", "B", "The bleed box of the page", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Crop Box", "C", "The crop box of the page", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Trim Box", "T", "The trim box of the page", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -53,18 +60,27 @@ namespace PdfPlus.Components
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             Page page = null;
-            if (!DA.GetData(0, ref page))return;
+            if (!DA.GetData(0, ref page)) return;
             page = new Page(page);
 
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, geometry)) return;
+            Rectangle3d artbox = new Rectangle3d();
+            if (DA.GetData(1, ref artbox)) page.ArtBox = artbox;
 
-            foreach(IGH_Goo goos in geometry)
-            {
-                page.AddShape(goos);
-            }
+            Rectangle3d bleedbox = new Rectangle3d();
+            if (DA.GetData(2, ref bleedbox)) page.BleedBox = bleedbox;
+
+            Rectangle3d cropbox = new Rectangle3d();
+            if (DA.GetData(3, ref cropbox)) page.CropBox = cropbox;
+
+            Rectangle3d trimbox = new Rectangle3d();
+            if (DA.GetData(4, ref trimbox)) page.TrimBox = trimbox;
 
             DA.SetData(0, page);
+            DA.SetData(1, page.ArtBox);
+            DA.SetData(2, page.BleedBox);
+            DA.SetData(3, page.CropBox);
+            DA.SetData(4, page.TrimBox);
+
         }
 
         /// <summary>
@@ -76,7 +92,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_AddContent4_01;
+                return Properties.Resources.PDF_Border_01;
             }
         }
 
@@ -85,7 +101,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("7e649fc6-716b-4079-90eb-9fd203298a38"); }
+            get { return new Guid("6ca6613e-f5a3-4f72-8737-fe6d8d116189"); }
         }
     }
 }

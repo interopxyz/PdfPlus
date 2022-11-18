@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using PdfSharp;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
+using Grasshopper.Kernel.Parameters;
 
 namespace PdfPlus.Components
 {
@@ -34,7 +35,15 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Pages", "P", "Pages to add to the document", GH_ParamAccess.list);
+            pManager.AddGenericParameter("Pages", "Pg", "Pages to add to the document", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Page Layout", "L", "The page layout", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (PageLayouts value in Enum.GetValues(typeof(PageLayouts)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -55,6 +64,9 @@ namespace PdfPlus.Components
             if(!DA.GetDataList(0, pages))return;
 
             Document document = new Document(pages);
+
+            int layout = 0;
+            if (DA.GetData(1, ref layout)) document.PageLayout = (PageLayouts)layout;
 
             DA.SetData(0, document);
         }

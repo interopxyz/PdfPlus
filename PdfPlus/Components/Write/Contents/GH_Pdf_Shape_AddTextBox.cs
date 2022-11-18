@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Contents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Shape_AddTextBox : GH_Component
     {
@@ -26,7 +26,7 @@ namespace PdfPlus.Components.Contents
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.senary; }
+            get { return GH_Exposure.quinary; }
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace PdfPlus.Components.Contents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddRectangleParameter("Boundary", "B", "The boundary of the text", GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
             pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Alignment", "A", "The paragraph alignment", GH_ParamAccess.item,0);
             pManager[2].Optional = true;

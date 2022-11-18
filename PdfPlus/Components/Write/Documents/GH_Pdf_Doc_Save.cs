@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace PdfPlus.Components.Documents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Doc_Save : GH_Component
     {
@@ -80,10 +80,7 @@ namespace PdfPlus.Components.Documents
                 }
 
                 string name = DateTime.UtcNow.ToString("yyyy-dd-M_HH-mm-ss");
-                DA.GetData(1, ref name);
-
-                int ext = 0;
-                DA.GetData(2, ref ext);
+                DA.GetData(2, ref name);
 
                 string filepath = path + name + ".pdf";
 

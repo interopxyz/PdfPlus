@@ -43,12 +43,6 @@
     <Reference Include="Grasshopper, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=dda4f5ec2cd80803, processorArchitecture=MSIL">
       <HintPath>packages\Grasshopper.6.35.21222.17001\lib\net45\Grasshopper.dll</HintPath>
     </Reference>
-    <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="PdfSharp.Charting, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.Charting.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="Rhino.UI, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
       <HintPath>packages\RhinoCommon.6.35.21222.17001\lib\net45\Rhino.UI.dll</HintPath>
@@ -65,17 +59,22 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\DataSet.cs" />
     <Compile Include="Classes\Document.cs" />
     <Compile Include="Classes\Font.cs" />
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
     <Compile Include="Classes\Shape.cs" />
+    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddGraph.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImage.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImagePt.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddTextBox.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddTextPt.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_EditFont.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_EditGraphics.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphData.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphPie.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Add.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Add.cs" />
@@ -84,6 +83,7 @@
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddMetric.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddRectangle.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Deconstruct.cs" />
+    <Compile Include="Components\Write\Pages\GH_Pdf_Page_Frames.cs" />
     <Compile Include="PdfPlusInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -166,6 +166,31 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\Read\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
+      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
+      <Name>PdfSharp.Charting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
+      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
+      <Name>PdfSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PDF_Chart-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PDF_ChartData-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PDF_PieGraph-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PDF_Border-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PDF_Link-01.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
