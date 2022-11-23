@@ -440,8 +440,9 @@ namespace PdfPlus
                     Pd.XGraphicsPath crvPath = new Pd.XGraphicsPath();
 
                     List<Rg.Curve> curves = Rg.NurbsCurve.JoinCurves(brep.DuplicateNakedEdgeCurves(true, true)).ToList();
-                    foreach (Rg.NurbsCurve nurbs in curves)
+                    foreach (Rg.Curve curve in curves)
                     {
+                        Rg.NurbsCurve nurbs = curve.ToNurbsCurve();
                         crvPath.StartFigure();
                         crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
                         if (nurbs.IsClosed) crvPath.CloseFigure();
