@@ -1,5 +1,5 @@
 # PDF +
-A simple pdf composition plugin for Grasshopper 3d
+PDF composition plugin for Grasshopper 3d
 
 ---
 
