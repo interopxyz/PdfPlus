@@ -183,6 +183,15 @@ namespace PdfPlus
             this.graphic = new Graphic(graphic);
         }
 
+        public Shape(Rg.Rectangle3d rect, Graphic graphic)
+        {
+            shapeType = ShapeType.Polyline;
+
+            this.polyline = rect.ToPolyline();
+
+            this.graphic = new Graphic(graphic);
+        }
+
         public Shape(Rg.Arc arc, Graphic graphic)
         {
             shapeType = ShapeType.Bezier;
