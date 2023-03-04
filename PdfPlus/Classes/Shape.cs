@@ -595,7 +595,7 @@ namespace PdfPlus
                     frame.Location = new Pd.XPoint(boundary.Corner(0).X, boundary.Corner(3).Y);
                     frame.Size = new Pd.XSize(boundary.Width, boundary.Height);
 
-                    frame.Background = graphic.Color.ToPdfBrush();
+                    //frame.Background = graphic.Color.ToPdfBrush();
 
                     frame.Add(chart);
                     frame.Draw(graph);
