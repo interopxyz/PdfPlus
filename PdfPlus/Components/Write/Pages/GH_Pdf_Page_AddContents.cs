@@ -1,10 +1,10 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Geometry;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-
-using Sd = System.Drawing;
+using System.Security.Cryptography;
 
 namespace PdfPlus.Components
 {
@@ -75,16 +75,18 @@ namespace PdfPlus.Components
             foreach(IGH_Goo goos in geometry)
             {
                 page.AddShape(goos);
-                
+
+                //transformation for preview
+                Rhino.Geometry.Plane plane = Rhino.Geometry.Plane.WorldZX;
+                plane.OriginY = page.BaseObject.Height.Point / 2.0;
+
+                Rhino.Geometry.Plane frame = Rhino.Geometry.Plane.WorldXY;
+                frame.Transform(Transform.Mirror(plane));
+                movematrix = Transform.PlaneToPlane(page.Frame, frame);
+
             }
 
-            //transformation for preview
-            Plane plane = Plane.WorldZX;
-            plane.OriginY = page.BaseObject.Height.Point / 2.0;
 
-            Plane frame = Plane.WorldXY;
-            frame.Transform(Transform.Mirror(plane));
-            movematrix = Transform.PlaneToPlane(page.Frame, frame);
 
 
             pages.Add(page);
@@ -114,13 +116,9 @@ namespace PdfPlus.Components
                 {
                     item.DrawInViewport(args.Display, movematrix);
                 }
-            }
-            base.DrawViewportMeshes(args);
-            
-            //base.DrawViewportWires(args);
-            
         }
-
+            base.DrawViewportMeshes(args);
+        }
         /// <summary>
         /// Gets the unique ID for this component. Do not change this ID after release.
         /// </summary>

@@ -18,6 +18,7 @@ using System.Drawing;
 using System.Drawing.Text;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Rhino.Geometry;
+using Grasshopper.Kernel;
 
 namespace PdfPlus
 {
@@ -419,6 +420,7 @@ namespace PdfPlus
             }
         }
 
+
         /// <summary>
         /// YOUWEI DOMAIN
         /// </summary>
@@ -428,12 +430,14 @@ namespace PdfPlus
             switch (shapeType)
             {
                 case ShapeType.Line:
-                    dp.DrawLine(line, graphic.Color);
+                    //Line lineDup = new Line(line);
+                    //line.Transform(movematrix);
+                    //dp.DrawLine(line, graphic.Color);
                     break;
                 case ShapeType.Polyline:
                     Polyline pDup = polyline.Duplicate();
                     pDup.Transform(movematrix);
-                    dp.DrawPolyline(polyline, graphic.Color, (int)graphic.Weight);
+                    dp.DrawPolyline(pDup, Color.FromArgb(255, graphic.Color), (int)graphic.Weight);
                     break;
                 case ShapeType.Ellipse:
                     dp.DrawCircle(circle, graphic.Color);
@@ -441,7 +445,7 @@ namespace PdfPlus
                 case ShapeType.Bezier:
                     Curve cDup = curve.DuplicateCurve();
                     cDup.Transform(movematrix);
-                    dp.DrawCurve(cDup, graphic.Color);
+                    dp.DrawCurve(cDup, Color.FromArgb(255,graphic.Color));
                     break;
                 case ShapeType.Arc:
                     dp.DrawArc(arc, graphic.Color);
@@ -449,15 +453,17 @@ namespace PdfPlus
                 case ShapeType.Brep:
                     Brep bDup = brep.DuplicateBrep();
                     bDup.Transform(movematrix);
-                    dp.DrawBrepWires (bDup, graphic.Color);
+                    dp.DrawBrepWires (bDup, Color.FromArgb(255, graphic.Color));
                     break;
                 case ShapeType.Mesh:
                     Mesh mDup = mesh.DuplicateMesh();
                     mDup.Transform(movematrix);
-                    dp.DrawMeshWires(mDup, graphic.Color);
+                    dp.DrawMeshWires(mDup, Color.FromArgb(255, graphic.Color));
                     break;
                 case ShapeType.ImageFrame:
-                    this.boundary.Transform(movematrix);
+                    boundary.Transform(movematrix);
+                    NurbsCurve boundarycurve = boundary.ToNurbsCurve();
+                    dp.DrawCurve(boundarycurve, Color.FromArgb(255, graphic.Color));
                     break;
                 case ShapeType.ImageObj:
                     this.boundary.Transform(movematrix);
