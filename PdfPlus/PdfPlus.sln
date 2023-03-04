@@ -1,15 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33403.182
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfPlus", "PdfPlus.csproj", "{DD85E2C9-0312-4415-A8D0-4CC46BABA9F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp", "..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj", "{5A6055BC-BF86-4FDD-9F62-0109DB7A303B}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ref_pdfsharp", "ref_pdfsharp", "{9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp.Charting", "..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj", "{6F98A822-41B0-4C7A-85A6-E95C1D3E88EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp.Charting-gdi", "..\..\..\other\PDFsharp\src\PdfSharp.Charting-gdi\PdfSharp.Charting-gdi.csproj", "{CFDB7D46-EA8D-47DE-B10A-9E755A1B48BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp.Charting-wpf", "..\..\..\other\PDFsharp\src\PdfSharp.Charting-wpf\PdfSharp.Charting-wpf.csproj", "{E6A2734E-0CD6-4210-8AEC-47EE348F8D78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp-gdi", "..\..\..\other\PDFsharp\src\PdfSharp-gdi\PdfSharp-gdi.csproj", "{5384CE57-1F94-4D22-860D-2E9C1AC12DDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp-wpf", "..\..\..\other\PDFsharp\src\PdfSharp-wpf\PdfSharp-wpf.csproj", "{02FCC0BB-2AA2-43BA-8D2F-66D168B87A1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +29,14 @@ Global
 		{DD85E2C9-0312-4415-A8D0-4CC46BABA9F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD85E2C9-0312-4415-A8D0-4CC46BABA9F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD85E2C9-0312-4415-A8D0-4CC46BABA9F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A6055BC-BF86-4FDD-9F62-0109DB7A303B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A6055BC-BF86-4FDD-9F62-0109DB7A303B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A6055BC-BF86-4FDD-9F62-0109DB7A303B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A6055BC-BF86-4FDD-9F62-0109DB7A303B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F98A822-41B0-4C7A-85A6-E95C1D3E88EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F98A822-41B0-4C7A-85A6-E95C1D3E88EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F98A822-41B0-4C7A-85A6-E95C1D3E88EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F98A822-41B0-4C7A-85A6-E95C1D3E88EF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CFDB7D46-EA8D-47DE-B10A-9E755A1B48BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CFDB7D46-EA8D-47DE-B10A-9E755A1B48BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFDB7D46-EA8D-47DE-B10A-9E755A1B48BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -29,13 +45,25 @@ Global
 		{E6A2734E-0CD6-4210-8AEC-47EE348F8D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6A2734E-0CD6-4210-8AEC-47EE348F8D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6A2734E-0CD6-4210-8AEC-47EE348F8D78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5384CE57-1F94-4D22-860D-2E9C1AC12DDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5384CE57-1F94-4D22-860D-2E9C1AC12DDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5384CE57-1F94-4D22-860D-2E9C1AC12DDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5384CE57-1F94-4D22-860D-2E9C1AC12DDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02FCC0BB-2AA2-43BA-8D2F-66D168B87A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02FCC0BB-2AA2-43BA-8D2F-66D168B87A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02FCC0BB-2AA2-43BA-8D2F-66D168B87A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02FCC0BB-2AA2-43BA-8D2F-66D168B87A1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{5A6055BC-BF86-4FDD-9F62-0109DB7A303B} = {9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}
+		{6F98A822-41B0-4C7A-85A6-E95C1D3E88EF} = {9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}
 		{CFDB7D46-EA8D-47DE-B10A-9E755A1B48BA} = {9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}
 		{E6A2734E-0CD6-4210-8AEC-47EE348F8D78} = {9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}
+		{5384CE57-1F94-4D22-860D-2E9C1AC12DDF} = {9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}
+		{02FCC0BB-2AA2-43BA-8D2F-66D168B87A1D} = {9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6C9FE328-F1D7-4DC5-82F0-6AAF0B3A69C8}
