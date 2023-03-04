@@ -22,6 +22,8 @@ namespace PdfPlus.Components
         {
         }
 
+        Transform movematrix;
+
         /// <summary>
         /// Set Exposure level for the component.
         /// </summary>
@@ -55,6 +57,7 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            movematrix = Transform.Translation(Vector3d.Zero);
 
             if (RunCount == 1)
             {
@@ -72,9 +75,20 @@ namespace PdfPlus.Components
             foreach(IGH_Goo goos in geometry)
             {
                 page.AddShape(goos);
+                
             }
 
+            //transformation for preview
+            Plane plane = Plane.WorldZX;
+            plane.OriginY = page.BaseObject.Height.Point / 2.0;
+
+            Plane frame = Plane.WorldXY;
+            frame.Transform(Transform.Mirror(plane));
+            movematrix = Transform.PlaneToPlane(page.Frame, frame);
+
+
             pages.Add(page);
+            
 
             DA.SetData(0, page);
         }
@@ -98,10 +112,13 @@ namespace PdfPlus.Components
             {
                 foreach (var item in page.shapes)
                 {
-                    item.DrawInViewport(args.Display);
+                    item.DrawInViewport(args.Display, movematrix);
                 }
             }
             base.DrawViewportMeshes(args);
+            
+            //base.DrawViewportWires(args);
+            
         }
 
         /// <summary>

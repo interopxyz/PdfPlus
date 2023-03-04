@@ -196,16 +196,16 @@ namespace PdfPlus
             {
                 default:
                     return Pd.XUnit.FromMillimeter(value);
-                    break;
+                    //break;
                 case Units.Centimeter:
                     return Pd.XUnit.FromCentimeter(value);
-                    break;
+                    //break;
                 case Units.Inch:
                     return Pd.XUnit.FromInch(value);
-                    break;
+                    //break;
                 case Units.Point:
                     return Pd.XUnit.FromPoint(value);
-                    break;
+                    //break;
             }
         }
 
@@ -251,22 +251,22 @@ namespace PdfPlus
                     return Pc.ChartType.ColumnStacked2D;
                 case Shape.ChartTypes.Area:
                     return Pc.ChartType.Area2D;
-                    break;
+                    //break;
                 case Shape.ChartTypes.Bar:
                     return Pc.ChartType.Bar2D;
-                    break;
+                    //break;
                 case Shape.ChartTypes.BarStacked:
                     return Pc.ChartType.BarStacked2D;
-                    break;
+                    //break;
                 case Shape.ChartTypes.Column:
                     return Pc.ChartType.Column2D;
-                    break;
+                    //break;
                 case Shape.ChartTypes.Line:
                     return Pc.ChartType.Line;
-                    break;
+                    //break;
                 case Shape.ChartTypes.Pie:
                     return Pc.ChartType.Pie2D;
-                    break;
+                    //break;
             }
         }
 
