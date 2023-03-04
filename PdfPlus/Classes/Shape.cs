@@ -84,6 +84,11 @@ namespace PdfPlus
             this.mesh = shape.mesh.DuplicateMesh();
         }
 
+        public override string ToString()
+        {
+            return $"PdfPlus.Shape ({shapeType.ToString()})";
+        }
+
         #region text
         public Shape(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
         {
