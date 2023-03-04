@@ -11,6 +11,8 @@ using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
 using Rg = Rhino.Geometry;
 using System.IO;
+using Rhino.DocObjects;
+using Rhino.Display;
 
 namespace PdfPlus
 {
@@ -20,7 +22,7 @@ namespace PdfPlus
         public enum ShapeType { None, Line, Polyline, Bezier, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
         protected ShapeType shapeType = ShapeType.None;
 
-        public enum LinkTypes { Hyperlink,Filepath,Page};
+        public enum LinkTypes { Hyperlink, Filepath, Page };
         protected LinkTypes linkType = LinkTypes.Hyperlink;
 
         public enum ChartTypes { Bar, BarStacked, Column, ColumnStacked, Line, Area, Pie };
@@ -411,6 +413,22 @@ namespace PdfPlus
             }
         }
 
+        /// <summary>
+        /// YOUWEI DOMAIN
+        /// </summary>
+        /// <param name="dp"></param>
+        public void DrawInViewport(DisplayPipeline dp)
+        {
+            switch (shapeType)
+            {
+                case ShapeType.Polyline:
+                    dp.DrawPolyline(polyline, graphic.Color, (int)graphic.Weight);
+                    break;
+            }
+
+
+        }
+
         public void Render(Pd.XGraphics graph, Page page)
         {
             switch (this.shapeType)
@@ -424,7 +442,7 @@ namespace PdfPlus
 
                     plinePath.StartFigure();
                     plinePath.AddLines(polyline.ToPdf().ToArray());
-                        if (polyline.IsClosed) plinePath.CloseFigure();
+                    if (polyline.IsClosed) plinePath.CloseFigure();
                     graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
                     break;
 
@@ -505,7 +523,7 @@ namespace PdfPlus
                         case LinkTypes.Page:
                             int index = 0;
                             bool isInt = int.TryParse(this.content, out index);
-                            if(isInt)page.AddPageLink(this.boundary, index+1);
+                            if (isInt) page.AddPageLink(this.boundary, index + 1);
                             break;
                     }
                     break;
@@ -619,10 +637,10 @@ namespace PdfPlus
                         series.Name = d.Title;
 
                         if (d.Graphic.HasStroke)
-                        { 
-                        series.LineFormat.Visible = true;
-                        series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
-                        series.LineFormat.Width = d.Graphic.Weight;
+                        {
+                            series.LineFormat.Visible = true;
+                            series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
+                            series.LineFormat.Width = d.Graphic.Weight;
 
                         }
 

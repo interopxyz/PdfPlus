@@ -22,7 +22,7 @@ namespace PdfPlus
         public Units Unit = Units.Millimeter;
         public Rg.Plane Frame = Rg.Plane.WorldXY;
 
-        protected List<Shape> shapes = new List<Shape>();
+        public List<Shape> shapes = new List<Shape>();
 
         #endregion
 

@@ -10,6 +10,8 @@ namespace PdfPlus.Components
 {
     public class GH_Pdf_Page_AddContents : GH_Component
     {
+        List<Page> pages = new List<Page>();
+
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
         /// </summary>
@@ -33,6 +35,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+           
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
             pManager.AddGenericParameter("Content", "C", "Shapes, Text, or Geometry to add to the document", GH_ParamAccess.list);
             pManager[1].Optional = true;
@@ -52,6 +55,13 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+
+            if (RunCount == 1)
+            {
+                pages.Clear();
+            }
+
+
             Page page = null;
             if (!DA.GetData(0, ref page))return;
             page = new Page(page);
@@ -63,6 +73,8 @@ namespace PdfPlus.Components
             {
                 page.AddShape(goos);
             }
+
+            pages.Add(page);
 
             DA.SetData(0, page);
         }
@@ -78,6 +90,18 @@ namespace PdfPlus.Components
                 // return Resources.IconForThisComponent;
                 return Properties.Resources.Pdf_Page_AddContent4_01;
             }
+        }
+
+        public override void DrawViewportMeshes(IGH_PreviewArgs args)
+        {
+            foreach (var page in pages)
+            {
+                foreach (var item in page.shapes)
+                {
+                    item.DrawInViewport(args.Display);
+                }
+            }
+            base.DrawViewportMeshes(args);
         }
 
         /// <summary>
