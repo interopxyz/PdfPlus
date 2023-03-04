@@ -174,7 +174,17 @@ namespace PdfPlus
         public bool AddShape(IGH_Goo goo)
         {
             Shape shape = null;
-            bool isValid = goo.TryGetShape(ref shape);
+            bool isValid = true;
+            if(goo is GH_Rectangle rect)
+            {
+                shape = new Shape(rect.Value, new Graphic());
+                isValid = rect.IsValid;
+            }
+            else
+            {
+                isValid = goo.TryGetShape(ref shape);
+            }
+            
             shape.AlignContent(this);
             this.shapes.Add(shape);
 
