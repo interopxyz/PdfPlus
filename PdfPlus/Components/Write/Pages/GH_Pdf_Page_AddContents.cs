@@ -5,6 +5,8 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using static PdfPlus.Shape;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace PdfPlus.Components
 {

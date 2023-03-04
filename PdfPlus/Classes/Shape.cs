@@ -19,6 +19,9 @@ using System.Drawing.Text;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Rhino.Geometry;
 using Grasshopper.Kernel;
+using Rhino.UI;
+using PdfSharp.Pdf.Advanced;
+using System.Windows.Media.TextFormatting;
 
 namespace PdfPlus
 {
@@ -265,7 +268,12 @@ namespace PdfPlus
 
             this.graphic = new Graphic(graphic);
         }
+        public Shape(DisplayBitmap bitmap, Graphic graphic)
+        {
+            shapeType = ShapeType.ImageObj;
 
+            this.graphic = new Graphic(graphic);
+        }
         #endregion
 
         #endregion
@@ -461,21 +469,45 @@ namespace PdfPlus
                     dp.DrawMeshWires(mDup, Color.FromArgb(255, graphic.Color));
                     break;
                 case ShapeType.ImageFrame:
-                    boundary.Transform(movematrix);
-                    NurbsCurve boundarycurve = boundary.ToNurbsCurve();
+                    Rectangle3d rec = boundary;
+                    rec.Transform(movematrix);
+                    NurbsCurve boundarycurve = rec.ToNurbsCurve();
                     dp.DrawCurve(boundarycurve, Color.FromArgb(255, graphic.Color));
                     break;
                 case ShapeType.ImageObj:
-                    this.boundary.Transform(movematrix);
+                    DisplayBitmap rhinoImage = new DisplayBitmap(image);
+                    Point2d drawlocation = new Point2d(location.X, location.Y);
+                    dp.DrawSprite(rhinoImage, drawlocation, image.Height);
                     break;
                 case ShapeType.TextObj:
-                    this.boundary.Transform(movematrix);
+                    Vector3d one = new Vector3d(0, 0, 1);
+                    Plane textplace = new Plane(location, one);
+                    textplace.Transform(movematrix);
+                    //Plane mirrortext = Plane.WorldZX;
+                    //textplace.Transform(Transform.Mirror(mirrortext));
+                    var text_entity = new TextEntity
+                    {
+                        
+                        PlainText = $"{content}",
+                        Justification = TextJustification.MiddleCenter,
+                        TextHeight = boundary.Height,
+                        Plane = textplace,
+                        
+                        //textFormatter.Alignment = this.alignment.ToPdf();
+                        //textFormatter.LayoutRectangle = this.boundary.ToPdf();
+                        //textFormatter.Text = this.content;
+                        //textFormatter.Font = pdfFont;
+                        //this.content = content;
+                        //this.location = new Rg.Point3d(location);
+                        //this.font = new Font(font);
+                    };
+                    dp.DrawText(text_entity, Color.FromArgb(255, graphic.Color));
                     break;
                 case ShapeType.TextBox:
-                    this.boundary.Transform(movematrix);
+                    //
                     break;
                 case ShapeType.LinkObj:
-                    this.boundary.Transform(movematrix);
+                    //
                     break;
                 case ShapeType.ChartObj:
                     Pc.Chart chart = CombinationChart();
