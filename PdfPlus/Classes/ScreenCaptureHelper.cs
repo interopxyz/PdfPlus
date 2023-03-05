@@ -238,9 +238,11 @@ namespace PdfPlus.Classes
 
             foreach (var id in ids)
             {
+                Rhino.RhinoDoc.ActiveDoc.Objects.Show(id, true);
                 Rhino.RhinoDoc.ActiveDoc.Objects.Delete(id, true);
             }
-            RhinoDoc.ActiveDoc.Views.Redraw();
+
+          //  RhinoDoc.ActiveDoc.Views.Redraw();
             return bitmap;
         }
 
