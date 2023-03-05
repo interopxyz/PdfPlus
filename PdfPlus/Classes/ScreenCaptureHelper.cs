@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Rhino.Display;
 using System.Windows.Forms;
+using Grasshopper.Kernel.Types.Transforms;
+using System.Drawing;
 
 namespace PdfPlus.Classes
 {
@@ -128,7 +130,6 @@ namespace PdfPlus.Classes
             return planes;
         }
 
-
         /// <summary>
         /// Gets the avg point of a list of points
         /// </summary>
@@ -201,6 +202,48 @@ namespace PdfPlus.Classes
                dp.DrawArrow(GetArrowLine(plane),System.Drawing.Color.Orange);
             }
         }
+
+
+        /// <summary>
+        /// Gets the bitmap of a cdrtain geometry 
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="clippingPlanePlanes"></param>
+        /// <param name="CameraDirection"></param>
+        /// <param name="bitmapHeight"></param>
+        /// <param name="bitmapWidth"></param>
+        /// <param name="parallelprojection"></param>
+        /// <returns></returns>
+        public static Bitmap GetBitmap(GeometryBase geometry , List<Plane> clippingPlanePlanes ,  Vector3d CameraDirection , int bitmapHeight , int bitmapWidth,bool parallelprojection) 
+        {
+            //Make Clipping planes and hide them
+            List<System.Guid>  ids = CreateClippingPlanes(clippingPlanePlanes);
+            foreach (var id in ids)
+            {
+              Rhino.RhinoDoc.ActiveDoc.Objects.Hide(id, true);
+            }
+            var bb = geometry.GetBoundingBox(true);
+            var activeViewPort = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport;
+            activeViewPort.SetCameraDirection(CameraDirection, true);
+            activeViewPort.SetCameraLocation(bb.Center,true);
+            activeViewPort.SetCameraTarget(bb.Center, true);
+
+            if (parallelprojection)
+            {
+                activeViewPort.ChangeToParallelProjection(true);
+            }
+
+            activeViewPort.ZoomBoundingBox(bb);
+            System.Drawing.Bitmap bitmap = Rhino.Display.DisplayPipeline.DrawToBitmap(activeViewPort, bitmapHeight, bitmapWidth);
+
+            foreach (var id in ids)
+            {
+                Rhino.RhinoDoc.ActiveDoc.Objects.Delete(id, true);
+            }
+
+            return bitmap;
+        }
+
 
 
     }
