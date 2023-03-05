@@ -13,6 +13,12 @@ using Rg = Rhino.Geometry;
 using System.IO;
 using Rhino.DocObjects;
 using Rhino.Display;
+using System.Drawing;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using PdfSharp.Drawing;
+using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Media.TextFormatting;
+using System.Windows.Forms;
 
 namespace PdfPlus
 {
@@ -45,7 +51,7 @@ namespace PdfPlus
         protected Rg.Polyline polyline = new Rg.Polyline();
         protected Rg.Line line = new Rg.Line();
         protected Rg.Arc arc = new Rg.Arc();
-        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
+        public Rg.Rectangle3d boundary = new Rg.Rectangle3d();
         protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
 
         protected Rg.Brep brep = new Rg.Brep();
@@ -106,6 +112,7 @@ namespace PdfPlus
 
             this.content = content;
             this.location = new Rg.Point3d(location);
+            this.boundary = new Rg.Rectangle3d(new Rg.Plane(location, Rg.Vector3d.ZAxis), 1, 1);
             this.font = new Font(font);
         }
 
@@ -136,6 +143,7 @@ namespace PdfPlus
 
             this.image = new Sd.Bitmap(bitmap);
             this.location = new Rg.Point3d(location);
+            this.boundary = new Rg.Rectangle3d(new Rg.Plane(location, Rg.Vector3d.ZAxis), bitmap.Width, bitmap.Height);
         }
 
         #endregion
@@ -186,6 +194,8 @@ namespace PdfPlus
             this.line = new Rg.Line(line.From, line.To);
 
             this.graphic = new Graphic(graphic);
+            var bb = line.BoundingBox;
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, line.From, line.To);
         }
 
         public Shape(Rg.Rectangle3d rect, Graphic graphic)
@@ -195,6 +205,7 @@ namespace PdfPlus
             this.polyline = rect.ToPolyline();
 
             this.graphic = new Graphic(graphic);
+            this.boundary = rect;
         }
 
         public Shape(Rg.Arc arc, Graphic graphic)
@@ -205,6 +216,7 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, arc.PointAt(0), arc.PointAt(1));
         }
 
         public Shape(Rg.Circle circle, Graphic graphic)
@@ -224,6 +236,7 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
+            // TODO:
         }
 
         public Shape(Rg.BezierCurve bezier, Graphic graphic)
@@ -233,6 +246,9 @@ namespace PdfPlus
             this.curve = bezier.ToNurbsCurve();
 
             this.graphic = new Graphic(graphic);
+
+            var bb = this.curve.GetBoundingBox(false);
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         public Shape(Rg.Curve curve, Graphic graphic)
@@ -243,6 +259,9 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
+            var bb = this.curve.GetBoundingBox(false);
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
+
         }
 
         public Shape(Rg.NurbsCurve curve, Graphic graphic)
@@ -253,6 +272,8 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
+            var bb = this.curve.GetBoundingBox(false);
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         public Shape(Rg.Brep brep, Graphic graphic)
@@ -262,6 +283,8 @@ namespace PdfPlus
             this.brep = brep.DuplicateBrep();
 
             this.graphic = new Graphic(graphic);
+            var bb = this.curve.GetBoundingBox(false);
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         public Shape(Rg.Mesh mesh, Graphic graphic)
@@ -271,6 +294,8 @@ namespace PdfPlus
             this.mesh = mesh.DuplicateMesh();
 
             this.graphic = new Graphic(graphic);
+            var bb = this.curve.GetBoundingBox(false);
+            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         #endregion
@@ -425,6 +450,45 @@ namespace PdfPlus
                     this.mesh.Transform(Rg.Transform.PlaneToPlane(page.Frame, frame));
                     break;
             }
+        }
+
+        
+
+        /// <summary>
+        /// Crops the input geometries to the frame - INDESIGN MODE
+        /// TODO: We never finished this. Lack of region trim items we know from grasshopper - not exposed in rhinocommon
+        /// </summary>
+        /// <param name="rect"></param>
+        public void Crop(Rectangle rect)
+        {
+            switch (this.shapeType)
+            {
+
+                case ShapeType.Line:
+                    this.line = CroppedLine(this.line, rect);
+                    break;
+                case ShapeType.Polyline:
+                case ShapeType.Bezier:
+
+                    break;
+            }
+        }
+
+        Rg.Line CroppedLine(Rg.Line line, Rectangle rect)
+        {
+            if (line.FromX > rect.X + rect.Width && line.ToX > rect.X + rect.Width) return new Rg.Line(-1,-1,-1,-1,-1,1); //bad fix of null
+            if (line.FromX < rect.X && line.ToX < rect.X) return new Rg.Line(-1, -1, -1, -1, -1, 1); //bad fix of null
+            if (line.FromY > rect.Y + rect.Height && line.ToY > rect.Y + rect.Height) return new Rg.Line(-1, -1, -1, -1, -1, 1); //bad fix of null
+            if (line.FromY < rect.Y && line.ToY < rect.Y) return new Rg.Line(-1, -1, -1, -1, -1, 1); //bad fix of null
+
+            if (line.FromX > rect.X && line.ToX < rect.X - rect.Width && line.FromY > rect.Y && line.FromY < rect.Y + rect.Height) return line; //inside
+
+
+            // TODO: We'll never finish here. Where is the RhinoCommon region trim!?
+            return line;
+
+
+
         }
 
         /// <summary>

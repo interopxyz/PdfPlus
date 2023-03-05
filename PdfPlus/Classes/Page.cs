@@ -9,6 +9,7 @@ using Pf = PdfSharp.Pdf;
 using Pd = PdfSharp.Drawing;
 using Rg = Rhino.Geometry;
 using Grasshopper.Kernel.Types;
+using System.Drawing;
 
 namespace PdfPlus
 {
@@ -190,6 +191,9 @@ namespace PdfPlus
 
             return isValid;
         }
+
+
+
 
         #endregion
 
