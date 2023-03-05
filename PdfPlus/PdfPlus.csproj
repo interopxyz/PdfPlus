@@ -73,8 +73,10 @@
     <Compile Include="Classes\Font.cs" />
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
+    <Compile Include="Classes\ScreenCaptureHelper.cs" />
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_CreateClippingPlanesPlanes.cs" />
     <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddGraph.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImage.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImagePt.cs" />
