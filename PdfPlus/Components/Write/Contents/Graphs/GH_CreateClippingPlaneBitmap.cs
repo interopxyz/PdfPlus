@@ -94,6 +94,7 @@ namespace PdfPlus.Components.Write.Contents.Graphs
                     var bb = geo.GetBoundingBox(true);
                     Bitmap bitmap = ScreenCaptureHelper.GetBitmap(geo, planesList, cameraDirection, bitmapHeight, bitmapWidth, para);
                     bitmaps.Add(bitmap);
+
                 }
             }
 

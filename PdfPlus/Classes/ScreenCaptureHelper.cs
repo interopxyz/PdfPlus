@@ -240,7 +240,7 @@ namespace PdfPlus.Classes
             {
                 Rhino.RhinoDoc.ActiveDoc.Objects.Delete(id, true);
             }
-
+            RhinoDoc.ActiveDoc.Views.Redraw();
             return bitmap;
         }
 
