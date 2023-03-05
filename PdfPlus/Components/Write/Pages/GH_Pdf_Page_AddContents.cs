@@ -25,6 +25,7 @@ namespace PdfPlus.Components
         }
 
         Transform movematrix;
+        Page page;
 
         /// <summary>
         /// Set Exposure level for the component.
@@ -59,7 +60,7 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            movematrix = Transform.Translation(Vector3d.Zero);
+            //movematrix = Transform.Translation(Vector3d.Zero);
 
             if (RunCount == 1)
             {
@@ -78,18 +79,15 @@ namespace PdfPlus.Components
             {
                 page.AddShape(goos);
 
-                //transformation for preview
-                Rhino.Geometry.Plane plane = Rhino.Geometry.Plane.WorldZX;
-                plane.OriginY = page.BaseObject.Height.Point / 2.0;
+                ////transformation for preview
+                //Rhino.Geometry.Plane plane = Rhino.Geometry.Plane.WorldZX;
+                //plane.OriginY = page.BaseObject.Height.Point / 2.0;
 
-                Rhino.Geometry.Plane frame = Rhino.Geometry.Plane.WorldXY;
-                frame.Transform(Transform.Mirror(plane));
-                movematrix = Transform.PlaneToPlane(page.Frame, frame);
+                //Rhino.Geometry.Plane frame = Rhino.Geometry.Plane.WorldXY;
+                //frame.Transform(Transform.Mirror(plane));
+                //movematrix = Transform.PlaneToPlane(page.Frame, frame);
 
             }
-
-
-
 
             pages.Add(page);
             
@@ -116,7 +114,8 @@ namespace PdfPlus.Components
             {
                 foreach (var item in page.shapes)
                 {
-                    item.DrawInViewport(args.Display, movematrix);
+                    
+                    item.DrawInViewport(args.Display, page);
                 }
         }
             base.DrawViewportMeshes(args);
