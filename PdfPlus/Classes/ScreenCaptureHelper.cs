@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rhino.Display;
+using System.Windows.Forms;
 
 namespace PdfPlus.Classes
 {
@@ -14,15 +15,33 @@ namespace PdfPlus.Classes
     {
 
         /// <summary>
-        /// Returns a list of planes (axis oriented) based on the bounding box faces
+        /// 
         /// </summary>
         /// <param name="bb"></param>
+        /// <param name="inflateFactor"></param>
+        /// <param name="flip"></param>
+        /// <param name="nZ"></param>
+        /// <param name="pZ"></param>
+        /// <param name="pX"></param>
+        /// <param name="nX"></param>
+        /// <param name="nY"></param>
+        /// <param name="pY"></param>
         /// <returns></returns>
-        public List<Plane> GetBBPlanes(BoundingBox bb, double inflateFactor, bool flip, bool nZ, bool pZ, bool pX, bool nX, bool nY, bool pY)
+        public static List<Plane> GetBBPlanes(BoundingBox bb, double inflateFactor, bool flip, bool nZ, bool pZ, bool pX, bool nX, bool nY, bool pY)
         {
             List<Plane> planes = new List<Plane>();
             bb.Inflate(inflateFactor);
             var BBpts = bb.GetCorners();
+
+            double flipFactor = 0;
+            if (flip)
+            {
+                flipFactor = -1;
+            }
+            else
+            {
+                flipFactor = 1;
+            }
 
             if (nZ)
             {
@@ -33,7 +52,7 @@ namespace PdfPlus.Classes
                 botPts.Add(BBpts[3]);
 
                 var botPt = GetPointAvg(botPts);
-                var botPlane = new Plane(botPt, Vector3d.ZAxis * -1);
+                var botPlane = new Plane(botPt, Vector3d.ZAxis * -1 * flipFactor);
                 planes.Add(botPlane);
             }
 
@@ -46,7 +65,7 @@ namespace PdfPlus.Classes
                 topPts.Add(BBpts[7]);
 
                 var topPt = GetPointAvg(topPts);
-                var topPlane = new Plane(topPt, Vector3d.ZAxis);
+                var topPlane = new Plane(topPt, Vector3d.ZAxis * flipFactor);
                 planes.Add(topPlane);
             }
 
@@ -60,7 +79,7 @@ namespace PdfPlus.Classes
                 pxPts.Add(BBpts[2]);
 
                 var pxPt = GetPointAvg(pxPts);
-                var pxPlane = new Plane(pxPt, Vector3d.XAxis);
+                var pxPlane = new Plane(pxPt, Vector3d.XAxis * flipFactor);
                 planes.Add(pxPlane);
             }
 
@@ -73,7 +92,7 @@ namespace PdfPlus.Classes
                 nxPts.Add(BBpts[0]);
 
                 var nxPt = GetPointAvg(nxPts);
-                var nxPlane = new Plane(nxPt, Vector3d.XAxis * -1);
+                var nxPlane = new Plane(nxPt, Vector3d.XAxis * -1 * flipFactor);
                 planes.Add(nxPlane);
             }
 
@@ -86,7 +105,7 @@ namespace PdfPlus.Classes
                 nyPts.Add(BBpts[0]);
 
                 var nyPt = GetPointAvg(nyPts);
-                var nyPlane = new Plane(nyPt, Vector3d.YAxis * -1);
+                var nyPlane = new Plane(nyPt, Vector3d.YAxis * -1 * flipFactor);
                 planes.Add(nyPlane);
             }
 
@@ -100,22 +119,14 @@ namespace PdfPlus.Classes
                 pyPts.Add(BBpts[3]);
 
                 var pyPt = GetPointAvg(pyPts);
-                var pyPlane = new Plane(pyPt, Vector3d.YAxis);
+                var pyPlane = new Plane(pyPt, Vector3d.YAxis * flipFactor);
                 planes.Add(pyPlane);
 
             }
 
-            if (flip)
-            {
-                foreach (var plane in planes)
-                {
-                    plane.Flip();
-                }
-            }
 
             return planes;
         }
-
 
 
         /// <summary>
@@ -123,7 +134,7 @@ namespace PdfPlus.Classes
         /// </summary>
         /// <param name="pts"></param>
         /// <returns></returns>
-        public Point3d GetPointAvg(List<Point3d> pts)
+        public static Point3d GetPointAvg(List<Point3d> pts)
         {
             Point3d pt = new Point3d(0, 0, 0);
             foreach (var point in pts)
@@ -135,12 +146,11 @@ namespace PdfPlus.Classes
         }
 
         /// <summary>
-        /// Creates clipping planes based on a list of Planes
+        /// Create Clipping Planes. Remeber to delete after usage
         /// </summary>
         /// <param name="planes"></param>
-        /// <param name="flip"></param>
         /// <returns></returns>
-        public List<System.Guid> CreateClippingPlanes(List<Plane> planes)
+        public static List<System.Guid> CreateClippingPlanes(List<Plane> planes)
         {
             List<System.Guid> ids = new List<System.Guid>();
 
@@ -160,7 +170,7 @@ namespace PdfPlus.Classes
         /// </summary>
         /// <param name="plane"></param>
         /// <returns></returns>
-        public Polyline GetPolyLineRectangle (Plane plane)
+        public static Polyline GetPolyLineRectangle (Plane plane)
         {
             Interval interval = new Interval(-1,1);
             var rect = new Rectangle3d(plane, interval,interval);
@@ -173,7 +183,7 @@ namespace PdfPlus.Classes
         /// </summary>
         /// <param name="plane"></param>
         /// <returns></returns>
-        public Line GetArrowLine (Plane plane)
+        public static Line GetArrowLine (Plane plane)
         {
             return new Line(plane.Origin, plane.Origin + plane.Normal * 1);
         }
@@ -183,7 +193,7 @@ namespace PdfPlus.Classes
         /// </summary>
         /// <param name="dp"></param>
         /// <param name="planes"></param>
-        public void DrawClippingPlanesRectangles(Rhino.Display.DisplayPipeline dp , List<Plane> planes)
+        public static void DrawClippingPlanesRectangles(Rhino.Display.DisplayPipeline dp , List<Plane> planes)
         {
             foreach (var plane in planes)
             {
