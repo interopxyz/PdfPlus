@@ -46,22 +46,27 @@ namespace PdfPlus
                         {
                             string type = goo.ToString();
 
-                            switch (type)
+                            switch (type.Substring(0, 6))
                             {
                                 default:
                                     shape = new Shape(curve.ToNurbsCurve(), new Graphic());
                                     break;
-                                case "Polyline Curve":
+                                case "Polyli": //ne Curve
                                     Rg.Polyline pline;
                                     if (curve.TryGetPolyline(out pline)) shape = new Shape(pline, new Graphic());
                                     break;
-                                case "Line-like Curve":
+                                case "Line-l": //ike Curve
                                     shape = new Shape(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
                                     break;
-                                case "Elliptical Curve":
+                                case "Ellipt": //ical Curve
                                     Rg.Ellipse ellipse;
                                     curve.TryGetEllipse(out ellipse);
                                     shape = new Shape(ellipse, new Graphic());
+                                    break;
+                                case "Rectan":
+                                    Rg.Rectangle3d rect;
+                                    if(goo.CastTo<Rg.Rectangle3d>(out rect))
+                                    shape = new Shape(rect, new Graphic());
                                     break;
                             }
                             isValid = true;

@@ -11,6 +11,9 @@ using Rg = Rhino.Geometry;
 
 namespace PdfPlus
 {
+    /// <summary>
+    /// The graphic class is a container of all the graphics settings
+    /// </summary>
     public class Graphic
     {
         #region members
@@ -27,11 +30,17 @@ namespace PdfPlus
 
         #region constructor
 
+        /// <summary>
+        /// The graphic class is a container of all the graphics settings
+        /// </summary>
         public Graphic()
         {
 
         }
 
+        /// <summary>
+        /// Copy a graphic settings
+        /// </summary>
         public Graphic(Graphic graphic)
         {
             this.color = graphic.color;
