@@ -9,7 +9,6 @@ using Pf = PdfSharp.Pdf;
 using Pd = PdfSharp.Drawing;
 using Rg = Rhino.Geometry;
 using Grasshopper.Kernel.Types;
-using System.Drawing;
 
 namespace PdfPlus
 {
@@ -23,7 +22,7 @@ namespace PdfPlus
         public Units Unit = Units.Millimeter;
         public Rg.Plane Frame = Rg.Plane.WorldXY;
 
-        public List<Shape> shapes = new List<Shape>();
+        protected List<Shape> shapes = new List<Shape>();
 
         #endregion
 
@@ -175,25 +174,12 @@ namespace PdfPlus
         public bool AddShape(IGH_Goo goo)
         {
             Shape shape = null;
-            bool isValid = true;
-            if(goo is GH_Rectangle rect)
-            {
-                shape = new Shape(rect.Value, new Graphic());
-                isValid = rect.IsValid;
-            }
-            else
-            {
-                isValid = goo.TryGetShape(ref shape);
-            }
-            
+            bool isValid = goo.TryGetShape(ref shape);
             shape.AlignContent(this);
             this.shapes.Add(shape);
 
             return isValid;
         }
-
-
-
 
         #endregion
 
