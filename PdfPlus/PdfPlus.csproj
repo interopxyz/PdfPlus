@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,11 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PdfPlus</RootNamespace>
     <AssemblyName>PdfPlus</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +44,14 @@
     <Reference Include="Grasshopper, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=dda4f5ec2cd80803, processorArchitecture=MSIL">
       <HintPath>packages\Grasshopper.6.35.21222.17001\lib\net45\Grasshopper.dll</HintPath>
     </Reference>
+    <Reference Include="PdfSharp-gdi, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>References\PdfSharp-gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting-gdi, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>References\PdfSharp.Charting-gdi.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="Rhino.UI, Version=6.35.21222.17000, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
       <HintPath>packages\RhinoCommon.6.35.21222.17001\lib\net45\Rhino.UI.dll</HintPath>
@@ -64,8 +73,12 @@
     <Compile Include="Classes\Font.cs" />
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
+    <Compile Include="Classes\ScreenCaptureHelper.cs" />
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_CreateClippingPlaneBitmap.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_CreateClippingPlanesPlanes.cs" />
+    <Compile Include="Components\Write\Contents\GH_PDF_Shape_Shape_Placeholder.cs" />
     <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddGraph.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImage.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImagePt.cs" />
@@ -168,16 +181,6 @@
     <Folder Include="Components\Read\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
-      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
-      <Name>PdfSharp.Charting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
-      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
-      <Name>PdfSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\PDF_Chart-01.png" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +205,8 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
+Copy "$(TargetPath)" "C:\Users\$(Username)\AppData\Roaming\Grasshopper\Libraries\$(ProjectName)\$(ProjectName).gha"
+echo "Build =&gt; $(SolutionDir) To =&gt; $(TargetDir)"</PostBuildEvent>
 Erase "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

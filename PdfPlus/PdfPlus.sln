@@ -1,10 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfPlus", "PdfPlus.csproj", "{DD85E2C9-0312-4415-A8D0-4CC46BABA9F7}"
 EndProject
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfSharp", "..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj", "{5A6055BC-BF86-4FDD-9F62-0109DB7A303B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ref_pdfsharp", "ref_pdfsharp", "{9DA49155-9CE2-4AF0-A342-B4BAB04B69E4}"
