@@ -11,17 +11,6 @@ using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
 using Rg = Rhino.Geometry;
 using System.IO;
-using Rhino.DocObjects;
-using Rhino.Display;
-using System.Drawing;
-using Rhino.Geometry;
-using Grasshopper.Kernel.Types.Transforms;
-using System.Windows.Media.TextFormatting;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using PdfSharp.Drawing;
-using static System.Net.Mime.MediaTypeNames;
-using System.Windows.Forms;
-
 
 namespace PdfPlus
 {
@@ -31,7 +20,7 @@ namespace PdfPlus
         public enum ShapeType { None, Line, Polyline, Bezier, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
         protected ShapeType shapeType = ShapeType.None;
 
-        public enum LinkTypes { Hyperlink, Filepath, Page };
+        public enum LinkTypes { Hyperlink,Filepath,Page};
         protected LinkTypes linkType = LinkTypes.Hyperlink;
 
         public enum ChartTypes { Bar, BarStacked, Column, ColumnStacked, Line, Area, Pie };
@@ -54,12 +43,11 @@ namespace PdfPlus
         protected Rg.Polyline polyline = new Rg.Polyline();
         protected Rg.Line line = new Rg.Line();
         protected Rg.Arc arc = new Rg.Arc();
-        public Rg.Rectangle3d boundary = new Rg.Rectangle3d();
+        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
         protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
 
         protected Rg.Brep brep = new Rg.Brep();
         protected Rg.Mesh mesh = new Rg.Mesh();
-        protected Rg.Circle circle = new Rg.Circle();
 
         #endregion
 
@@ -94,11 +82,6 @@ namespace PdfPlus
             this.mesh = shape.mesh.DuplicateMesh();
         }
 
-        public override string ToString()
-        {
-            return $"PdfPlus.Shape ({shapeType.ToString()})";
-        }
-
         #region text
         public Shape(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
         {
@@ -116,7 +99,6 @@ namespace PdfPlus
 
             this.content = content;
             this.location = new Rg.Point3d(location);
-            this.boundary = new Rg.Rectangle3d(new Rg.Plane(location, Rg.Vector3d.ZAxis), 1, 1);
             this.font = new Font(font);
         }
 
@@ -147,7 +129,6 @@ namespace PdfPlus
 
             this.image = new Sd.Bitmap(bitmap);
             this.location = new Rg.Point3d(location);
-            this.boundary = new Rg.Rectangle3d(new Rg.Plane(location, Rg.Vector3d.ZAxis), bitmap.Width, bitmap.Height);
         }
 
         #endregion
@@ -198,18 +179,6 @@ namespace PdfPlus
             this.line = new Rg.Line(line.From, line.To);
 
             this.graphic = new Graphic(graphic);
-            var bb = line.BoundingBox;
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, line.From, line.To);
-        }
-
-        public Shape(Rg.Rectangle3d rect, Graphic graphic)
-        {
-            shapeType = ShapeType.Polyline;
-
-            this.polyline = rect.ToPolyline();
-
-            this.graphic = new Graphic(graphic);
-            this.boundary = rect;
         }
 
         public Shape(Rg.Arc arc, Graphic graphic)
@@ -220,7 +189,6 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, arc.PointAt(0), arc.PointAt(1));
         }
 
         public Shape(Rg.Circle circle, Graphic graphic)
@@ -240,7 +208,6 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
-            // TODO:
         }
 
         public Shape(Rg.BezierCurve bezier, Graphic graphic)
@@ -250,9 +217,6 @@ namespace PdfPlus
             this.curve = bezier.ToNurbsCurve();
 
             this.graphic = new Graphic(graphic);
-
-            var bb = this.curve.GetBoundingBox(false);
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         public Shape(Rg.Curve curve, Graphic graphic)
@@ -263,9 +227,6 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
-            var bb = this.curve.GetBoundingBox(false);
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
-
         }
 
         public Shape(Rg.NurbsCurve curve, Graphic graphic)
@@ -276,8 +237,6 @@ namespace PdfPlus
             this.curve.MakePiecewiseBezier(true);
 
             this.graphic = new Graphic(graphic);
-            var bb = this.curve.GetBoundingBox(false);
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         public Shape(Rg.Brep brep, Graphic graphic)
@@ -287,8 +246,6 @@ namespace PdfPlus
             this.brep = brep.DuplicateBrep();
 
             this.graphic = new Graphic(graphic);
-            var bb = this.curve.GetBoundingBox(false);
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
 
         public Shape(Rg.Mesh mesh, Graphic graphic)
@@ -298,15 +255,8 @@ namespace PdfPlus
             this.mesh = mesh.DuplicateMesh();
 
             this.graphic = new Graphic(graphic);
-            var bb = this.curve.GetBoundingBox(false);
-            this.boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, bb.Min, bb.Max);
         }
-        public Shape(DisplayBitmap bitmap, Graphic graphic)
-        {
-            shapeType = ShapeType.ImageObj;
 
-            this.graphic = new Graphic(graphic);
-        }
         #endregion
 
         #endregion
@@ -461,271 +411,6 @@ namespace PdfPlus
             }
         }
 
-
-        
-
-        /// <summary>
-        /// Crops the input geometries to the frame - INDESIGN MODE
-        /// TODO: We never finished this. Lack of region trim items we know from grasshopper - not exposed in rhinocommon
-        /// </summary>
-        /// <param name="rect"></param>
-        public void Crop(Rectangle rect)
-        {
-            switch (this.shapeType)
-            {
-
-                case ShapeType.Line:
-                    this.line = CroppedLine(this.line, rect);
-                    break;
-                case ShapeType.Polyline:
-                case ShapeType.Bezier:
-
-                    break;
-            }
-        }
-
-        Rg.Line CroppedLine(Rg.Line line, Rectangle rect)
-        {
-            if (line.FromX > rect.X + rect.Width && line.ToX > rect.X + rect.Width) return new Rg.Line(-1,-1,-1,-1,-1,1); //bad fix of null
-            if (line.FromX < rect.X && line.ToX < rect.X) return new Rg.Line(-1, -1, -1, -1, -1, 1); //bad fix of null
-            if (line.FromY > rect.Y + rect.Height && line.ToY > rect.Y + rect.Height) return new Rg.Line(-1, -1, -1, -1, -1, 1); //bad fix of null
-            if (line.FromY < rect.Y && line.ToY < rect.Y) return new Rg.Line(-1, -1, -1, -1, -1, 1); //bad fix of null
-
-            if (line.FromX > rect.X && line.ToX < rect.X - rect.Width && line.FromY > rect.Y && line.FromY < rect.Y + rect.Height) return line; //inside
-
-
-            // TODO: We'll never finish here. Where is the RhinoCommon region trim!?
-            return line;
-
-
-
-        }
-
-        /// <summary>
-        /// YOUWEI DOMAIN
-        /// </summary>
-        /// <param name="dp"></param>
-        public void DrawInViewport(DisplayPipeline dp, Page page)
-        {
-            switch (shapeType)
-            {
-                case ShapeType.Line:
-                    //Line lineDup = new Line(line);
-                    //line.Transform(movematrix);
-                    //dp.DrawLine(line, graphic.Color);
-                    break;
-                case ShapeType.Polyline:
-                    Polyline pDup = polyline.Duplicate();
-                    //transformation for preview
-                    Rhino.Geometry.Plane plane = Rhino.Geometry.Plane.WorldZX;
-                    plane.OriginY = page.BaseObject.Height.Point / 2.0;
-
-                    Rhino.Geometry.Plane frame = Rhino.Geometry.Plane.WorldXY;
-                    frame.Transform(Transform.Mirror(plane));
-                    Transform movematrix = Transform.PlaneToPlane(page.Frame, frame);
-                    pDup.Transform(movematrix);
-                    dp.DrawPolyline(pDup, Color.FromArgb(255, graphic.Color), (int)graphic.Weight);
-                    break;
-                case ShapeType.Ellipse:
-                    dp.DrawCircle(circle, graphic.Color);
-                    break;
-                case ShapeType.Bezier:
-                    Curve cDup = curve.DuplicateCurve();
-                    //transformation for preview
-                     plane = Rhino.Geometry.Plane.WorldZX;
-                    plane.OriginY = page.BaseObject.Height.Point / 2.0;
-
-                    frame = Rhino.Geometry.Plane.WorldXY;
-                    frame.Transform(Transform.Mirror(plane));
-                    movematrix = Transform.PlaneToPlane(page.Frame, frame);
-                    cDup.Transform(movematrix);
-                    dp.DrawCurve(cDup, Color.FromArgb(255,graphic.Color));
-                    break;
-                case ShapeType.Arc:
-                    dp.DrawArc(arc, graphic.Color);
-                    break;
-                case ShapeType.Brep:
-                    Brep bDup = brep.DuplicateBrep();
-                    //transformation for preview
-                    plane = Rhino.Geometry.Plane.WorldZX;
-                    plane.OriginY = page.BaseObject.Height.Point / 2.0;
-
-                    frame = Rhino.Geometry.Plane.WorldXY;
-                    frame.Transform(Transform.Mirror(plane));
-                    movematrix = Transform.PlaneToPlane(page.Frame, frame);
-                    bDup.Transform(movematrix);
-                    dp.DrawBrepWires (bDup, Color.FromArgb(255, graphic.Color));
-                    break;
-                case ShapeType.Mesh:
-                    Mesh mDup = mesh.DuplicateMesh();
-                    //transformation for preview
-                    plane = Rhino.Geometry.Plane.WorldZX;
-                    plane.OriginY = page.BaseObject.Height.Point / 2.0;
-
-                    frame = Rhino.Geometry.Plane.WorldXY;
-                    frame.Transform(Transform.Mirror(plane));
-                    movematrix = Transform.PlaneToPlane(page.Frame, frame);
-                    mDup.Transform(movematrix);
-                    dp.DrawMeshWires(mDup, Color.FromArgb(255, graphic.Color));
-                    break;
-                case ShapeType.ImageFrame:
-                    Rectangle3d rec = boundary;
-                    //transformation for preview
-                    plane = Rhino.Geometry.Plane.WorldZX;
-                    plane.OriginY = page.BaseObject.Height.Point / 2.0;
-
-                    frame = Rhino.Geometry.Plane.WorldXY;
-                    frame.Transform(Transform.Mirror(plane));
-                    movematrix = Transform.PlaneToPlane(page.Frame, frame);
-                    rec.Transform(movematrix);
-                    NurbsCurve boundarycurve = rec.ToNurbsCurve();
-                    dp.DrawCurve(boundarycurve, Color.FromArgb(255, graphic.Color));
-                    break;
-                case ShapeType.ImageObj:
-                    DisplayBitmap rhinoImage = new DisplayBitmap(image);
-                    Point2d drawlocation = new Point2d(location.X, location.Y);
-                    dp.DrawSprite(rhinoImage, drawlocation, image.Height);
-                    break;
-                case ShapeType.TextObj:
-
-                    //transformation for preview
-                    plane = Rhino.Geometry.Plane.WorldZX;
-                    plane.OriginY = page.BaseObject.Height.Point / 2.0;
-
-                    frame = Rhino.Geometry.Plane.WorldXY;
-                    frame.Transform(Transform.Mirror(plane));
-                    movematrix = Transform.PlaneToPlane(page.Frame, frame);
-
-                    Vector3d one = new Vector3d(0, 0, 1);
-
-                    Point3d rhilocation = new Point3d(-location.X, -location.Y, location.Z);
-                    Plane textplace = new Plane(location, one);
-                    //textplace.Rotate(Math.PI, new Vector3d(boundary.Center.X, boundary.Center.Y, 1));
-                    //Transform mir = Transform.Mirror(textplace) * movematrix;
-                    textplace.Transform(movematrix);
-
-                    var text_entity = new TextEntity
-                    {
-                        
-                        PlainText = $"{content}",
-                        Justification = TextJustification.MiddleCenter,
-                        TextHeight = font.Size,
-                        Plane = textplace,
-
-                        //textFormatter.Alignment = this.alignment.ToPdf();
-                        //textFormatter.LayoutRectangle = this.boundary.ToPdf();
-                        //textFormatter.Text = this.content;
-                        //textFormatter.Font = pdfFont;
-                        //this.content = content;
-                        //this.location = new Rg.Point3d(location);
-                        //this.font = new Font(font);
-                    };
-                    dp.DrawText(text_entity, Color.FromArgb(255, graphic.Color));
-                    break;
-                case ShapeType.TextBox:
-                    //
-                    break;
-                case ShapeType.LinkObj:
-                    //
-                    break;
-                case ShapeType.ChartObj:
-                    //Pc.Chart chart = CombinationChart();
-
-                    //if (this.justification != Justification.None)
-                    //{
-                    //    chart.Legend.Docking = this.justification.ToPdf();
-                    //    chart.Legend.Font.Color = this.font.Color.ToPdf();
-                    //    chart.Legend.Font.Name = this.font.Family;
-                    //    chart.Legend.Font.Size = this.font.Size;
-                    //    chart.Legend.Font.Bold = this.font.IsBold;
-                    //    chart.Legend.Font.Italic = this.font.IsItalic;
-                    //    if (this.font.IsUnderlined) chart.Legend.Font.Underline = Pc.Underline.Single;
-                    //}
-
-                    //chart.Font.Color = this.FontColor.ToPdf();
-                    //chart.Font.Name = this.FontFamily;
-                    //chart.Font.Size = this.FontSize;
-                    //chart.Font.Bold = this.font.IsBold;
-                    //chart.Font.Italic = this.font.IsItalic;
-                    //if (this.font.IsUnderlined) chart.Font.Underline = Pc.Underline.Single;
-
-                    //if (this.HasXAxis)
-                    //{
-                    //    chart.XAxis.MajorTickMark = Pc.TickMarkType.Outside;
-                    //    chart.XAxis.Title.Caption = this.xAxis;
-                    //    chart.XAxis.HasMajorGridlines = true;
-
-                    //    chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                    //    chart.XAxis.LineFormat.Width = this.graphic.Weight;
-
-                    //    chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                    //    chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
-
-                    //    chart.XAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
-                    //    chart.XAxis.TickLabels.Font.Name = this.FontFamily;
-                    //    chart.XAxis.TickLabels.Font.Size = this.FontSize;
-                    //    chart.XAxis.TickLabels.Font.Bold = this.font.IsBold;
-                    //    chart.XAxis.TickLabels.Font.Italic = this.font.IsItalic;
-                    //    if (this.font.IsUnderlined) chart.XAxis.TickLabels.Font.Underline = Pc.Underline.Single;
-
-                    //    chart.XAxis.Title.Font.Color = this.FontColor.ToPdf();
-                    //    chart.XAxis.Title.Font.Name = this.FontFamily;
-                    //    chart.XAxis.Title.Font.Size = this.FontSize;
-                    //    chart.XAxis.Title.Font.Bold = this.font.IsBold;
-                    //    chart.XAxis.Title.Font.Italic = this.font.IsItalic;
-                    //    if (this.font.IsUnderlined) chart.XAxis.Title.Font.Underline = Pc.Underline.Single;
-                    //}
-                    //else
-                    //{
-                    //    chart.XAxis.HasMajorGridlines = false;
-                    //    chart.XAxis.MajorTickMark = Pc.TickMarkType.None;
-                    //}
-
-                    //if (this.HasYAxis)
-                    //{
-                    //    chart.YAxis.MajorTickMark = Pc.TickMarkType.Outside;
-                    //    chart.YAxis.Title.Caption = this.yAxis;
-                    //    chart.YAxis.HasMajorGridlines = true;
-
-                    //    chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                    //    chart.YAxis.LineFormat.Width = this.graphic.Weight;
-
-                    //    chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                    //    chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
-
-                    //    chart.YAxis.TickLabels.Format = "#.####";
-                    //    chart.YAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
-                    //    chart.YAxis.TickLabels.Font.Name = this.FontFamily;
-                    //    chart.YAxis.TickLabels.Font.Size = this.FontSize;
-                    //    chart.YAxis.TickLabels.Font.Bold = this.font.IsBold;
-                    //    chart.YAxis.TickLabels.Font.Italic = this.font.IsItalic;
-                    //    if (this.font.IsUnderlined) chart.YAxis.TickLabels.Font.Underline = Pc.Underline.Single;
-
-                    //    chart.YAxis.Title.Font.Color = this.FontColor.ToPdf();
-                    //    chart.YAxis.Title.Font.Name = this.FontFamily;
-                    //    chart.YAxis.Title.Font.Size = this.FontSize;
-                    //    chart.YAxis.Title.Font.Bold = this.font.IsBold;
-                    //    chart.YAxis.Title.Font.Italic = this.font.IsItalic;
-                    //    if (this.font.IsUnderlined) chart.YAxis.Title.Font.Underline = Pc.Underline.Single;
-                    //}
-
-
-                    //Pc.ChartFrame frame = new Pc.ChartFrame();
-                    //frame.Location = new Pd.XPoint(boundary.Corner(0).X, boundary.Corner(3).Y);
-                    //frame.Size = new Pd.XSize(boundary.Width, boundary.Height);
-
-                    ////frame.Background = graphic.Color.ToPdfBrush();
-
-                    //frame.Add(chart);
-                    ////frame.Draw(graph);
-
-                    break;
-            }
-
-
-        }
-
-
         public void Render(Pd.XGraphics graph, Page page)
         {
             switch (this.shapeType)
@@ -739,7 +424,7 @@ namespace PdfPlus
 
                     plinePath.StartFigure();
                     plinePath.AddLines(polyline.ToPdf().ToArray());
-                    if (polyline.IsClosed) plinePath.CloseFigure();
+                        if (polyline.IsClosed) plinePath.CloseFigure();
                     graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
                     break;
 
@@ -820,7 +505,7 @@ namespace PdfPlus
                         case LinkTypes.Page:
                             int index = 0;
                             bool isInt = int.TryParse(this.content, out index);
-                            if (isInt) page.AddPageLink(this.boundary, index + 1);
+                            if(isInt)page.AddPageLink(this.boundary, index+1);
                             break;
                     }
                     break;
@@ -910,7 +595,7 @@ namespace PdfPlus
                     frame.Location = new Pd.XPoint(boundary.Corner(0).X, boundary.Corner(3).Y);
                     frame.Size = new Pd.XSize(boundary.Width, boundary.Height);
 
-                    //frame.Background = graphic.Color.ToPdfBrush();
+                    frame.Background = graphic.Color.ToPdfBrush();
 
                     frame.Add(chart);
                     frame.Draw(graph);
@@ -934,10 +619,10 @@ namespace PdfPlus
                         series.Name = d.Title;
 
                         if (d.Graphic.HasStroke)
-                        {
-                            series.LineFormat.Visible = true;
-                            series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
-                            series.LineFormat.Width = d.Graphic.Weight;
+                        { 
+                        series.LineFormat.Visible = true;
+                        series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
+                        series.LineFormat.Width = d.Graphic.Weight;
 
                         }
 

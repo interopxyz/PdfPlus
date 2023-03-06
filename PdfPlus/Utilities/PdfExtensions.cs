@@ -46,27 +46,22 @@ namespace PdfPlus
                         {
                             string type = goo.ToString();
 
-                            switch (type.Substring(0, 6))
+                            switch (type)
                             {
                                 default:
                                     shape = new Shape(curve.ToNurbsCurve(), new Graphic());
                                     break;
-                                case "Polyli": //ne Curve
+                                case "Polyline Curve":
                                     Rg.Polyline pline;
                                     if (curve.TryGetPolyline(out pline)) shape = new Shape(pline, new Graphic());
                                     break;
-                                case "Line-l": //ike Curve
+                                case "Line-like Curve":
                                     shape = new Shape(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
                                     break;
-                                case "Ellipt": //ical Curve
+                                case "Elliptical Curve":
                                     Rg.Ellipse ellipse;
                                     curve.TryGetEllipse(out ellipse);
                                     shape = new Shape(ellipse, new Graphic());
-                                    break;
-                                case "Rectan":
-                                    Rg.Rectangle3d rect;
-                                    if(goo.CastTo<Rg.Rectangle3d>(out rect))
-                                    shape = new Shape(rect, new Graphic());
                                     break;
                             }
                             isValid = true;
@@ -201,16 +196,16 @@ namespace PdfPlus
             {
                 default:
                     return Pd.XUnit.FromMillimeter(value);
-                    //break;
+                    break;
                 case Units.Centimeter:
                     return Pd.XUnit.FromCentimeter(value);
-                    //break;
+                    break;
                 case Units.Inch:
                     return Pd.XUnit.FromInch(value);
-                    //break;
+                    break;
                 case Units.Point:
                     return Pd.XUnit.FromPoint(value);
-                    //break;
+                    break;
             }
         }
 
@@ -256,22 +251,22 @@ namespace PdfPlus
                     return Pc.ChartType.ColumnStacked2D;
                 case Shape.ChartTypes.Area:
                     return Pc.ChartType.Area2D;
-                    //break;
+                    break;
                 case Shape.ChartTypes.Bar:
                     return Pc.ChartType.Bar2D;
-                    //break;
+                    break;
                 case Shape.ChartTypes.BarStacked:
                     return Pc.ChartType.BarStacked2D;
-                    //break;
+                    break;
                 case Shape.ChartTypes.Column:
                     return Pc.ChartType.Column2D;
-                    //break;
+                    break;
                 case Shape.ChartTypes.Line:
                     return Pc.ChartType.Line;
-                    //break;
+                    break;
                 case Shape.ChartTypes.Pie:
                     return Pc.ChartType.Pie2D;
-                    //break;
+                    break;
             }
         }
 
