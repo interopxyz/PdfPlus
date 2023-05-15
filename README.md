@@ -1,6 +1,8 @@
 # PDF +
 PDF composition plugin for Grasshopper 3d
 
+_Like PDF+ [Buy me a coffee :D](http://www.buymeacoffee.com/davidmans)_
+
 ---
 
 PDF Plus is a simple plugin for grasshopper 3d that lets you compose geometry, images, and text into multi-page documents and write them to PDF files.
