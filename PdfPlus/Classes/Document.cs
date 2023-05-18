@@ -48,6 +48,8 @@ namespace PdfPlus
 
         public void Save(string filepath)
         {
+            if (PdfPlusEnvironment.FileIoBlocked)
+                return;
             var doc = Bake();
             doc.Save(filepath);
         }
