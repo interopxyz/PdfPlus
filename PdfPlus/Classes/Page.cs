@@ -138,35 +138,20 @@ namespace PdfPlus
 
         #region methods
 
-        public void AddHyperLink(Rg.Rectangle3d boundary, string hyperlink)
-        {
-            //this.baseObject.AddDocumentLink(boundary.ToPdfRect(), 1);
-            this.baseObject.AddWebLink(boundary.ToPdfRect(this.Frame), hyperlink);
-        }
-
-        public void AddFileLink(Rg.Rectangle3d boundary, string filename)
-        {
-            this.baseObject.AddFileLink(boundary.ToPdfRect(this.Frame), filename);
-        }
-
-        public void AddPageLink(Rg.Rectangle3d boundary, int page)
-        {
-            this.baseObject.AddDocumentLink(boundary.ToPdfRect(this.Frame), page);
-        }
-
         public Pf.PdfDocument AddToDocument(Pf.PdfDocument document)
         {
-            this.baseObject = document.AddPage(this.BaseObject);
-            this.Render();
+            var clone = (Pf.PdfPage)this.baseObject.Clone();
+            document.AddPage(clone);
+            this.Render(clone);
             return document;
         }
 
-        public void Render()
+        protected void Render(Pf.PdfPage page)
         {
-            graph = Pd.XGraphics.FromPdfPage(this.baseObject);
+            graph = Pd.XGraphics.FromPdfPage(page);
             foreach (Shape shape in shapes)
             {
-                shape.Render(graph,this);
+                shape.Render(graph, page, this.Frame);
             }
             graph.Dispose();
         }
