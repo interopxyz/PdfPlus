@@ -123,10 +123,11 @@ namespace PdfPlus
             }
             return isValid;
         }
-        public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap)
+        public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap, ref string path)
         {
 
             string filePath = string.Empty;
+            path = filePath;
             goo.CastTo<string>(out filePath);
             Sd.Bitmap bmp = null;
 
@@ -139,6 +140,7 @@ namespace PdfPlus
             {
                 if (filePath.GetBitmapFromFile(out bmp))
                 {
+                    path = filePath;
                     bitmap = bmp;
                     return true;
                 }

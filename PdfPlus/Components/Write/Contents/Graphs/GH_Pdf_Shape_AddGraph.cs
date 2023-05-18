@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_AddGraph : GH_Component
+    public class GH_Pdf_Shape_AddGraph : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Shape_AddGraph class.
@@ -92,6 +92,7 @@ namespace PdfPlus.Components
             int justification = 0;
             if (DA.GetData(5, ref justification)) shape.Justification = (Justification)justification;
 
+            prev_shapes.Add(shape);
             DA.SetData(0, shape);
 
         }

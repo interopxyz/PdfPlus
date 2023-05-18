@@ -35,6 +35,7 @@ namespace PdfPlus
         protected Font font = new Font();
 
         protected Sd.Bitmap image = new Sd.Bitmap(10, 10);
+        protected string imagePath = "";
 
         protected string content = string.Empty;
         protected Alignment alignment = Alignment.Left;
@@ -71,6 +72,7 @@ namespace PdfPlus
             this.alignment = shape.alignment;
 
             this.image = new Sd.Bitmap(shape.image);
+            this.imagePath = shape.imagePath;
 
             this.location = new Rg.Point3d(shape.location);
             this.polyline = shape.polyline.Duplicate();
@@ -115,20 +117,26 @@ namespace PdfPlus
 
         #region image
 
-        public Shape(Sd.Bitmap bitmap, Rg.Rectangle3d boundary)
+        public Shape(Sd.Bitmap bitmap, Rg.Rectangle3d boundary, string path = "")
         {
             shapeType = ShapeType.ImageFrame;
 
             this.image = new Sd.Bitmap(bitmap);
+            this.imagePath = path;
             this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
         }
 
-        public Shape(Sd.Bitmap bitmap, Rg.Point3d location)
+        public Shape(Sd.Bitmap bitmap, Rg.Point3d location, double scale = 1.0, string path = "")
         {
             shapeType = ShapeType.ImageObj;
 
             this.image = new Sd.Bitmap(bitmap);
+            this.imagePath = path;
             this.location = new Rg.Point3d(location);
+            Rg.Plane plane = Rg.Plane.WorldXY;
+            double factor = 72.0/96.0;
+            plane.Origin = location - new Rg.Vector3d(0, bitmap.Height * factor * scale, 0);
+            this.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X+bitmap.Width * factor * scale, location.Y+bitmap.Height * factor * scale, 0));
         }
 
         #endregion
@@ -291,6 +299,26 @@ namespace PdfPlus
             set { this.font.Size = value; }
         }
 
+        public virtual bool IsBold
+        {
+            get { return this.font.IsBold; }
+        }
+
+        public virtual bool IsItalic
+        {
+            get { return this.font.IsItalic; }
+        }
+
+        public virtual bool IsUnderlined
+        {
+            get { return this.font.IsUnderlined; }
+        }
+
+        public virtual bool IsStrikeout
+        {
+            get { return this.font.IsStrikeout; }
+        }
+
         public virtual Sd.Color FillColor
         {
             get { return this.graphic.Color; }
@@ -353,6 +381,31 @@ namespace PdfPlus
         {
             get { return this.justification; }
             set { this.justification = value; }
+        }
+
+        public virtual string TextContent
+        {
+            get { return this.content; }
+        }
+
+        public virtual Rg.Point3d Location
+        {
+            get { return this.location; }
+        }
+
+        public virtual Rg.Rectangle3d Boundary
+        {
+            get { return this.boundary; }
+        }
+
+        public virtual Sd.Bitmap Image
+        {
+            get { return new Sd.Bitmap(this.image); }
+        }
+
+        public virtual string ImagePath
+        {
+            get { return imagePath; }
         }
 
         #endregion
@@ -464,18 +517,12 @@ namespace PdfPlus
                     break;
 
                 case ShapeType.ImageFrame:
-                    Stream streamA = image.ToStream();
-                    Pd.XImage xImageA = Pd.XImage.FromStream(streamA);
+                case ShapeType.ImageObj:
+                    Stream stream = image.ToStream();
+                    Pd.XImage xImageA = Pd.XImage.FromStream(stream);
 
                     graph.DrawImage(xImageA, this.boundary.ToPdf());
-                    streamA.Dispose();
-                    break;
-
-                case ShapeType.ImageObj:
-                    Stream streamB = image.ToStream();
-                    Pd.XImage xImageB = Pd.XImage.FromStream(streamB);
-                    graph.DrawImage(xImageB, location.ToPdf());
-                    streamB.Dispose();
+                    stream.Dispose();
                     break;
 
                 case ShapeType.TextObj:

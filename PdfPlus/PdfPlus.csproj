@@ -66,6 +66,7 @@
     <Compile Include="Classes\Page.cs" />
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
+    <Compile Include="Components\Write\Contents\GH_Pdf__Base.cs" />
     <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddGraph.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImage.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImagePt.cs" />
@@ -168,16 +169,6 @@
     <Folder Include="Components\Read\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
-      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
-      <Name>PdfSharp.Charting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
-      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
-      <Name>PdfSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\PDF_Chart-01.png" />
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +182,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\PDF_Link-01.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
+      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
+      <Name>PdfSharp.Charting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
+      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
+      <Name>PdfSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

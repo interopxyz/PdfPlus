@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_EditGraphics : GH_Component
+    public class GH_Pdf_Shape_EditGraphics : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_EditGraphics class.
@@ -87,6 +87,7 @@ namespace PdfPlus.Components
             if (isShape)
             {
                 shape.Graphic = graphic;
+                prev_shapes.Add(shape);
                 DA.SetData(0, shape);
             }
 
