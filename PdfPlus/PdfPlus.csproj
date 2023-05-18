@@ -91,6 +91,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\PdfPlusEnvironment.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\Enums.cs" />
     <Compile Include="Utilities\PdfExtensions.cs" />
