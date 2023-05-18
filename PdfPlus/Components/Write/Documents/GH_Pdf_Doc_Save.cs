@@ -6,7 +6,7 @@ using System.IO;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_Save : GH_Component
+    public class GH_Pdf_Doc_Save : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Doc_Save class.
@@ -84,6 +84,7 @@ namespace PdfPlus.Components
 
                 string filepath = path + name + ".pdf";
 
+                PrevDocumentShapes(document);
                 document.Save(filepath);
                 DA.SetData(0, filepath);
             }

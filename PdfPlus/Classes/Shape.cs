@@ -398,6 +398,45 @@ namespace PdfPlus
             get { return this.boundary; }
         }
 
+        public virtual Rg.Line Line
+        {
+            get { return this.line; }
+        }
+
+        public virtual Rg.Arc Arc
+        {
+            get { return this.arc; }
+        }
+
+        public virtual Rg.Ellipse Ellipse
+        {
+            get { return new Rg.Ellipse(this.boundary.Plane,this.boundary.Width,this.boundary.Height); }
+        }
+
+        public virtual Rg.Polyline Polyline
+        {
+            get { return this.polyline; }
+        }
+
+        public virtual Rg.Brep Brep
+        {
+            get { return this.brep; }
+        }
+
+        public virtual Rg.Mesh Mesh
+        {
+            get { return this.mesh; }
+        }
+
+        public virtual Rg.NurbsCurve Bezier
+        {
+            get {
+                Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
+                nurbs.MakePiecewiseBezier(true);
+                return nurbs; 
+            }
+        }
+
         public virtual Sd.Bitmap Image
         {
             get { return new Sd.Bitmap(this.image); }

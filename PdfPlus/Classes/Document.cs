@@ -56,6 +56,14 @@ namespace PdfPlus
             get { return (pdf.PdfDocument)baseObject.Clone(); }
         }
 
+        public virtual List<Page> Pages
+        {
+            get { 
+                List<Page> output = new List<Page>();
+                foreach (Page page in pages) output.Add(new Page(page));
+                return output;
+            }
+        }
 
         #endregion
 

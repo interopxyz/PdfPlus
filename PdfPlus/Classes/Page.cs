@@ -75,6 +75,21 @@ namespace PdfPlus
             this.Unit = Units.Inch;
         }
 
+        public List<Shape> Shapes
+        {
+            get
+            {
+                List<Shape> output = new List<Shape>();
+                foreach (Shape shape in shapes)
+                {
+                    Shape shp = new Shape(shape);
+                    shp.AlignContent(this);
+                    output.Add(shp);
+                }
+                return output;
+            }
+        }
+
         #endregion
 
         #region properties

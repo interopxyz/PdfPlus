@@ -73,6 +73,16 @@ namespace PdfPlus.Components
             get { return new Guid("92db2d26-2a13-4992-a450-f20704b41a73"); }
         }
 
+        protected void PrevPageShapes(Page page)
+        {
+            prev_shapes.AddRange(page.Shapes);
+        }
+
+        protected void PrevDocumentShapes(Document doc)
+        {
+            foreach(Page page in doc.Pages) prev_shapes.AddRange(page.Shapes);
+        }
+
         public override void DrawViewportMeshes(IGH_PreviewArgs args)
         {
             double mTol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
@@ -139,6 +149,35 @@ namespace PdfPlus.Components
                             args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.Boundary, shape.Image, 2));
                         }
                         break;
+                    case Shape.ShapeType.Arc:
+                        args.Display.DrawArc(shape.Arc, shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Bezier:
+                        args.Display.DrawCurve(shape.Bezier, shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Ellipse:
+                        args.Display.DrawCurve(shape.Ellipse.ToNurbsCurve(), shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Line:
+                        args.Display.DrawLine(shape.Line, shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Polyline:
+                        args.Display.DrawPolyline(shape.Polyline, shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Brep:
+                        Curve[] brepCurves = shape.Brep.DuplicateNakedEdgeCurves(true, true);
+                        Hatch[] brepHatches = Hatch.Create(brepCurves, 0,0,1,mTol);
+                        foreach(Hatch hatch in brepHatches) args.Display.DrawHatch(hatch, shape.FillColor, shape.FillColor);
+                        foreach (Curve curve in brepCurves) args.Display.DrawCurve(curve, shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Mesh:
+                        List<Curve> meshCurves = new List<Curve>();
+                        Polyline[] meshPlines = shape.Mesh.GetNakedEdges();
+                        foreach (Polyline pline in meshPlines) meshCurves.Add(pline.ToNurbsCurve());
+                        Hatch[] meshHatches = Hatch.Create(meshCurves,0,0,1,mTol);
+                        foreach (Hatch hatch in meshHatches) args.Display.DrawHatch(hatch, shape.FillColor, shape.FillColor);
+                        foreach (Curve curve in meshCurves) args.Display.DrawCurve(curve, shape.StrokeColor, (int)shape.StrokeWeight);
+                        break;
                 }
             }
 
@@ -154,8 +193,8 @@ namespace PdfPlus.Components
             Mesh mesh = RectToDenseMesh(rectangle, xStep-1, yStep-1);
             List<Color> colors = new List<Color>();
 
-            for (int y = 0; y < bitmap.Height; y += yStep){
-                for (int x = 0; x < bitmap.Width; x += xStep){
+            for (int y = 0; y < bitmap.Height; y += count){
+                for (int x = 0; x < bitmap.Width; x += count){
                     colors.Add(bitmap.GetPixel(x, y));
                 }
             }
