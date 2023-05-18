@@ -14,8 +14,7 @@ namespace PdfPlus
         #region members
 
         public PageLayouts PageLayout = PageLayouts.Single;
-        protected pdf.PdfDocument baseObject = new pdf.PdfDocument();
-
+    
         protected List<Page> pages = new List<Page>();
 
         #endregion
@@ -24,17 +23,11 @@ namespace PdfPlus
 
         public Document()
         {
-            this.baseObject = new pdf.PdfDocument();
         }
 
         public Document(Document document)
         {
-            this.baseObject = (pdf.PdfDocument)document.baseObject.Clone();
-            this.PageLayout = document.PageLayout;
-            foreach(Page page in document.pages)
-            {
-                this.pages.Add(new Page(page));
-            }
+            CopyFrom(document);
         }
 
         public Document(List<Page> pages)
@@ -49,29 +42,12 @@ namespace PdfPlus
 
         #endregion
 
-        #region properties
-
-        public virtual pdf.PdfDocument BaseObject
-        {
-            get { return (pdf.PdfDocument)baseObject.Clone(); }
-        }
-
-
-        #endregion
-
         #region methods
 
         public void Save(string filepath)
         {
-            this.baseObject = new pdf.PdfDocument();
-            this.baseObject.PageLayout = this.PageLayout.ToPdf();
-            
-            foreach (Page page in this.pages)
-            {
-                this.baseObject = page.AddToDocument(this.baseObject);
-            }
-            int i = this.baseObject.Pages.Count;
-            this.baseObject.Save(filepath);
+            var doc = Bake();
+            doc.Save(filepath);
         }
 
         public void AddPages(List<Page> pages)
@@ -84,7 +60,47 @@ namespace PdfPlus
 
         public void AddPages(Page page)
         {
-            page.AddToDocument(this.baseObject);
+            this.pages.Add(new Page(page));
+        }
+
+        public void CopyFrom(Document document)
+        {
+            this.pages = new List<Page>();
+            AddPages(document.pages);
+            this.PageLayout = document.PageLayout;
+        }
+
+        protected pdf.PdfDocument Bake()
+        {
+            var pdf = new pdf.PdfDocument();
+            pdf.PageLayout = this.PageLayout.ToPdf();
+
+            foreach (Page page in this.pages)
+            {
+                pdf = page.AddToDocument(pdf);
+            }
+
+            return pdf;
+        }
+
+        public MemoryStream GetStream()
+        {
+            if (this.pages.Count == 0)
+                return null;
+            var pdf = Bake();
+            var stream = new MemoryStream();
+            pdf.Save(stream, false);
+            return stream;
+        }
+
+        public byte[] GetByteArray()
+        {
+            var stream = GetStream();
+            if (stream == null)
+                return null;
+            byte[] fileContents = stream.ToArray();
+            stream.Dispose();
+            return fileContents;
         }
 
         #endregion
