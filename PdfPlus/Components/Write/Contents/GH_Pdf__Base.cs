@@ -80,18 +80,45 @@ namespace PdfPlus.Components
 
         protected void PrevDocumentShapes(Document doc)
         {
-            foreach(Page page in doc.Pages) prev_shapes.AddRange(page.Shapes);
+            foreach (Page page in doc.Pages)
+            {
+                prev_shapes.AddRange(page.Shapes);
+                prev_shapes.Add(new Shape(page.Boundary.ToNurbsCurve(), new Graphic(Color.LightGray,1)));
+            }
         }
 
         public override void DrawViewportMeshes(IGH_PreviewArgs args)
         {
+            if (Hidden) return;
+            if (Locked) return;
             double mTol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+
+            Rhino.Display.DisplayMaterial mat = new Rhino.Display.DisplayMaterial();
+            if (Attributes.Selected)
+            {
+                mat = args.ShadeMaterial_Selected;
+            }
+            else
+            {
+                mat = args.ShadeMaterial;
+            }
+
+            Color activeColor = mat.Diffuse;
 
             foreach (Shape shape in prev_shapes)
             {
                 Plane plane = Plane.WorldXY;
 
-                switch (shape.Type)
+                Color strokeColor = shape.StrokeColor;
+                Color fillColor = shape.FillColor;
+                Color fontColor = shape.FontColor;
+                if (Attributes.Selected)
+                {
+                    strokeColor = activeColor;
+                    fillColor = activeColor;
+                    fontColor = activeColor;
+                }
+                    switch (shape.Type)
                 {
                     case Shape.ShapeType.TextObj:
                         plane.Origin = shape.Location;
@@ -100,83 +127,90 @@ namespace PdfPlus.Components
                         text.Bold = shape.IsBold;
                         text.Italic = shape.IsItalic;
 
-                        args.Display.Draw3dText(text, shape.FontColor);
-                        args.Display.DrawPoint(shape.Location, Rhino.Display.PointStyle.Circle, 2, shape.FontColor);
+                        args.Display.Draw3dText(text, fontColor);
+                        args.Display.DrawPoint(shape.Location, Rhino.Display.PointStyle.Circle, 2, activeColor);
 
                         Point3d[] corners = text.BoundingBox.GetCorners();
-                        if (shape.IsUnderlined) args.Display.DrawLine(new Line(corners[0], corners[1]), shape.FontColor);
+                        if (shape.IsUnderlined) args.Display.DrawLine(new Line(corners[0], corners[1]), fontColor);
 
-                        if (shape.IsStrikeout) args.Display.DrawLine(new Line((corners[0]+ corners[3])/2.0, (corners[1] + corners[2]) / 2.0), shape.FontColor);
+                        if (shape.IsStrikeout) args.Display.DrawLine(new Line((corners[0] + corners[3]) / 2.0, (corners[1] + corners[2]) / 2.0), fontColor);
                         break;
                     case Shape.ShapeType.TextBox:
 
                         Point3d[] c = shape.Boundary.ToNurbsCurve().Points.ControlPolygon().ToArray();
-                        plane.Origin = c[3] - new Vector3d(0, shape.FontSize * 0.663,0);
+                        plane.Origin = c[3] - new Vector3d(0, shape.FontSize * 0.663, 0);
 
                         Rhino.Display.Text3d txt = new Rhino.Display.Text3d(shape.TextContent, plane, shape.FontSize * 0.663);
                         txt.FontFace = shape.FontFamily;
                         txt.Bold = shape.IsBold;
                         txt.Italic = shape.IsItalic;
-                        
-                        args.Display.Draw3dText(txt, shape.FontColor);
 
-                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), shape.FontColor,false);
+                        args.Display.Draw3dText(txt, fontColor);
+
+                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), activeColor,false);
 
                         break;
 
                     case Shape.ShapeType.ChartObj:
 
-                        args.Display.DrawPatternedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), shape.FillColor, 1000,1, false);
+                        args.Display.DrawPatternedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), fillColor, 1000,1, false);
 
                         break;
                     case Shape.ShapeType.ImageObj:
                     case Shape.ShapeType.ImageFrame:
-                        
-                        if (shape.ImagePath != "")
-                        {
-                            Material material = new Material();
-                            material.SetBitmapTexture(shape.ImagePath);
 
-                            material.DiffuseColor = Color.White;
-                            material.AmbientColor = Color.Black;
-                            material.EmissionColor = Color.Black;
-                            material.Reflectivity = 0.0;
-                            material.ReflectionGlossiness = 0.0;
-                            args.Display.DrawMeshShaded(RectToMesh(shape.Boundary), new Rhino.Display.DisplayMaterial(material));
+                        if (Attributes.Selected)
+                        {
+                            args.Display.DrawMeshShaded(RectToMesh(shape.Boundary), mat);
                         }
                         else
                         {
-                            args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.Boundary, shape.Image, 2));
+                            if (shape.ImagePath != "")
+                            {
+                                Material material = new Material();
+                                material.SetBitmapTexture(shape.ImagePath);
+
+                                material.DiffuseColor = Color.White;
+                                material.AmbientColor = Color.Black;
+                                material.EmissionColor = Color.Black;
+                                material.Reflectivity = 0.0;
+                                material.ReflectionGlossiness = 0.0;
+                                args.Display.DrawMeshShaded(RectToMesh(shape.Boundary), new Rhino.Display.DisplayMaterial(material));
+                            }
+                            else
+                            {
+                                args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.Boundary, shape.Image, 2));
+                            }
                         }
                         break;
                     case Shape.ShapeType.Arc:
-                        args.Display.DrawArc(shape.Arc, shape.StrokeColor, (int)shape.StrokeWeight);
+                        args.Display.DrawArc(shape.Arc, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Bezier:
-                        args.Display.DrawCurve(shape.Bezier, shape.StrokeColor, (int)shape.StrokeWeight);
+                        args.Display.DrawCurve(shape.Bezier, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Ellipse:
-                        args.Display.DrawCurve(shape.Ellipse.ToNurbsCurve(), shape.StrokeColor, (int)shape.StrokeWeight);
+                        args.Display.DrawCurve(shape.Ellipse.ToNurbsCurve(), strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Line:
-                        args.Display.DrawLine(shape.Line, shape.StrokeColor, (int)shape.StrokeWeight);
+                        args.Display.DrawLine(shape.Line, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Polyline:
-                        args.Display.DrawPolyline(shape.Polyline, shape.StrokeColor, (int)shape.StrokeWeight);
+                        args.Display.DrawPolyline(shape.Polyline, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Brep:
                         Curve[] brepCurves = shape.Brep.DuplicateNakedEdgeCurves(true, true);
                         Hatch[] brepHatches = Hatch.Create(brepCurves, 0,0,1,mTol);
-                        foreach(Hatch hatch in brepHatches) args.Display.DrawHatch(hatch, shape.FillColor, shape.FillColor);
-                        foreach (Curve curve in brepCurves) args.Display.DrawCurve(curve, shape.StrokeColor, (int)shape.StrokeWeight);
+                        foreach(Hatch hatch in brepHatches) args.Display.DrawHatch(hatch, fillColor, shape.FillColor);
+                        foreach (Curve curve in brepCurves) args.Display.DrawCurve(curve, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Mesh:
                         List<Curve> meshCurves = new List<Curve>();
                         Polyline[] meshPlines = shape.Mesh.GetNakedEdges();
                         foreach (Polyline pline in meshPlines) meshCurves.Add(pline.ToNurbsCurve());
                         Hatch[] meshHatches = Hatch.Create(meshCurves,0,0,1,mTol);
-                        foreach (Hatch hatch in meshHatches) args.Display.DrawHatch(hatch, shape.FillColor, shape.FillColor);
-                        foreach (Curve curve in meshCurves) args.Display.DrawCurve(curve, shape.StrokeColor, (int)shape.StrokeWeight);
+                        foreach (Hatch hatch in meshHatches) args.Display.DrawHatch(hatch, fillColor, shape.FillColor);
+                        foreach (Curve curve in meshCurves) args.Display.DrawCurve(curve, strokeColor, (int)shape.StrokeWeight);
                         break;
                 }
             }
