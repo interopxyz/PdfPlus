@@ -10,6 +10,7 @@ namespace PdfPlus.Components
     public abstract class GH_Pdf__Base : GH_Component
     {
         protected List<Shape> prev_shapes = new List<Shape>();
+        protected List<Page> prev_pages = new List<Page>();
 
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Base_ShapePreview class.
@@ -28,6 +29,7 @@ namespace PdfPlus.Components
         protected override void BeforeSolveInstance()
         {
             prev_shapes = new List<Shape>();
+            prev_pages = new List<Page>();
         }
 
         /// <summary>
@@ -76,14 +78,15 @@ namespace PdfPlus.Components
         protected void PrevPageShapes(Page page)
         {
             prev_shapes.AddRange(page.Shapes);
+            prev_pages.Add(new Page(page));
         }
 
         protected void PrevDocumentShapes(Document doc)
         {
             foreach (Page page in doc.Pages)
             {
+                prev_pages.Add(new Page(page));
                 prev_shapes.AddRange(page.Shapes);
-                prev_shapes.Add(new Shape(page.Boundary.ToNurbsCurve(), new Graphic(Color.LightGray,1)));
             }
         }
 
@@ -92,6 +95,8 @@ namespace PdfPlus.Components
             if (Hidden) return;
             if (Locked) return;
             double mTol = Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
+            int messageSize = 4;
+            string messageFont = "Arial";
 
             Rhino.Display.DisplayMaterial mat = new Rhino.Display.DisplayMaterial();
             if (Attributes.Selected)
@@ -104,6 +109,12 @@ namespace PdfPlus.Components
             }
 
             Color activeColor = mat.Diffuse;
+            double factor = (72.0 / 96.0);
+
+            foreach (Page page in prev_pages)
+            {
+                args.Display.DrawPatternedPolyline(page.Boundary.ToNurbsCurve().Points.ControlPolygon(), activeColor, 12, 1, false);
+            }
 
             foreach (Shape shape in prev_shapes)
             {
@@ -118,11 +129,11 @@ namespace PdfPlus.Components
                     fillColor = activeColor;
                     fontColor = activeColor;
                 }
-                    switch (shape.Type)
+                switch (shape.Type)
                 {
                     case Shape.ShapeType.TextObj:
                         plane.Origin = shape.Location;
-                        Rhino.Display.Text3d text = new Rhino.Display.Text3d(shape.TextContent, plane, shape.FontSize * 0.663);
+                        Rhino.Display.Text3d text = new Rhino.Display.Text3d(shape.TextContent, plane, shape.FontSize * factor);
                         text.FontFace = shape.FontFamily;
                         text.Bold = shape.IsBold;
                         text.Italic = shape.IsItalic;
@@ -136,24 +147,39 @@ namespace PdfPlus.Components
                         if (shape.IsStrikeout) args.Display.DrawLine(new Line((corners[0] + corners[3]) / 2.0, (corners[1] + corners[2]) / 2.0), fontColor);
                         break;
                     case Shape.ShapeType.TextBox:
-
                         Point3d[] c = shape.Boundary.ToNurbsCurve().Points.ControlPolygon().ToArray();
-                        plane.Origin = c[3] - new Vector3d(0, shape.FontSize * 0.663, 0);
+                        plane.Origin = c[0]+new Vector3d(0,-4,0);
+                        args.Display.Draw3dText("Preview Purposes Only", activeColor, plane, messageSize, messageFont);
+                        plane.Origin = c[3] - new Vector3d(0, shape.FontSize * factor * 1.5, 0);
+                        List<string> lines = BreakLines(shape.TextContent, shape.FontFamily, shape.FontSize, shape.Boundary.Width);
+                        foreach (string line in lines)
+                        {
+                            Rhino.Display.Text3d txt = new Rhino.Display.Text3d(line, plane, shape.FontSize * 72.0 / 100.0);
+                            txt.FontFace = shape.FontFamily;
+                            txt.Bold = shape.IsBold;
+                            txt.Italic = shape.IsItalic;
 
-                        Rhino.Display.Text3d txt = new Rhino.Display.Text3d(shape.TextContent, plane, shape.FontSize * 0.663);
-                        txt.FontFace = shape.FontFamily;
-                        txt.Bold = shape.IsBold;
-                        txt.Italic = shape.IsItalic;
+                            args.Display.Draw3dText(txt, fontColor);
+                            plane.Origin = plane.Origin + new Vector3d(0, -shape.FontSize * factor * 1.8, 0);
+                        }
 
-                        args.Display.Draw3dText(txt, fontColor);
-
-                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), activeColor,false);
-
+                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), activeColor, false);
                         break;
 
                     case Shape.ShapeType.ChartObj:
 
-                        args.Display.DrawPatternedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), fillColor, 1000,1, false);
+                        plane.Origin = shape.Boundary.Corner(0);
+                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), fillColor,false);
+                        args.Display.Draw3dText("This preview does not represent actual chart appearance", activeColor, plane, messageSize, messageFont);
+                        List<Curve> crvs = shape.RenderChart(out List<Color> clrs);
+                        if (Attributes.Selected)
+                        {
+                            for (int i = 0; i < crvs.Count; i++) args.Display.DrawCurve(crvs[i], activeColor, 1);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < crvs.Count; i++) args.Display.DrawCurve(crvs[i], clrs[i], 1);
+                        }
 
                         break;
                     case Shape.ShapeType.ImageObj:
@@ -183,11 +209,20 @@ namespace PdfPlus.Components
                             }
                         }
                         break;
+                    case Shape.ShapeType.LinkObj:
+                        Curve[] linkCurves = new Curve[] { shape.Boundary.ToNurbsCurve() };
+                        Hatch[] linkHatches = Hatch.Create(linkCurves, 0, 0, 1, mTol);
+                        foreach (Hatch hatch in linkHatches) args.Display.DrawHatch(hatch, Color.FromArgb(30,activeColor), shape.FillColor);
+                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), strokeColor,false);
+                        break;
                     case Shape.ShapeType.Arc:
                         args.Display.DrawArc(shape.Arc, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Bezier:
                         args.Display.DrawCurve(shape.Bezier, strokeColor, (int)shape.StrokeWeight);
+                        break;
+                    case Shape.ShapeType.Circle:
+                        args.Display.DrawCurve(shape.Circle.ToNurbsCurve(), strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Ellipse:
                         args.Display.DrawCurve(shape.Ellipse.ToNurbsCurve(), strokeColor, (int)shape.StrokeWeight);
@@ -200,15 +235,15 @@ namespace PdfPlus.Components
                         break;
                     case Shape.ShapeType.Brep:
                         Curve[] brepCurves = shape.Brep.DuplicateNakedEdgeCurves(true, true);
-                        Hatch[] brepHatches = Hatch.Create(brepCurves, 0,0,1,mTol);
-                        foreach(Hatch hatch in brepHatches) args.Display.DrawHatch(hatch, fillColor, shape.FillColor);
+                        Hatch[] brepHatches = Hatch.Create(brepCurves, 0, 0, 1, mTol);
+                        foreach (Hatch hatch in brepHatches) args.Display.DrawHatch(hatch, fillColor, shape.FillColor);
                         foreach (Curve curve in brepCurves) args.Display.DrawCurve(curve, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Mesh:
                         List<Curve> meshCurves = new List<Curve>();
                         Polyline[] meshPlines = shape.Mesh.GetNakedEdges();
                         foreach (Polyline pline in meshPlines) meshCurves.Add(pline.ToNurbsCurve());
-                        Hatch[] meshHatches = Hatch.Create(meshCurves,0,0,1,mTol);
+                        Hatch[] meshHatches = Hatch.Create(meshCurves, 0, 0, 1, mTol);
                         foreach (Hatch hatch in meshHatches) args.Display.DrawHatch(hatch, fillColor, shape.FillColor);
                         foreach (Curve curve in meshCurves) args.Display.DrawCurve(curve, strokeColor, (int)shape.StrokeWeight);
                         break;
@@ -218,17 +253,77 @@ namespace PdfPlus.Components
             // Set Display Override
             base.DrawViewportWires(args);
         }
-        
+        //Credit: The following function was written by David Rutten
+        private List<string> BreakLines(string Text, string Font, double Size, double Width)
+        {
+            if (string.IsNullOrWhiteSpace(Text)) return null;
+
+            if (string.IsNullOrWhiteSpace(Font))
+                throw new ArgumentException("Font name not specified.");
+
+            if (Size <= 1.0)
+                throw new ArgumentException("Size needs to be at least 1.0, because the text measuring uses integer arithmetic.");
+
+            if (Width < Size * 10)
+                throw new ArgumentException("Container width must be at least 10 times the font size.");
+
+            System.Drawing.Font font = new System.Drawing.Font(Font, (float)Size, System.Drawing.FontStyle.Regular, GraphicsUnit.World);
+
+            string[] words = Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            Queue<string> queue = new Queue<string>(words);
+
+            List<string> lines = new List<string>();
+            while (queue.Count > 0)
+            {
+                string line = ExtractLine(queue, font, Width);
+                lines.Add(line);
+            }
+
+            font.Dispose();
+            return lines;
+        }
+
+        //Credit: The following function was written by David Rutten
+        private string ExtractLine(Queue<string> words, System.Drawing.Font font, double maxWidth)
+        {
+            // Try the first word. If it is already longer than the maximum width, return immediately.
+            string line = words.Dequeue();
+            double width = Grasshopper.Kernel.GH_FontServer.StringWidth(line, font);
+            if (width >= maxWidth)
+                return line;
+
+            // Now add subsequent words one at a time.
+            while (true)
+            {
+                // No words left.
+                if (words.Count == 0)
+                    return line;
+
+                string longerLine = line + " " + words.Peek();
+
+                width = Grasshopper.Kernel.GH_FontServer.StringWidth(longerLine, font);
+                if (width >= maxWidth)
+                    return line;
+
+                // We can fit the longer line.
+                // Remeber the new line and properly dequeue the appended word.
+                line = longerLine;
+                words.Dequeue();
+            }
+        }
+
         private Mesh MeshColorByBitmap(Rectangle3d rectangle, Bitmap bitmap, int count)
         {
             int xStep = bitmap.Width / count;
             int yStep = bitmap.Height / count;
 
-            Mesh mesh = RectToDenseMesh(rectangle, xStep-1, yStep-1);
+            Mesh mesh = RectToDenseMesh(rectangle, xStep - 1, yStep - 1);
             List<Color> colors = new List<Color>();
 
-            for (int y = 0; y < bitmap.Height; y += count){
-                for (int x = 0; x < bitmap.Width; x += count){
+            for (int y = 0; y < bitmap.Height; y += count)
+            {
+                for (int x = 0; x < bitmap.Width; x += count)
+                {
                     colors.Add(bitmap.GetPixel(x, y));
                 }
             }
@@ -254,7 +349,7 @@ namespace PdfPlus.Components
         private Surface RectToSurface(Rectangle3d rectangle)
         {
             Point3d[] p = rectangle.ToNurbsCurve().Points.ControlPolygon().ToArray();
-            Surface srf = NurbsSurface.CreateFromCorners(p[0],p[1],p[2],p[3]);
+            Surface srf = NurbsSurface.CreateFromCorners(p[0], p[1], p[2], p[3]);
 
             return srf;
         }
@@ -271,5 +366,6 @@ namespace PdfPlus.Components
             Mesh mesh = Mesh.CreateFromPlane(rectangle.Plane, rectangle.X, rectangle.Y, 1, 1);
             return mesh;
         }
+
     }
 }

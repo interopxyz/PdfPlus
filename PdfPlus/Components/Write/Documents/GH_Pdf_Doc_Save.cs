@@ -54,13 +54,15 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+                Document document = null;
+                DA.GetData(0, ref document);
+                document = new Document(document);
+                PrevDocumentShapes(document);
+
             bool save = false;
             DA.GetData(3, ref save);
             if (save)
             {
-                Document document = null;
-                DA.GetData(0, ref document);
-                document = new Document(document);
 
                 string path = "C:\\Users\\Public\\Documents\\";
                 bool hasPath = DA.GetData(1, ref path);
@@ -84,7 +86,6 @@ namespace PdfPlus.Components
 
                 string filepath = path + name + ".pdf";
 
-                PrevDocumentShapes(document);
                 document.Save(filepath);
                 DA.SetData(0, filepath);
             }
