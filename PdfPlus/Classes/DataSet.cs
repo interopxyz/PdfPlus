@@ -60,7 +60,12 @@ namespace PdfPlus
 
         public virtual List<Sd.Color> Colors
         {
-            get { return colors; }
+            get 
+            {
+                List<Sd.Color> output = colors;
+                output.AddRange(Enumerable.Repeat(Sd.Color.Black,this.values.Count-colors.Count));
+                return output; 
+            }
             set
             {
                 this.colors = value;

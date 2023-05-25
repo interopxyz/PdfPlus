@@ -10,7 +10,7 @@ using Grasshopper.Kernel.Parameters;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_Add : GH_Component
+    public class GH_Pdf_Doc_Add : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the Test class.
@@ -68,6 +68,7 @@ namespace PdfPlus.Components
             int layout = 0;
             if (DA.GetData(1, ref layout)) document.PageLayout = (PageLayouts)layout;
 
+            PrevDocumentShapes(document);
             DA.SetData(0, document);
         }
 

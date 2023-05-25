@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_AddTextPt : GH_Component
+    public class GH_Pdf_Shape_AddTextPt : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
@@ -57,9 +57,10 @@ namespace PdfPlus.Components
             string content = string.Empty;
             if (!DA.GetData(1, ref content)) return;
 
-            Shape text = new Shape(content, location, new Font());
+            Shape shape = new Shape(content, location, new Font());
 
-            DA.SetData(0, text);
+            prev_shapes.Add(shape);
+            DA.SetData(0, shape);
         }
 
         /// <summary>

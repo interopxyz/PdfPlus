@@ -6,7 +6,7 @@ using System.IO;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_Save : GH_Component
+    public class GH_Pdf_Doc_Save : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Doc_Save class.
@@ -54,17 +54,15 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+                Document document = null;
+                DA.GetData(0, ref document);
+                document = new Document(document);
+                PrevDocumentShapes(document);
+
             bool save = false;
             DA.GetData(3, ref save);
             if (save)
             {
-                Document document = null;
-                if (!DA.GetData(0, ref document))
-                {
-                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Please provide a document.");
-                    return;
-                }
-                document = new Document(document);
 
                 string path = "C:\\Users\\Public\\Documents\\";
                 bool hasPath = DA.GetData(1, ref path);
@@ -73,21 +71,20 @@ namespace PdfPlus.Components
                 {
                     if (this.OnPingDocument().FilePath != null)
                     {
-                        path = Path.GetDirectoryName(this.OnPingDocument().FilePath);
+                        path = Path.GetDirectoryName(this.OnPingDocument().FilePath) + "\\";
                     }
                 }
 
                 if (!Directory.Exists(path))
                 {
-                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "The provided directory does not exist. Please verify this is a valid file path.");
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "The file provided path does not exist. Please verify this is a valid file path.");
                     return;
                 }
 
                 string name = DateTime.UtcNow.ToString("yyyy-dd-M_HH-mm-ss");
                 DA.GetData(2, ref name);
 
-                name = name.EndsWith(".pdf") ? name : $"{name}.pdf";
-                string filepath = Path.Combine(path, name);
+                string filepath = path + name + ".pdf";
 
                 document.Save(filepath);
                 DA.SetData(0, filepath);

@@ -115,7 +115,7 @@ namespace PdfPlus
                         Rg.Mesh mesh;
                         if (goo.CastTo<Rg.Mesh>(out mesh))
                         {
-                            shape = new Shape(mesh,new Graphic());
+                            shape = new Shape(mesh, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -123,10 +123,11 @@ namespace PdfPlus
             }
             return isValid;
         }
-        public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap)
+        public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap, ref string path)
         {
 
             string filePath = string.Empty;
+            path = filePath;
             goo.CastTo<string>(out filePath);
             Sd.Bitmap bmp = null;
 
@@ -135,10 +136,11 @@ namespace PdfPlus
                 bitmap = new Sd.Bitmap(bmp);
                 return true;
             }
-            else if (!PdfPlusEnvironment.FileIoBlocked && File.Exists(filePath))
+            else if (File.Exists(filePath))
             {
                 if (filePath.GetBitmapFromFile(out bmp))
                 {
+                    path = filePath;
                     bitmap = bmp;
                     return true;
                 }
@@ -190,7 +192,7 @@ namespace PdfPlus
             }
         }
 
-        public static Pd.XUnit SetValue(this Units unit,double value)
+        public static Pd.XUnit SetValue(this Units unit, double value)
         {
             switch (unit)
             {
@@ -388,19 +390,107 @@ namespace PdfPlus
 
         #region geometry
 
+        public static Rg.Rectangle3d Inflate(this Rg.Rectangle3d input, double offset)
+        {
+            Rg.Interval w = input.X;
+            Rg.Interval h = input.Y;
+
+            return new Rg.Rectangle3d(input.Plane, new Rg.Interval(w.Min - offset, w.Max + offset), new Rg.Interval(h.Min - offset, h.Max + offset));
+        }
+
         public static Rg.Polyline ToBezierPolyline(this Rg.NurbsCurve input, double multiple = 1.0)
         {
             List<Rg.Point3d> points = new List<Rg.Point3d>();
-            Rg.BezierCurve[] beziers = Rg.BezierCurve.CreateCubicBeziers(input, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance* multiple, Rhino.RhinoDoc.ActiveDoc.PageAngleToleranceRadians* multiple);
-            foreach(Rg.BezierCurve bezier in beziers)
+            Rg.BezierCurve[] beziers = Rg.BezierCurve.CreateCubicBeziers(input, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance * multiple, Rhino.RhinoDoc.ActiveDoc.PageAngleToleranceRadians * multiple);
+            foreach (Rg.BezierCurve bezier in beziers)
             {
                 points.Add(bezier.GetControlVertex3d(0));
                 points.Add(bezier.GetControlVertex3d(1));
                 points.Add(bezier.GetControlVertex3d(2));
             }
-            points.Add(beziers[beziers.Length-1].GetControlVertex3d(3));
+            points.Add(beziers[beziers.Length - 1].GetControlVertex3d(3));
 
             return new Rg.Polyline(points);
+        }
+
+        public static List<double> ReMap(this List<double> input, Rg.Interval bounds)
+        {
+            List<double> output = new List<double>();
+
+            foreach (double val in input) output.Add((val - bounds.Min) / (bounds.Max - bounds.Min));
+
+            return output;
+        }
+
+        public static List<List<double>> ReMapSet(this List<DataSet> input)
+        {
+            List<List<double>> output = new List<List<double>>();
+
+            int count = 0;
+            foreach(DataSet ds in input)
+            {
+                count = Math.Max(count, ds.Values.Count);
+            }
+
+            List<double> peaks = new List<double>();
+            for(int i = 0; i < count; i++)
+            {
+                peaks.Add(0);
+                foreach(DataSet ds in input)
+                {
+                    if (i < ds.Values.Count)
+                    {
+                        peaks[i] += ds.Values[i];
+                    }
+                }
+            }
+
+            Rg.Interval bounds = new Rg.Interval(0, peaks.Max());
+
+            for (int i = 0; i < count; i++)
+            {
+                peaks.Add(0);
+                double j = 0;
+                output.Add(new List<double> { 0 });
+                foreach (DataSet ds in input)
+                {
+                    if (i < ds.Values.Count)
+                    {
+                        j = j + ds.Values[i] / bounds.Max;
+                        output[i].Add(j);
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        public static List<double> ReMapStack(this List<double> input)
+        {
+            double min = input.Min();
+            double max = input.Max();
+            List<double> output = new List<double>();
+
+            double t = 0;
+            foreach (double val in input)
+            {
+                t += (val - min) / (max - min);
+                output.Add(t);
+            }
+            return output;
+        }
+
+        public static Rg.Interval Bounds(this List<DataSet> input)
+        {
+            double min = input[0].Values.Min();
+            double max = input[0].Values.Max();
+
+            foreach(DataSet data in input)
+            {
+                min = Math.Min(min, data.Values.Min());
+                max = Math.Max(max, data.Values.Max());
+            }
+            return new Rg.Interval(min, max);
         }
 
         public static Pd.XPoint ToPdf(this Rg.Point3d input)
@@ -444,16 +534,18 @@ namespace PdfPlus
             return new Rg.Interval(input.Bottom, input.Top);
         }
 
-        public static Rg.Rectangle3d ToRhino(this Pd.XRect input)
+        public static Rg.Rectangle3d ToRhino(this Pd.XRect input, Rg.Plane frame)
         {
-            Rg.Rectangle3d boundary = new Rg.Rectangle3d(Rg.Plane.WorldXY, input.BottomLeft.ToRhino(), input.TopRight.ToRhino());
+            Rg.Point3d a = input.BottomLeft.ToRhino();
+            Rg.Point3d b = input.TopRight.ToRhino();
+            Rg.Rectangle3d boundary = new Rg.Rectangle3d(frame, frame.PointAt(a.X, a.Y), frame.PointAt(b.X, b.Y));
             return boundary;
         }
 
-        public static Rg.Rectangle3d ToRhino(this Pf.PdfRectangle input)
+        public static Rg.Rectangle3d ToRhino(this Pf.PdfRectangle input, Rg.Plane frame )
         {
             Pd.XRect rect = input.ToXRect();
-            Rg.Rectangle3d boundary = rect.ToRhino();
+            Rg.Rectangle3d boundary = rect.ToRhino(frame);
             return boundary;
         }
 

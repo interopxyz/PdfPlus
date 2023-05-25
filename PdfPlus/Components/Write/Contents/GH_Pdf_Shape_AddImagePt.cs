@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_AddImagePt : GH_Component
+    public class GH_Pdf_Shape_AddImagePt : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddImagePt class.
@@ -35,6 +35,8 @@ namespace PdfPlus.Components
         {
             pManager.AddGenericParameter("Image", "I", "The System.Drawing.Bitmap or Image Filepath to display", GH_ParamAccess.item);
             pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Scale", "S", "A unitized scale factor (0-1) for the image", GH_ParamAccess.item, 1.0);
+            pManager[2].Optional = true;
         }
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The image boundary in points", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -53,16 +56,27 @@ namespace PdfPlus.Components
         {
             IGH_Goo goo = null;
             Sd.Bitmap bitmap = null;
+            string path = "";
 
             if (!DA.GetData(0, ref goo)) return;
-            if (!goo.TryGetBitmap(ref bitmap)) return;
+            if (!goo.TryGetBitmap(ref bitmap,ref path)) return;
 
-            Point3d location = new Point3d();
-            if (!DA.GetData(1, ref location)) return;
+            Point3d p = new Point3d();
+            if (!DA.GetData(1, ref p)) return;
 
-            Shape text = new Shape(bitmap, location);
+            double scale = 1.0;
+            DA.GetData(2, ref scale);
 
-            DA.SetData(0, text);
+            double w = bitmap.Width * (72.0 / 96.0) * scale;
+            double h = bitmap.Height * (72.0 / 96.0) * scale;
+
+            Rectangle3d rect = new Rectangle3d(Plane.WorldXY, p, new Point3d(p.X + w, p.Y + h, 0));
+
+            Shape shape = new Shape(bitmap, rect, path);
+
+            prev_shapes.Add(shape);
+            DA.SetData(0, shape);
+            DA.SetData(1, shape.Boundary);
         }
 
         /// <summary>
