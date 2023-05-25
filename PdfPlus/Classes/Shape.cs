@@ -681,7 +681,7 @@ namespace PdfPlus
             }
         }
 
-        public void Render(Pd.XGraphics graph, Page page)
+        public void Render(Pd.XGraphics graph, Pf.PdfPage page, Rg.Plane coordinateframe)
         {
             switch (this.shapeType)
             {
@@ -765,15 +765,16 @@ namespace PdfPlus
                     switch (this.linkType)
                     {
                         case LinkTypes.Hyperlink:
-                            page.AddHyperLink(this.boundary, this.content);
+                            page.AddWebLink(boundary.ToPdfRect(coordinateframe), this.content);
                             break;
                         case LinkTypes.Filepath:
-                            page.AddFileLink(this.boundary, this.content);
+                            page.AddFileLink(boundary.ToPdfRect(coordinateframe), this.content);
                             break;
                         case LinkTypes.Page:
                             int index = 0;
                             bool isInt = int.TryParse(this.content, out index);
-                            if(isInt)page.AddPageLink(this.boundary, index+1);
+                            if (isInt)
+                                page.AddDocumentLink(boundary.ToPdfRect(coordinateframe), index + 1);
                             break;
                     }
                     break;
