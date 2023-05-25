@@ -183,13 +183,12 @@ namespace PdfPlus
 
         public Pf.PdfDocument AddToDocument(Pf.PdfDocument document)
         {
-            var clone = (Pf.PdfPage)this.baseObject.Clone();
-            document.AddPage(clone);
-            this.Render(clone);
+            this.baseObject = document.AddPage(this.BaseObject);
+            this.Render();
             return document;
         }
 
-        protected void Render(Pf.PdfPage page)
+        public void Render()
         {
             graph = Pd.XGraphics.FromPdfPage(this.baseObject);
             foreach (Shape shp in shapes)

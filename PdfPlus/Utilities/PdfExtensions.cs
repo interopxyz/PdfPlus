@@ -136,7 +136,7 @@ namespace PdfPlus
                 bitmap = new Sd.Bitmap(bmp);
                 return true;
             }
-            else if (!PdfPlusEnvironment.FileIoBlocked && File.Exists(filePath))
+            else if (File.Exists(filePath))
             {
                 if (filePath.GetBitmapFromFile(out bmp))
                 {
