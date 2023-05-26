@@ -55,8 +55,12 @@ namespace PdfPlus.Components
         protected override void SolveInstance(IGH_DataAccess DA)
         {
                 Document document = null;
-                DA.GetData(0, ref document);
-                document = new Document(document);
+            if (!DA.GetData(0, ref document))
+            {
+                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Please provide a document.");
+                return;
+            }
+            document = new Document(document);
                 PrevDocumentShapes(document);
 
             bool save = false;
@@ -71,20 +75,21 @@ namespace PdfPlus.Components
                 {
                     if (this.OnPingDocument().FilePath != null)
                     {
-                        path = Path.GetDirectoryName(this.OnPingDocument().FilePath) + "\\";
+                        path = Path.GetDirectoryName(this.OnPingDocument().FilePath);
                     }
                 }
 
                 if (!Directory.Exists(path))
                 {
-                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "The file provided path does not exist. Please verify this is a valid file path.");
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "The provided directory does not exist. Please verify this is a valid file path.");
                     return;
                 }
 
                 string name = DateTime.UtcNow.ToString("yyyy-dd-M_HH-mm-ss");
                 DA.GetData(2, ref name);
 
-                string filepath = path + name + ".pdf";
+                name = name.EndsWith(".pdf") ? name : $"{name}.pdf";
+                string filepath = Path.Combine(path, name);
 
                 document.Save(filepath);
                 DA.SetData(0, filepath);

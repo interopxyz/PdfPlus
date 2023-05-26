@@ -95,6 +95,7 @@
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\Enums.cs" />
     <Compile Include="Utilities\PdfExtensions.cs" />
+    <Compile Include="Utilities\PdfPlusEnvironment.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
