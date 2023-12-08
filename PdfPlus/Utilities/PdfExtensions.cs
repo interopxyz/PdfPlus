@@ -352,6 +352,19 @@ namespace PdfPlus
             }
         }
 
+        public static PageOrientation ToPlus(this Ps.PageOrientation input)
+        {
+            switch (input)
+            {
+                default:
+                    return PageOrientation.Portrait;
+                    break;
+                case Ps.PageOrientation.Landscape:
+                    return PageOrientation.Landscape;
+                    break;
+            }
+        }
+
         #endregion
 
         #region document

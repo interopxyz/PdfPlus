@@ -54,28 +54,31 @@ namespace PdfPlus
             this.Unit = unit;
             this.Width = width;
             this.Height = height;
-            this.SetDefaultPages();
+            //this.SetDefaultPages();
         }
 
-        public Page(SizesA size)
+        public Page(SizesA size, PageOrientation orientation = PageOrientation.Default)
         {
             this.baseObject.Size = size.ToSharp();
             this.Unit = Units.Millimeter;
-            this.SetDefaultPages();
+            this.Orientation = orientation;
+            //this.SetDefaultPages();
         }
 
-        public Page(SizesB size)
+        public Page(SizesB size, PageOrientation orientation = PageOrientation.Default)
         {
             this.baseObject.Size = size.ToSharp();
             this.Unit = Units.Millimeter;
-            this.SetDefaultPages();
+            this.Orientation = orientation;
+            //this.SetDefaultPages();
         }
 
-        public Page(SizesImperial size)
+        public Page(SizesImperial size, PageOrientation orientation = PageOrientation.Default)
         {
             this.baseObject.Size = size.ToSharp();
             this.Unit = Units.Inch;
-            this.SetDefaultPages();
+            this.Orientation = orientation;
+            //this.SetDefaultPages();
         }
 
         public List<Shape> Shapes
@@ -116,14 +119,16 @@ namespace PdfPlus
 
         public virtual Rg.Rectangle3d Boundary
         {
-            get { return new Rg.Rectangle3d(this.Frame, this.baseObject.Width.Point, this.baseObject.Height.Point); }
+            get
+            {
+                        return new Rg.Rectangle3d(this.Frame, this.baseObject.Width.Point, this.baseObject.Height.Point);
+            }
         }
 
         public virtual PageOrientation Orientation
         {
-            set { 
-                if(value!= PageOrientation.Default) this.baseObject.Orientation = value.ToPdf(); 
-            }
+            get { return this.baseObject.Orientation.ToPlus(); }
+            set { this.baseObject.Orientation = value.ToPdf(); }
         }
 
         public virtual Rg.Rectangle3d ArtBox

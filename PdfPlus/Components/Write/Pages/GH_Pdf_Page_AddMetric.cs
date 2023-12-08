@@ -69,13 +69,13 @@ namespace PdfPlus.Components
             int type = 0;
             DA.GetData(1, ref type);
 
-            Page page = new Page((SizesA)type);
+            int orient = 0;
+            DA.GetData(2, ref orient);
+            Page page = new Page((SizesA)type, (PageOrientation)orient);
 
             Plane plane = Plane.WorldXY;
             if (DA.GetData(0, ref plane)) page.Frame = new Plane(plane);
 
-            int orient = 0;
-            if (DA.GetData(2, ref orient)) page.Orientation = (PageOrientation)orient;
 
             DA.SetData(0, page);
             DA.SetData(1, page.Boundary);
