@@ -873,6 +873,7 @@ namespace PdfPlus
             }
 
         }
+
         private Pc.Chart CombinationChart()
         {
             Pc.ChartType cType = this.chartType.ToPdf();
@@ -984,6 +985,7 @@ namespace PdfPlus
 
             return chart;
         }
+
         #endregion
 
     }

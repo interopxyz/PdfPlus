@@ -15,7 +15,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_GraphData()
           : base("Graph Data", "Data",
               "Compile data points into a Data Set",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

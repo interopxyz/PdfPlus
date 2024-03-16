@@ -1,22 +1,21 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
+using MigraDoc.Rendering;
+using MigraDoc.DocumentObjectModel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Page_AddContents : GH_Pdf__Base
+    public class GH_Pdf_Blk_Text : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
+        /// Initializes a new instance of the GH_Pdf_Blk_Text class.
         /// </summary>
-        public GH_Pdf_Page_AddContents()
-          : base("Set Contents", "Content",
-              "Add text, image, or geometric based shapes to a PDF Page.",
-              Constants.ShortName, Constants.WritePage)
+        public GH_Pdf_Blk_Text()
+          : base("Text Block", "Txt",
+              "Create a text block",
+              Constants.ShortName, Constants.MigraDoc)
         {
         }
 
@@ -25,7 +24,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -33,9 +32,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
-            pManager.AddGenericParameter("Content", "C", "Shapes, Text, or Geometry to add to the document", GH_ParamAccess.list);
-            pManager[1].Optional = true;
+            pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -43,7 +40,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -52,20 +49,12 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Page page = null;
-            if (!DA.GetData(0, ref page))return;
-            page = new Page(page);
+            string text = string.Empty;
+            DA.GetData(0, ref text);
 
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, geometry)) return;
+            Block block = Block.CreateText(text);
 
-            foreach(IGH_Goo goos in geometry)
-            {
-                page.AddShape(goos);
-            }
-
-            this.PrevPageShapes(page);
-            DA.SetData(0, page);
+            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -77,7 +66,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_AddContent4_01;
+                return null;
             }
         }
 
@@ -86,7 +75,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("7e649fc6-716b-4079-90eb-9fd203298a38"); }
+            get { return new Guid("4e9ff875-26bb-4365-a839-1fbccccae6bd"); }
         }
     }
 }

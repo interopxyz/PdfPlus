@@ -123,6 +123,106 @@ namespace PdfPlus
             }
             return isValid;
         }
+
+        public static bool TryGetBlock(this IGH_Goo goo, ref Block block)
+        {
+            Block blk;
+            bool isValid = false;
+
+            if (goo.CastTo<Block>(out blk))
+            {
+                block = new Block(blk);
+                isValid = true;
+            }
+            else
+            {
+                //switch (goo.TypeName)
+                //{
+                //    case "Curve":
+                //        Rg.Curve curve;
+                //        isValid = true;
+
+                //        if (goo.CastTo<Rg.Curve>(out curve))
+                //        {
+                //            string type = goo.ToString();
+
+                //            switch (type)
+                //            {
+                //                default:
+                //                    shape = new Shape(curve.ToNurbsCurve(), new Graphic());
+                //                    break;
+                //                case "Polyline Curve":
+                //                    Rg.Polyline pline;
+                //                    if (curve.TryGetPolyline(out pline)) shape = new Shape(pline, new Graphic());
+                //                    break;
+                //                case "Line-like Curve":
+                //                    shape = new Shape(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
+                //                    break;
+                //                case "Elliptical Curve":
+                //                    Rg.Ellipse ellipse;
+                //                    curve.TryGetEllipse(out ellipse);
+                //                    shape = new Shape(ellipse, new Graphic());
+                //                    break;
+                //            }
+                //            isValid = true;
+                //        }
+                //        break;
+                //    case "Arc":
+                //        Rg.Arc arc;
+
+                //        if (goo.CastTo<Rg.Arc>(out arc))
+                //        {
+                //            shape = new Shape(arc, new Graphic());
+                //            isValid = true;
+                //        }
+                //        break;
+                //    case "Circle":
+                //        Rg.Circle circle;
+
+                //        if (goo.CastTo<Rg.Circle>(out circle))
+                //        {
+                //            shape = new Shape(circle, new Graphic());
+                //            isValid = true;
+                //        }
+                //        break;
+                //    case "Line":
+                //        Rg.Line line;
+
+                //        if (goo.CastTo<Rg.Line>(out line))
+                //        {
+                //            shape = new Shape(line, new Graphic());
+                //            isValid = true;
+                //        }
+                //        break;
+                //    case "Surface":
+                //        Rg.Surface surface;
+                //        if (goo.CastTo<Rg.Surface>(out surface))
+                //        {
+                //            Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
+                //            shape = new Shape(srfBrep, new Graphic());
+                //            isValid = true;
+                //        }
+                //        break;
+                //    case "Brep":
+                //        Rg.Brep brep;
+                //        if (goo.CastTo<Rg.Brep>(out brep))
+                //        {
+                //            shape = new Shape(brep, new Graphic());
+                //            isValid = true;
+                //        }
+                //        break;
+                //    case "Mesh":
+                //        Rg.Mesh mesh;
+                //        if (goo.CastTo<Rg.Mesh>(out mesh))
+                //        {
+                //            shape = new Shape(mesh, new Graphic());
+                //            isValid = true;
+                //        }
+                //        break;
+                //}
+            }
+            return isValid;
+        }
         public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap, ref string path)
         {
 

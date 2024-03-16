@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddGraph()
           : base("Add Chart", "Chart",
               "Create a Chart Shape within a rectangular boundary",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

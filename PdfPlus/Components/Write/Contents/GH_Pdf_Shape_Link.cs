@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Write.Contents
         public GH_Pdf_Shape_Link()
           : base("Link Region", "Link",
               "Create a link to a document, hyperlink, or page within a rectangular boundary",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

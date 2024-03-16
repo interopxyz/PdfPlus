@@ -44,14 +44,24 @@ namespace PdfPlus
 
         #region 
 
-        public static string WritePage
+        public static string PdfSharp
         {
             get { return "PDF"; }
         }
 
-        public static string ReadPage
+        public static string MigraDoc
         {
-            get { return "Read PDF"; }
+            get { return "Doc"; }
+        }
+
+        public static string File
+        {
+            get { return "File"; }
+        }
+
+        public static Descriptor Block
+        {
+            get { return new Descriptor("Block", "Bk", "PDF Document Block", "PDF Document Block", "PDF Document Blocks"); }
         }
 
         public static Descriptor Shape

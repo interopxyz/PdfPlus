@@ -93,6 +93,7 @@ namespace PdfPlus
 
             foreach (Page page in this.pages)
             {
+                
                 pdf = page.AddToDocument(pdf);
             }
 

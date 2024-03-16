@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddImagePt()
           : base("Image Point", "Img Pt",
               "Create an Image Shape at a point location",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

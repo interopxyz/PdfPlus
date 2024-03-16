@@ -1,20 +1,22 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+using Sd = System.Drawing;
+
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_AddRectangle : GH_Component
+    public class GH_Pdf_Page_AddContents : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddRectangle class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
         /// </summary>
-        public GH_Pdf_Page_AddRectangle()
-          : base("Add Page Boundary", "Page Rect",
-              "Create a new PDF Page from a boundary rectangle in Point units",
-              Constants.ShortName, Constants.PdfSharp)
+        public GH_Pdf_Page_AddContents()
+          : base("Place Shapes", "Place Shp",
+              "Place Text, Image, or Geometric based Shapes to a PDF Page.",
+              Constants.ShortName, Constants.MigraDoc)
         {
         }
 
@@ -23,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.secondary; }
+            get { return GH_Exposure.tertiary; }
         }
 
         /// <summary>
@@ -31,7 +33,9 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddRectangleParameter("Boundary", "B", "The page rectangular boundary in Points", GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter("Content", "C", "Shapes, Text, or Geometry Shapes to add to the document", GH_ParamAccess.list);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -48,17 +52,19 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Rectangle3d boundary = new Rectangle3d();
-            if(!DA.GetData(0, ref boundary))return;
+            Page page = null;
+            if (!DA.GetData(0, ref page))return;
+            page = new Page(page);
 
-            Point3d ptA = boundary.Corner(0);
-            Point3d ptB = boundary.Corner(1);
-            Point3d ptC = boundary.Corner(3);
-            Page page = new Page(Units.Point, ptA.DistanceTo(ptB), ptA.DistanceTo(ptC));
+            List<IGH_Goo> geometry = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, geometry)) return;
 
-            Plane plane = new Plane(ptA, ptB, ptC);
-            page.Frame = new Plane(plane);
+            foreach(IGH_Goo goos in geometry)
+            {
+                page.AddShape(goos);
+            }
 
+            this.PrevPageShapes(page);
             DA.SetData(0, page);
         }
 
@@ -71,7 +77,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Boundary_01;
+                return Properties.Resources.Pdf_Page_AddContent4_01;
             }
         }
 
@@ -80,7 +86,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("331173ec-eb7d-4c09-851f-87131c6ec061"); }
+            get { return new Guid("7e649fc6-716b-4079-90eb-9fd203298a38"); }
         }
     }
 }

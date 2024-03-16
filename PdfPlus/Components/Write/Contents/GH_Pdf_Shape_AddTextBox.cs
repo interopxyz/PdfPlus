@@ -17,7 +17,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddTextBox()
           : base("Text Box", "Txt Box",
               "Create a Text Shape within a rectangular boundary",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

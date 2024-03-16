@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using Sd = System.Drawing;
 using Pf = PdfSharp.Pdf;
 using Pd = PdfSharp.Drawing;
+
+using Md = MigraDoc.DocumentObjectModel;
+using Mr = MigraDoc.Rendering;
+
 using Rg = Rhino.Geometry;
 using Grasshopper.Kernel.Types;
 
@@ -23,6 +27,7 @@ namespace PdfPlus
         public Rg.Plane Frame = Rg.Plane.WorldXY;
 
         protected List<Shape> shapes = new List<Shape>();
+        protected List<Block> blocks = new List<Block>();
 
         #endregion
 
@@ -33,14 +38,27 @@ namespace PdfPlus
             this.baseObject = new Pf.PdfPage();
         }
 
+        public Page(Pf.PdfPage page)
+        {
+            this.baseObject = (Pf.PdfPage)page.Clone();
+        }
+
+        public Page(Pf.PdfPage page, Page reference)
+        {
+            this.baseObject = (Pf.PdfPage)page.Clone();
+
+            foreach (Shape shape in reference.shapes) this.shapes.Add(new Shape(shape));
+            this.Unit = reference.Unit;
+            this.Frame = new Rg.Plane(reference.Frame);
+            this.graph = reference.graph;
+        }
+
         public Page(Page page)
         {
             if (page != null)
             {
-                foreach (Shape shape in page.shapes)
-                {
-                    this.shapes.Add(new Shape(shape));
-                }
+                foreach (Shape shape in page.shapes) this.shapes.Add(new Shape(shape));
+                foreach (Block block in page.blocks) this.blocks.Add(new Block(block));
 
                 this.Unit = page.Unit;
                 this.Frame = new Rg.Plane(page.Frame);
@@ -96,6 +114,20 @@ namespace PdfPlus
             }
         }
 
+        public List<Block> Blocks
+        {
+            get
+            {
+                List<Block> output = new List<Block>();
+                foreach (Block block in blocks)
+                {
+                    Block blk = new Block(block);
+                    output.Add(blk);
+                }
+                return output;
+            }
+        }
+
         #endregion
 
         #region properties
@@ -119,10 +151,7 @@ namespace PdfPlus
 
         public virtual Rg.Rectangle3d Boundary
         {
-            get
-            {
-                        return new Rg.Rectangle3d(this.Frame, this.baseObject.Width.Point, this.baseObject.Height.Point);
-            }
+            get { return new Rg.Rectangle3d(this.Frame, this.baseObject.Width.Point, this.baseObject.Height.Point); }
         }
 
         public virtual PageOrientation Orientation
@@ -178,6 +207,28 @@ namespace PdfPlus
             return document;
         }
 
+        public List<Page> RenderBlocks()
+        {
+            List<Page> output = new List<Page>();
+
+            var clone = (Pf.PdfPage)this.baseObject.Clone();
+
+            Md.Document doc = new Md.Document();
+            foreach (Block block in blocks) block.Render(doc);
+
+                Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
+            pdfDocumentRenderer.Document = doc;
+            pdfDocumentRenderer.PdfDocument = new Pf.PdfDocument();
+
+            pdfDocumentRenderer.RenderDocument();
+            foreach(Pf.PdfPage page in pdfDocumentRenderer.PdfDocument.Pages)
+            {
+                output.Add(new Page(page));
+            }
+
+            return output;
+        }
+
         protected void Render(Pf.PdfPage page)
         {
             graph = Pd.XGraphics.FromPdfPage(page);
@@ -196,6 +247,15 @@ namespace PdfPlus
             bool isValid = goo.TryGetShape(ref shape);
             shape.AlignContent(this,false);
             this.shapes.Add(shape);
+
+            return isValid;
+        }
+
+        public bool AddBlock(IGH_Goo goo)
+        {
+            Block block = null;
+            bool isValid = goo.TryGetBlock(ref block);
+            this.blocks.Add(block);
 
             return isValid;
         }

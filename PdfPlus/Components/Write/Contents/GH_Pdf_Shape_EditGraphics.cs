@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_EditGraphics()
           : base("Shape Graphics", "Shp Graphics",
               "Edit shape graphical attributes",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

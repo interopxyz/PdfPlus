@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddImage()
           : base("Image Frame", "Img Frame",
               "Create an Image Shape within a rectangular boundary",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

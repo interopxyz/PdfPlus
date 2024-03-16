@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_AddImperial()
           : base("Add Page Imperial", "Page Imperial",
               "Create a new PDF Page from a standard imperial page size",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

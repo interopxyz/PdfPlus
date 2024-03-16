@@ -13,7 +13,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_Deconstruct()
           : base("Deconstruct Page", "DePage",
               "Deconstruct a PDF Page",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

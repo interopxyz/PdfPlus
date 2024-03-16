@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddTextPt()
           : base("Text Point", "Txt Pt",
               "Create a Text Shape at a point location",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 

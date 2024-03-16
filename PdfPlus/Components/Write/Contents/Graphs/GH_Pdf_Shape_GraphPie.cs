@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_GraphPie()
           : base("Add Pie Chart", "Pie",
               "Create a Chart Shape within a rectangular boundary",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 
