@@ -201,15 +201,16 @@ namespace PdfPlus
 
         public Pf.PdfDocument AddToDocument(Pf.PdfDocument document)
         {
-            var clone = (Pf.PdfPage)this.baseObject.Clone();
-            document.AddPage(clone);
-            this.Render(clone);
+            document = this.RenderBlocks(document);
+            if (shapes.Count > 0) { 
+            document.AddPage(this.baseObject);
+            this.Render(this.baseObject);
+            }
             return document;
         }
 
-        public List<Page> RenderBlocks()
+        public Pf.PdfDocument RenderBlocks(Pf.PdfDocument document)
         {
-            List<Page> output = new List<Page>();
 
             var clone = (Pf.PdfPage)this.baseObject.Clone();
 
@@ -218,15 +219,11 @@ namespace PdfPlus
 
                 Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
             pdfDocumentRenderer.Document = doc;
-            pdfDocumentRenderer.PdfDocument = new Pf.PdfDocument();
+            pdfDocumentRenderer.PdfDocument = document;
 
             pdfDocumentRenderer.RenderDocument();
-            foreach(Pf.PdfPage page in pdfDocumentRenderer.PdfDocument.Pages)
-            {
-                output.Add(new Page(page));
-            }
 
-            return output;
+            return pdfDocumentRenderer.PdfDocument;
         }
 
         protected void Render(Pf.PdfPage page)

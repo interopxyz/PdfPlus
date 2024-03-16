@@ -62,7 +62,7 @@ namespace PdfPlus
         {
             if (PdfPlusEnvironment.FileIoBlocked)
                 return;
-            var doc = Bake();
+            pdf.PdfDocument doc = Bake();
             doc.Save(filepath);
         }
 
@@ -88,16 +88,17 @@ namespace PdfPlus
 
         protected pdf.PdfDocument Bake()
         {
-            var pdf = new pdf.PdfDocument();
-            pdf.PageLayout = this.PageLayout.ToPdf();
+            pdf.PdfDocument doc = new pdf.PdfDocument();
+            doc.PageLayout = this.PageLayout.ToPdf();
+
+            
 
             foreach (Page page in this.pages)
             {
-                
-                pdf = page.AddToDocument(pdf);
+                doc = page.AddToDocument(doc);
             }
 
-            return pdf;
+            return doc;
         }
 
         public MemoryStream GetStream()

@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_AddContents()
           : base("Place Shapes", "Place Shp",
               "Place Text, Image, or Geometric based Shapes to a PDF Page.",
-              Constants.ShortName, Constants.MigraDoc)
+              Constants.ShortName, Constants.PdfSharp)
         {
         }
 
