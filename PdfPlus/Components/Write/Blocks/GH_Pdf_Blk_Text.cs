@@ -4,6 +4,7 @@ using MigraDoc.DocumentObjectModel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using Grasshopper.Kernel.Parameters;
 
 namespace PdfPlus.Components.Write.Blocks
 {
@@ -33,6 +34,15 @@ namespace PdfPlus.Components.Write.Blocks
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Formatting", "F", "Optional predefined text formatting", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (Block.FormatTypes value in Enum.GetValues(typeof(Block.FormatTypes)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -52,7 +62,10 @@ namespace PdfPlus.Components.Write.Blocks
             string text = string.Empty;
             DA.GetData(0, ref text);
 
-            Block block = Block.CreateText(text);
+            int formatting = 0;
+            DA.GetData(1, ref formatting);
+
+            Block block = Block.CreateText(text,(Block.FormatTypes)formatting);
 
             DA.SetData(0, block);
         }

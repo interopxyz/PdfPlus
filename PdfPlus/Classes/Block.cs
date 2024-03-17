@@ -29,15 +29,18 @@ namespace PdfPlus
         public enum PathTypes { }
 
         //Text
+        public enum FormatTypes { Normal, Heading1, Heading2, Heading3,Heading4, Heading5, Heading6, Heading7,Heading8,Heading9,List,Footnote,Header,Footer,Hyperlink,Custom };
+        private FormatTypes formatType = FormatTypes.Normal;
+        private string formatName = "Normal";
         private string paragraph = string.Empty;
 
         //List
         public enum ListTypes { Dot,Circle,Square,Number,NumberAlt,Letter}
         private ListTypes listType = ListTypes.Dot;
-        private List<string> items = new List<string>();
+        private List<string> listItems = new List<string>();
 
         //Table
-        private List<List<string>> contents = new List<List<string>>();
+        private List<List<string>> tableContents = new List<List<string>>();
 
         //Image
         string imageFileName = string.Empty;
@@ -57,17 +60,19 @@ namespace PdfPlus
 
             //text
             this.paragraph = block.paragraph;
+            this.formatType = block.formatType;
+            this.formatName = block.formatName;
 
             //list
             this.listType = block.listType;
-            foreach (string item in block.items) this.items.Add(item);
+            foreach (string item in block.listItems) this.listItems.Add(item);
 
             //table
             int i = 0;
-            foreach (List<string> entry in block.contents)
+            foreach (List<string> entry in block.tableContents)
             {
-                this.contents.Add(new List<string>());
-                foreach (string item in entry) this.contents[i].Add(item);
+                this.tableContents.Add(new List<string>());
+                foreach (string item in entry) this.tableContents[i].Add(item);
                 i++;
             }
 
@@ -90,11 +95,13 @@ namespace PdfPlus
 
         #region text
 
-        public static Block CreateText(string content)
+        public static Block CreateText(string content, FormatTypes format = FormatTypes.Normal)
         {
             Block block = new Block();
             block.blockType = BlockTypes.Text;
             block.paragraph = content;
+            block.formatType = format;
+            block.formatName = format.ToString();
 
             return block;
         }
@@ -108,7 +115,7 @@ namespace PdfPlus
             Block block = new Block();
             block.blockType = BlockTypes.List;
             block.listType = type;
-            foreach (string item in items) block.items.Add(item);
+            foreach (string item in items) block.listItems.Add(item);
 
             return block;
         }
@@ -125,8 +132,8 @@ namespace PdfPlus
             int i = 0;
             foreach (List<string> set in items)
             {
-                block.contents.Add(new List<string>());
-                foreach(string item in set) block.contents[i].Add(item);
+                block.tableContents.Add(new List<string>());
+                foreach(string item in set) block.tableContents[i].Add(item);
                 i++;
             }
 
@@ -147,13 +154,15 @@ namespace PdfPlus
 
         public Md.Document Render(Md.Document document)
         {
+            
             switch (this.blockType)
             {
                 case BlockTypes.PageBreak:
                     document.AddSection();
                     break;
                 case BlockTypes.Text:
-                    document.LastSection.AddParagraph(this.paragraph);
+                    Md.Paragraph txt = document.LastSection.AddParagraph();
+                    txt.AddFormattedText(this.paragraph, document.Styles[this.formatName].Font);
                     break;
                 case BlockTypes.List:
                     Md.Style style = document.AddStyle("List-"+this.listType.ToString(), "Normal");
@@ -161,12 +170,12 @@ namespace PdfPlus
 
                     Md.ListType listType = (Md.ListType)this.listType;
 
-                    for (int idx = 0; idx < items.Count; ++idx)
+                    for (int idx = 0; idx < listItems.Count; ++idx)
                     {
                         Md.ListInfo listinfo = new Md.ListInfo();
                         listinfo.ContinuePreviousList = idx > 0;
                         listinfo.ListType = listType;
-                        Md.Paragraph listItem = document.LastSection.AddParagraph(items[idx]);
+                        Md.Paragraph listItem = document.LastSection.AddParagraph(listItems[idx]);
                         listItem.Style = "List";
                         listItem.Format.ListInfo = listinfo;
                     }
@@ -176,9 +185,9 @@ namespace PdfPlus
                     int rowCount = 0;
 
                     //Columns
-                    for (int i = 0; i < contents.Count; i++)
+                    for (int i = 0; i < tableContents.Count; i++)
                     {
-                        rowCount = Math.Max(rowCount, contents[i].Count);
+                        rowCount = Math.Max(rowCount, tableContents[i].Count);
                         table.AddColumn();
                     }
 
@@ -189,11 +198,11 @@ namespace PdfPlus
                     }
 
                     //Cells
-                    for (int i = 0; i < contents.Count; i++)
+                    for (int i = 0; i < tableContents.Count; i++)
                     {
-                        for (int j = 0; j < contents[i].Count; j++)
+                        for (int j = 0; j < tableContents[i].Count; j++)
                         {
-                            table.Rows[j].Cells[i].AddParagraph(contents[i][j]);
+                            table.Rows[j].Cells[i].AddParagraph(tableContents[i][j]);
                         }
                     }
 

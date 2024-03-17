@@ -195,28 +195,28 @@
     <None Include="Resources\PDF_Link-01.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\assorted\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
-      <Project>{6318a852-ef6b-486f-8547-3d7e736d7943}</Project>
-      <Name>MigraDoc.DocumentObjectModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\assorted\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
-      <Project>{a0b7940a-0bfc-476d-a204-73f7c0f88fde}</Project>
-      <Name>MigraDoc.Rendering</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\assorted\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
-      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
-      <Name>PdfSharp.Charting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\assorted\PDFsharp\src\PdfSharp\PdfSharp.csproj">
-      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
-      <Name>PdfSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Pdf-Page-SetShapes.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Page-SetBlocks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
+      <Project>{6318a852-ef6b-486f-8547-3d7e736d7943}</Project>
+      <Name>MigraDoc.DocumentObjectModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
+      <Project>{a0b7940a-0bfc-476d-a204-73f7c0f88fde}</Project>
+      <Name>MigraDoc.Rendering</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
+      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
+      <Name>PdfSharp.Charting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
+      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
+      <Name>PdfSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
