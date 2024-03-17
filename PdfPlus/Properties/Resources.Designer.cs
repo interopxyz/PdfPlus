@@ -223,26 +223,6 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_AddContent_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Page_AddContent_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_AddContent4_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Page_AddContent4_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Pdf_Page_Boundary_01 {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Page_Boundary_01", resourceCulture);
@@ -276,6 +256,26 @@ namespace PdfPlus.Properties {
         internal static System.Drawing.Bitmap Pdf_Page_Metric_01 {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Page_Metric_01", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Page_SetBlocks {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Page_SetBlocks", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Page_SetShapes {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Page_SetShapes", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

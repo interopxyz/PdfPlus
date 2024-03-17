@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
         /// </summary>
         public GH_Pdf_Page_AddContents()
-          : base("Place Shapes", "Place Shp",
+          : base("Set Shapes", "Set Shp",
               "Place Text, Image, or Geometric based Shapes to a PDF Page.",
               Constants.ShortName, Constants.PdfSharp)
         {
@@ -77,7 +77,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_AddContent4_01;
+                return Properties.Resources.Pdf_Page_SetShapes;
             }
         }
 

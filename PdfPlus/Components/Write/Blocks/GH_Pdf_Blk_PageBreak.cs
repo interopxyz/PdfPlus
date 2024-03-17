@@ -1,20 +1,18 @@
 ﻿using Grasshopper.Kernel;
-using MigraDoc.Rendering;
-using MigraDoc.DocumentObjectModel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Blk_Text : GH_Component
+    public class GH_Pdf_Blk_PageBreak : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_Text class.
+        /// Initializes a new instance of the GH_Pdf_Blk_PageBreak class.
         /// </summary>
-        public GH_Pdf_Blk_Text()
-          : base("Text Block", "Txt Blk",
-              "Create a text block",
+        public GH_Pdf_Blk_PageBreak()
+          : base("Page Break Block", "Brk Blk",
+              "Create a page break block",
               Constants.ShortName, Constants.MigraDoc)
         {
         }
@@ -32,7 +30,6 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -49,10 +46,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string text = string.Empty;
-            DA.GetData(0, ref text);
-
-            Block block = Block.CreateText(text);
+            Block block = Block.CreatePageBreak();
 
             DA.SetData(0, block);
         }
@@ -75,7 +69,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("4e9ff875-26bb-4365-a839-1fbccccae6bd"); }
+            get { return new Guid("c8f9c9fa-6c24-4934-88af-20b0aeb788f9"); }
         }
     }
 }

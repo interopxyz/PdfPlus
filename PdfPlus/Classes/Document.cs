@@ -91,8 +91,6 @@ namespace PdfPlus
             pdf.PdfDocument doc = new pdf.PdfDocument();
             doc.PageLayout = this.PageLayout.ToPdf();
 
-            
-
             foreach (Page page in this.pages)
             {
                 doc = page.AddToDocument(doc);

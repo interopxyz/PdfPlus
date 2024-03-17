@@ -71,6 +71,8 @@
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
     <Compile Include="Classes\Shape.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_List.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_PageBreak.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Text.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf__Base.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphData.cs" />
     <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphPie.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Add.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Table.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Add.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_SetBlocks.cs" />
@@ -102,6 +105,7 @@
     </Compile>
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\Enums.cs" />
+    <Compile Include="Utilities\GhExtensions.cs" />
     <Compile Include="Utilities\PdfExtensions.cs" />
     <Compile Include="Utilities\PdfPlusEnvironment.cs" />
   </ItemGroup>
@@ -207,6 +211,12 @@
       <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
       <Name>PdfSharp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-SetShapes.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-SetBlocks.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

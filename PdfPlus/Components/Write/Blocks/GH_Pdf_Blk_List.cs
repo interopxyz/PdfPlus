@@ -1,20 +1,19 @@
 ﻿using Grasshopper.Kernel;
-using MigraDoc.Rendering;
-using MigraDoc.DocumentObjectModel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Blk_Text : GH_Component
+    public class GH_Pdf_Blk_List : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_Text class.
+        /// Initializes a new instance of the GH_Pdf_Blk_List class.
         /// </summary>
-        public GH_Pdf_Blk_Text()
-          : base("Text Block", "Txt Blk",
-              "Create a text block",
+        public GH_Pdf_Blk_List()
+          : base("List Block", "Lst Blk",
+              "Create a bulleted or numbered list block",
               Constants.ShortName, Constants.MigraDoc)
         {
         }
@@ -32,7 +31,16 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
+            pManager.AddTextParameter("List Items", "T", "A list of text to display", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Bullet Type", "B", "The list bullet type", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (Block.ListTypes value in Enum.GetValues(typeof(Block.ListTypes)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -49,10 +57,13 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string text = string.Empty;
-            DA.GetData(0, ref text);
+            List<string> items = new List<string>();
+            DA.GetDataList(0, items);
 
-            Block block = Block.CreateText(text);
+            int type = 0;
+            DA.GetData(1, ref type);
+
+            Block block = Block.CreateList(items,(Block.ListTypes)type);
 
             DA.SetData(0, block);
         }
@@ -75,7 +86,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("4e9ff875-26bb-4365-a839-1fbccccae6bd"); }
+            get { return new Guid("0e512243-8cec-406b-bb6b-4a6f16e2456d"); }
         }
     }
 }

@@ -1,20 +1,20 @@
 ﻿using Grasshopper.Kernel;
-using MigraDoc.Rendering;
-using MigraDoc.DocumentObjectModel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Blocks
+namespace PdfPlus.Components.Write.Documents
 {
-    public class GH_Pdf_Blk_Text : GH_Component
+    public class GH_Pdf_Doc_Blk_Table : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_Text class.
+        /// Initializes a new instance of the GH_Pdf_Doc_Blk_Table class.
         /// </summary>
-        public GH_Pdf_Blk_Text()
-          : base("Text Block", "Txt Blk",
-              "Create a text block",
+        public GH_Pdf_Doc_Blk_Table()
+          : base("Table Block", "Tbl Blk",
+              "Create a table block",
               Constants.ShortName, Constants.MigraDoc)
         {
         }
@@ -32,7 +32,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
+            pManager.AddTextParameter("Text Tree", "T", "A datatree of text values", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -49,12 +49,41 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string text = string.Empty;
-            DA.GetData(0, ref text);
 
-            Block block = Block.CreateText(text);
+            GH_Structure<GH_String> ghData = new GH_Structure<GH_String>();
+
+            if (!DA.GetDataTree(0, out ghData)) return;
+
+            Dictionary<int, List<List<string>>> dataSets = new Dictionary<int, List<List<string>>>();
+            List<List<string>> dataSet = new List<List<string>>();
+
+            dataSets.Add(0, new List<List<string>>());
+            int i = 0;
+            foreach (GH_Path path in ghData.Paths)
+            {
+                if (path.Length > 1)
+                {
+                    if (!dataSets.ContainsKey(path[0])) dataSets.Add(path[0], new List<List<string>>());
+                    dataSets[path[0]].Add(ghData.Branches[i].ToStringList());
+                }
+                else
+                {
+                    dataSets[0].Add(ghData.Branches[i].ToStringList());
+                }
+                i++;
+            }
+
+            int rc = this.RunCount - 1;
+            if (rc > (dataSets.Keys.Count - 1)) rc = dataSets.Keys.Count - 1;
+            foreach (List<string> data in dataSets[rc])
+            {
+                dataSet.Add(data);
+            }
+
+            Block block = Block.CreateTable(dataSet);
 
             DA.SetData(0, block);
+
         }
 
         /// <summary>
@@ -75,7 +104,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("4e9ff875-26bb-4365-a839-1fbccccae6bd"); }
+            get { return new Guid("621a662a-fefb-45ab-997d-efc8d4259ebc"); }
         }
     }
 }

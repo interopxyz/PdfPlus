@@ -215,9 +215,12 @@ namespace PdfPlus
             var clone = (Pf.PdfPage)this.baseObject.Clone();
 
             Md.Document doc = new Md.Document();
+            
+            Md.Section section = doc.Sections.AddSection();
+
             foreach (Block block in blocks) block.Render(doc);
 
-                Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
+            Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
             pdfDocumentRenderer.Document = doc;
             pdfDocumentRenderer.PdfDocument = document;
 

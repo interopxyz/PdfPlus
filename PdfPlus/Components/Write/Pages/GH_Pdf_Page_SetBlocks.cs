@@ -15,7 +15,7 @@ namespace PdfPlus.Components.Write.Pages
         /// </summary>
         public GH_Pdf_Page_SetBlocks()
           : base("Set Blocks", "Set Blk",
-              "Render a sequence of Blocks to PDF Pages.",
+              "Sequentially place a list of Blocks to PDF Pages.",
               Constants.ShortName, Constants.MigraDoc)
         {
         }
@@ -74,7 +74,7 @@ namespace PdfPlus.Components.Write.Pages
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Pdf_Page_SetBlocks;
             }
         }
 
