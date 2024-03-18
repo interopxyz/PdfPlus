@@ -47,6 +47,7 @@ namespace PdfPlus
 
         //Image
         string imageFileName = string.Empty;
+        protected Sd.Bitmap imageObject = new Sd.Bitmap(10, 10);
 
         #endregion
 
@@ -87,6 +88,7 @@ namespace PdfPlus
 
             //image
             this.imageFileName = block.imageFileName;
+            this.imageObject = new Sd.Bitmap(block.imageObject);
 
         }
 
@@ -161,6 +163,18 @@ namespace PdfPlus
 
         #endregion
 
+        #region image
+
+        public static Block CreateImage(Sd.Bitmap bitmap)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Image;
+
+            return block;
+        }
+
+        #endregion
+
         #endregion
 
         #region properties
@@ -179,18 +193,15 @@ namespace PdfPlus
                 case BlockTypes.LineBreak:
                     Md.Shapes.TextFrame frame = document.LastSection.AddTextFrame();
                     txt = document.LastSection.AddParagraph();
-                    for(int i =0;i<this.breakCount;i++) txt.AddLineBreak();
+                    for (int i =0;i<this.breakCount;i++) txt.AddLineBreak();
                     break;
                 case BlockTypes.PageBreak:
                     for (int i = 0; i < this.breakCount; i++) document.LastSection.AddPageBreak();
                     break;
                 case BlockTypes.Text:
                     txt = document.LastSection.AddParagraph(this.paragraph);
-                    txt.Format = document.Styles[this.formatName].ParagraphFormat.Clone();
-                    if (this.Font.IsModified)
-                    {
-                        txt.Format.Alignment = this.font.Justification.ToMigraDoc();
-                    }
+                    txt.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
+
                     break;
                 case BlockTypes.List:
                     Md.ListType listType = (Md.ListType)this.listType;
@@ -200,7 +211,7 @@ namespace PdfPlus
                         listinfo.ContinuePreviousList = idx > 0;
                         listinfo.ListType = listType;
                         Md.Paragraph listItem = document.LastSection.AddParagraph(listItems[idx]);
-                        listItem.Style = "List";
+                        listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
                         listItem.Format.ListInfo = listinfo;
                     }
 
@@ -227,13 +238,16 @@ namespace PdfPlus
                     {
                         for (int j = 0; j < tableContents[i].Count; j++)
                         {
-                            table.Rows[j].Cells[i].AddParagraph(tableContents[i][j]);
+                            txt = table.Rows[j].Cells[i].AddParagraph(tableContents[i][j]);
+                            txt.Format = this.font.ToMigraDocParagraphFormat(document.Styles["Normal"].ParagraphFormat.Clone());
+
                         }
                     }
 
                     break;
                 case BlockTypes.Image:
-                    document.LastSection.AddImage(imageFileName);
+                    Md.Shapes.Image img = document.LastSection.AddImage("base64:" + Convert.ToBase64String(this.imageObject.ToByteArray()));
+                    
                     break;
             }
 

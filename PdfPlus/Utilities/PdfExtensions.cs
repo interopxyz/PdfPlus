@@ -19,6 +19,7 @@ using Md = MigraDoc.DocumentObjectModel;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Grasshopper.Kernel.Types;
+using System.Reflection;
 
 namespace PdfPlus
 {
@@ -617,6 +618,14 @@ namespace PdfPlus
             return stream;
         }
 
+        public static Byte[] ToByteArray(this Sd.Bitmap input)
+        {
+            MemoryStream stream = new MemoryStream();
+
+            input.Save(stream, Sd.Imaging.ImageFormat.Png);
+            return stream.ToArray();
+        }
+
         #endregion
 
         #region text
@@ -723,6 +732,27 @@ namespace PdfPlus
 
         #region font
 
+        public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
+        {
+            if (input.IsModified)
+            {
+                if (input.HasFamily) format.Font.Name = input.Family;
+                if (input.HasSize)format.Font.Size = input.Size;
+                if (input.HasColor) format.Font.Color = input.Color.ToMigraDoc();
+                if (input.HasJustification) format.Alignment = input.Justification.ToMigraDoc();
+                if (input.HasStyle)
+                {
+                    format.Font.Bold = input.IsBold;
+                    format.Font.Italic = input.IsItalic;
+                    format.Font.Underline = Md.Underline.None;
+                    if (input.IsUnderlined) format.Font.Underline = Md.Underline.Single;
+                }
+
+            }
+
+            return format;
+        }
+
         public static Md.ParagraphAlignment ToMigraDoc(this Justification input)
         {
             switch (input)
@@ -746,6 +776,11 @@ namespace PdfPlus
         {
             return Md.Color.FromArgb(input.A, input.R, input.G, input.B);
         }
+
+        #endregion
+
+        #region images
+
 
         #endregion
 

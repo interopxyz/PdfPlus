@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Sd = System.Drawing;
+
 namespace PdfPlus
 {
     public class Element
