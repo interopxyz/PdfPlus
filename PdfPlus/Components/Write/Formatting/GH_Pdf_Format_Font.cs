@@ -34,20 +34,28 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Input, GH_ParamAccess.item);
             pManager.AddTextParameter("Family Name", "F", "Optional font family name", GH_ParamAccess.item);
             pManager[1].Optional = true;
             pManager.AddNumberParameter("Size", "S", "Optional font size", GH_ParamAccess.item);
             pManager[2].Optional = true;
             pManager.AddColourParameter("Color", "C", "Optional text color", GH_ParamAccess.item);
             pManager[3].Optional = true;
-            pManager.AddIntegerParameter("Style", "T", "The font style type", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Style", "T", "The font style type", GH_ParamAccess.item);
             pManager[4].Optional = true;
+            pManager.AddIntegerParameter("Justification", "J", "Text justification", GH_ParamAccess.item);
+            pManager[5].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[4];
             foreach (FontStyle value in Enum.GetValues(typeof(FontStyle)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
+            }
+
+            Param_Integer paramB = (Param_Integer)pManager[5];
+            foreach (Justification value in Enum.GetValues(typeof(Justification)))
+            {
+                paramB.AddNamedValue(value.ToString(), (int)value);
             }
 
         }
@@ -57,7 +65,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -71,14 +79,9 @@ namespace PdfPlus.Components
 
             IGH_Goo goo = null;
             if (!DA.GetData(0, ref goo)) return;
-            Shape shape = null;
-            bool isShape = goo.TryGetShape(ref shape);
-            if (isShape) font = shape.Font;
-
-            DataSet data = null;
-            bool isData = goo.CastTo<DataSet>(out data);
-            if (isData) data = new DataSet(data);
-            if (isData) font = data.Font;
+            Element elem = null;
+            bool isElement = goo.TryGetElement(ref elem);
+            if (isElement) font = elem.Font;
 
             string family = "Arial";
             if (DA.GetData(1, ref family)) font.Family = family;
@@ -92,18 +95,27 @@ namespace PdfPlus.Components
             int style = 0;
             if (DA.GetData(4, ref style)) font.Style = (FontStyle)style;
 
-            if (isShape)
+            int justification = 0;
+            if (DA.GetData(5, ref justification)) font.Justification = (Justification)justification;
+
+            Shape shape = null;
+            Block block = null;
+            DataSet dataSet = null;
+            if (goo.TryGetShape(ref shape))
             {
                 shape.Font = font;
-
                 prev_shapes.Add(shape);
                 DA.SetData(0, shape);
             }
-
-            if (isData)
+            else if (goo.TryGetBlock(ref block))
             {
-                data.Font = font;
-                DA.SetData(0, data);
+                block.Font = font;
+                DA.SetData(0, block);
+            }
+            else if (goo.TryGetDataSet(ref dataSet))
+            {
+                dataSet.Font = font;
+                DA.SetData(0, dataSet);
             }
         }
 

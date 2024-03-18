@@ -34,7 +34,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
-            pManager.AddGenericParameter("Content", "C", "Shapes, Text, or Geometry Shapes to add to the document", GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
             pManager[1].Optional = true;
         }
 

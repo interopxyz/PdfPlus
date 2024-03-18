@@ -64,10 +64,10 @@ namespace PdfPlus.Components
             Rectangle3d boundary = new Rectangle3d(Plane.WorldXY, 300, 200);
             DA.GetData(1, ref boundary);
 
-            Shape shape = new Shape(data, Shape.ChartTypes.Pie, boundary);
+            Shape shape = Shape.CreateChart(data, Shape.ChartTypes.Pie, boundary);
 
-            int justification = 0;
-            if (DA.GetData(2, ref justification)) shape.Justification = (Justification)justification;
+            int alignment = 0;
+            if (DA.GetData(2, ref alignment)) shape.Alignment = (Alignment)alignment;
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

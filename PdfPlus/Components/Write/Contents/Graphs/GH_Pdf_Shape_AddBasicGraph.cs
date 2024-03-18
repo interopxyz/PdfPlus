@@ -81,7 +81,7 @@ namespace PdfPlus.Components
             int type = 4;
             DA.GetData(2, ref type);
 
-            Shape shape = new Shape(data, (Shape.ChartTypes)type, boundary);
+            Shape shape = Shape.CreateChart(data, (Shape.ChartTypes)type, boundary);
 
             string x = string.Empty;
             if (DA.GetData(3, ref x))shape.XAxis = x;
@@ -89,8 +89,8 @@ namespace PdfPlus.Components
             string y = string.Empty;
             if (DA.GetData(4, ref y)) shape.YAxis = y;
 
-            int justification = 0;
-            if (DA.GetData(5, ref justification)) shape.Justification = (Justification)justification;
+            int alignment = 0;
+            if (DA.GetData(5, ref alignment)) shape.Alignment = (Alignment)alignment;
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

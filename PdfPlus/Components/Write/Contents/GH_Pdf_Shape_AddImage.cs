@@ -61,7 +61,7 @@ namespace PdfPlus.Components
             Rectangle3d boundary = new Rectangle3d();
             if (!DA.GetData(1, ref boundary)) return;
 
-            Shape shape = new Shape(bitmap, boundary, path);
+            Shape shape = Shape.CreateImage(bitmap, boundary, path);
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

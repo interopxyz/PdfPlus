@@ -34,7 +34,7 @@ namespace PdfPlus.Components.Write.Pages
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
-            pManager.AddGenericParameter("Blocks", "B", "Blocks to add to the document", GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
             pManager[1].Optional = true;
         }
 

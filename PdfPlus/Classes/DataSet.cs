@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus
 {
-    public class DataSet
+    public class DataSet: Element
     {
         #region members
 
@@ -18,28 +18,29 @@ namespace PdfPlus
         protected string title = string.Empty;
         protected bool hasTitle = false;
         protected bool hasGraphics = false;
-        public Graphic Graphic = new Graphic();
-        public Font Font = new Font();
 
         #endregion
 
         #region constructors
 
-        public DataSet(List<double> values)
+        public DataSet(List<double> values):base()
         {
+            this.elementType = ElementTypes.Data;
             this.values = values;
             this.Graphic.Stroke = Sd.Color.Black;
             this.Graphic.Weight = 1;
         }
-        public DataSet(List<double> values, List<string> labels)
+        public DataSet(List<double> values, List<string> labels) : base()
         {
+            this.elementType = ElementTypes.Data;
             this.values = values;
             this.Graphic.Stroke = Sd.Color.Black;
             this.Graphic.Weight = 1;
         }
 
-        public DataSet(DataSet dataSet)
+        public DataSet(DataSet dataSet) : base()
         {
+            this.elementType = dataSet.elementType;
             this.title = dataSet.title;
             this.hasTitle = dataSet.hasTitle;
             this.Graphic = new Graphic(dataSet.Graphic);

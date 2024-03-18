@@ -69,6 +69,11 @@ namespace PdfPlus
             get { return "Doc"; }
         }
 
+        public static Descriptor Element
+        {
+            get { return new Descriptor("Element", "El", "A Pdf Shape, Block, or DataSet Element", "A Pdf Shape, Block, or DataSet Element", "Pdf Shape, Block, or DataSet Elements"); }
+        }
+
         public static Descriptor Block
         {
             get { return new Descriptor("Block", "Bk", "PDF Document Block", "PDF Document Block", "PDF Document Blocks"); }

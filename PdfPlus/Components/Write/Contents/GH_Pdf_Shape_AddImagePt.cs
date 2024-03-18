@@ -72,7 +72,7 @@ namespace PdfPlus.Components
 
             Rectangle3d rect = new Rectangle3d(Plane.WorldXY, p, new Point3d(p.X + w, p.Y + h, 0));
 
-            Shape shape = new Shape(bitmap, rect, path);
+            Shape shape = Shape.CreateImage(bitmap, rect, path);
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

@@ -57,7 +57,7 @@ namespace PdfPlus.Components
             string content = string.Empty;
             if (!DA.GetData(1, ref content)) return;
 
-            Shape shape = new Shape(content, location, new Font());
+            Shape shape = Shape.CreateText(content, location, new Font());
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

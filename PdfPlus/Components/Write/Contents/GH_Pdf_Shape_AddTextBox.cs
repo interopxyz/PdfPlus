@@ -70,7 +70,7 @@ namespace PdfPlus.Components
             if (!DA.GetData(2, ref alignment)) return;
 
 
-            Shape shape = new Shape(content, boundary,(Alignment)alignment, new Font());
+            Shape shape = Shape.CreateText(content, boundary,(Alignment)alignment, new Font());
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

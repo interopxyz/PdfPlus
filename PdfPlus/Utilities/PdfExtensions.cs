@@ -51,19 +51,19 @@ namespace PdfPlus
                             switch (type)
                             {
                                 default:
-                                    shape = new Shape(curve.ToNurbsCurve(), new Graphic());
+                                    shape = Shape.CreateGeometry(curve.ToNurbsCurve(), new Graphic());
                                     break;
                                 case "Polyline Curve":
                                     Rg.Polyline pline;
-                                    if (curve.TryGetPolyline(out pline)) shape = new Shape(pline, new Graphic());
+                                    if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, new Graphic());
                                     break;
                                 case "Line-like Curve":
-                                    shape = new Shape(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
+                                    shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
                                     break;
                                 case "Elliptical Curve":
                                     Rg.Ellipse ellipse;
                                     curve.TryGetEllipse(out ellipse);
-                                    shape = new Shape(ellipse, new Graphic());
+                                    shape = Shape.CreateGeometry(ellipse, new Graphic());
                                     break;
                             }
                             isValid = true;
@@ -74,7 +74,7 @@ namespace PdfPlus
 
                         if (goo.CastTo<Rg.Arc>(out arc))
                         {
-                            shape = new Shape(arc, new Graphic());
+                            shape = Shape.CreateGeometry(arc, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -83,7 +83,7 @@ namespace PdfPlus
 
                         if (goo.CastTo<Rg.Circle>(out circle))
                         {
-                            shape = new Shape(circle, new Graphic());
+                            shape = Shape.CreateGeometry(circle, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -92,7 +92,7 @@ namespace PdfPlus
 
                         if (goo.CastTo<Rg.Line>(out line))
                         {
-                            shape = new Shape(line, new Graphic());
+                            shape = Shape.CreateGeometry(line, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -101,7 +101,7 @@ namespace PdfPlus
                         if (goo.CastTo<Rg.Surface>(out surface))
                         {
                             Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
-                            shape = new Shape(srfBrep, new Graphic());
+                            shape = Shape.CreateGeometry(srfBrep, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -109,7 +109,7 @@ namespace PdfPlus
                         Rg.Brep brep;
                         if (goo.CastTo<Rg.Brep>(out brep))
                         {
-                            shape = new Shape(brep, new Graphic());
+                            shape = Shape.CreateGeometry(brep, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -117,7 +117,7 @@ namespace PdfPlus
                         Rg.Mesh mesh;
                         if (goo.CastTo<Rg.Mesh>(out mesh))
                         {
-                            shape = new Shape(mesh, new Graphic());
+                            shape = Shape.CreateGeometry(mesh, new Graphic());
                             isValid = true;
                         }
                         break;
@@ -136,95 +136,38 @@ namespace PdfPlus
                 block = new Block(blk);
                 isValid = true;
             }
-            else
-            {
-                //switch (goo.TypeName)
-                //{
-                //    case "Curve":
-                //        Rg.Curve curve;
-                //        isValid = true;
 
-                //        if (goo.CastTo<Rg.Curve>(out curve))
-                //        {
-                //            string type = goo.ToString();
-
-                //            switch (type)
-                //            {
-                //                default:
-                //                    shape = new Shape(curve.ToNurbsCurve(), new Graphic());
-                //                    break;
-                //                case "Polyline Curve":
-                //                    Rg.Polyline pline;
-                //                    if (curve.TryGetPolyline(out pline)) shape = new Shape(pline, new Graphic());
-                //                    break;
-                //                case "Line-like Curve":
-                //                    shape = new Shape(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
-                //                    break;
-                //                case "Elliptical Curve":
-                //                    Rg.Ellipse ellipse;
-                //                    curve.TryGetEllipse(out ellipse);
-                //                    shape = new Shape(ellipse, new Graphic());
-                //                    break;
-                //            }
-                //            isValid = true;
-                //        }
-                //        break;
-                //    case "Arc":
-                //        Rg.Arc arc;
-
-                //        if (goo.CastTo<Rg.Arc>(out arc))
-                //        {
-                //            shape = new Shape(arc, new Graphic());
-                //            isValid = true;
-                //        }
-                //        break;
-                //    case "Circle":
-                //        Rg.Circle circle;
-
-                //        if (goo.CastTo<Rg.Circle>(out circle))
-                //        {
-                //            shape = new Shape(circle, new Graphic());
-                //            isValid = true;
-                //        }
-                //        break;
-                //    case "Line":
-                //        Rg.Line line;
-
-                //        if (goo.CastTo<Rg.Line>(out line))
-                //        {
-                //            shape = new Shape(line, new Graphic());
-                //            isValid = true;
-                //        }
-                //        break;
-                //    case "Surface":
-                //        Rg.Surface surface;
-                //        if (goo.CastTo<Rg.Surface>(out surface))
-                //        {
-                //            Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
-                //            shape = new Shape(srfBrep, new Graphic());
-                //            isValid = true;
-                //        }
-                //        break;
-                //    case "Brep":
-                //        Rg.Brep brep;
-                //        if (goo.CastTo<Rg.Brep>(out brep))
-                //        {
-                //            shape = new Shape(brep, new Graphic());
-                //            isValid = true;
-                //        }
-                //        break;
-                //    case "Mesh":
-                //        Rg.Mesh mesh;
-                //        if (goo.CastTo<Rg.Mesh>(out mesh))
-                //        {
-                //            shape = new Shape(mesh, new Graphic());
-                //            isValid = true;
-                //        }
-                //        break;
-                //}
-            }
             return isValid;
         }
+
+        public static bool TryGetElement(this IGH_Goo goo, ref Element element)
+        {
+            Element elem;
+            bool isValid = false;
+
+            if (goo.CastTo<Element>(out elem))
+            {
+                element = new Element(elem);
+                isValid = true;
+            }
+
+            return isValid;
+        }
+
+        public static bool TryGetDataSet(this IGH_Goo goo, ref DataSet dataSet)
+        {
+            Element elem;
+            bool isValid = false;
+
+            if (goo.CastTo<DataSet>(out dataSet))
+            {
+                dataSet = new DataSet(dataSet);
+                isValid = true;
+            }
+
+            return isValid;
+        }
+
         public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap, ref string path)
         {
 
@@ -250,6 +193,7 @@ namespace PdfPlus
             }
             return false;
         }
+
         public static bool GetBitmapFromFile(this string FilePath, out Sd.Bitmap bitmap)
         {
             bitmap = null;
@@ -334,17 +278,17 @@ namespace PdfPlus
 
         #region charts
 
-        public static Pc.DockingType ToPdf(this Justification input)
+        public static Pc.DockingType ToPdf(this Alignment input)
         {
             switch (input)
             {
                 default:
                     return Pc.DockingType.Bottom;
-                case Justification.Left:
+                case Alignment.Left:
                     return Pc.DockingType.Left;
-                case Justification.Right:
+                case Alignment.Right:
                     return Pc.DockingType.Right;
-                case Justification.Top:
+                case Alignment.Top:
                     return Pc.DockingType.Top;
             }
         }
@@ -544,16 +488,16 @@ namespace PdfPlus
             List<List<double>> output = new List<List<double>>();
 
             int count = 0;
-            foreach(DataSet ds in input)
+            foreach (DataSet ds in input)
             {
                 count = Math.Max(count, ds.Values.Count);
             }
 
             List<double> peaks = new List<double>();
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 peaks.Add(0);
-                foreach(DataSet ds in input)
+                foreach (DataSet ds in input)
                 {
                     if (i < ds.Values.Count)
                     {
@@ -602,7 +546,7 @@ namespace PdfPlus
             double min = input[0].Values.Min();
             double max = input[0].Values.Max();
 
-            foreach(DataSet data in input)
+            foreach (DataSet data in input)
             {
                 min = Math.Min(min, data.Values.Min());
                 max = Math.Max(max, data.Values.Max());
@@ -629,14 +573,14 @@ namespace PdfPlus
 
         public static Pd.XRect ToPdf(this Rg.Rectangle3d input)
         {
-            
+
             Pd.XRect rect = new Pd.XRect(input.Corner(0).X, input.Corner(3).Y, input.Width, input.Height);
             return rect;
         }
 
         public static Pf.PdfRectangle ToPdfRect(this Rg.Rectangle3d input, Rg.Plane plane)
         {
-            Pd.XRect rect = new Pd.XRect(input.Corner(0).X-plane.OriginX, input.Corner(0).Y - plane.OriginY, input.Width, input.Height);
+            Pd.XRect rect = new Pd.XRect(input.Corner(0).X - plane.OriginX, input.Corner(0).Y - plane.OriginY, input.Width, input.Height);
             Pf.PdfRectangle rectangle = new Pf.PdfRectangle(rect);
             return rectangle;
         }
@@ -659,7 +603,7 @@ namespace PdfPlus
             return boundary;
         }
 
-        public static Rg.Rectangle3d ToRhino(this Pf.PdfRectangle input, Rg.Plane frame )
+        public static Rg.Rectangle3d ToRhino(this Pf.PdfRectangle input, Rg.Plane frame)
         {
             Pd.XRect rect = input.ToXRect();
             Rg.Rectangle3d boundary = rect.ToRhino(frame);
@@ -688,17 +632,30 @@ namespace PdfPlus
             return new Pd.XFont(input.Family, input.Size, input.Style.ToPdf());
         }
 
-        public static Pl.XParagraphAlignment ToPdf(this Alignment input)
+        public static Pd.XStringAlignment ToPdfLine(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pd.XStringAlignment.Near;
+                case Justification.Center:
+                    return Pd.XStringAlignment.Center;
+                case Justification.Right:
+                    return Pd.XStringAlignment.Far;
+            }
+        }
+
+        public static Pl.XParagraphAlignment ToPdf(this Justification input)
         {
             switch (input)
             {
                 default:
                     return Pl.XParagraphAlignment.Left;
-                case Alignment.Center:
+                case Justification.Center:
                     return Pl.XParagraphAlignment.Center;
-                case Alignment.Right:
+                case Justification.Right:
                     return Pl.XParagraphAlignment.Right;
-                case Alignment.Justify:
+                case Justification.Justify:
                     return Pl.XParagraphAlignment.Justify;
             }
         }
@@ -728,6 +685,8 @@ namespace PdfPlus
 
         #region MigraDoc
 
+        #region units
+
         public static Md.Unit ToMigraDoc(this Pd.XUnit input)
         {
             switch (input.Type)
@@ -745,6 +704,10 @@ namespace PdfPlus
             }
         }
 
+        #endregion
+
+        #region pages
+
         public static Md.Orientation ToMigraDoc(this Ps.PageOrientation input)
         {
             switch (input)
@@ -756,10 +719,35 @@ namespace PdfPlus
             }
         }
 
+        #endregion
+
+        #region font
+
+        public static Md.ParagraphAlignment ToMigraDoc(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.ParagraphAlignment.Left;
+                case Justification.Right:
+                    return Md.ParagraphAlignment.Right;
+                case Justification.Center:
+                    return Md.ParagraphAlignment.Center;
+                case Justification.Justify:
+                    return Md.ParagraphAlignment.Justify;
+            }
+        }
+
+        #endregion
+
+        #region graphics
+
         public static Md.Color ToMigraDoc(this Sd.Color input)
         {
             return Md.Color.FromArgb(input.A, input.R, input.G, input.B);
         }
+
+        #endregion
 
         #endregion
     }

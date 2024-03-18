@@ -18,13 +18,13 @@ using System.IO;
 
 namespace PdfPlus
 {
-    public class Block
+    public class Block : Element
     {
 
         #region members
 
         public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Image };
-        private BlockTypes blockType = BlockTypes.None;
+        protected BlockTypes blockType = BlockTypes.None;
 
         public enum PathTypes { }
 
@@ -52,13 +52,16 @@ namespace PdfPlus
 
         #region constructors
 
-        public Block()
+        public Block():base()
         {
-
+            this.elementType = ElementTypes.Block;
         }
 
-        public Block(Block block)
+        public Block(Block block):base(block)
         {
+            this.graphic = new Graphic(block.graphic);
+            this.font = new Font(block.font);
+
             this.blockType = block.blockType;
 
             //text
@@ -174,6 +177,7 @@ namespace PdfPlus
             switch (this.blockType)
             {
                 case BlockTypes.LineBreak:
+                    Md.Shapes.TextFrame frame = document.LastSection.AddTextFrame();
                     txt = document.LastSection.AddParagraph();
                     for(int i =0;i<this.breakCount;i++) txt.AddLineBreak();
                     break;
@@ -182,14 +186,14 @@ namespace PdfPlus
                     break;
                 case BlockTypes.Text:
                     txt = document.LastSection.AddParagraph(this.paragraph);
-                    txt.Format = (Md.ParagraphFormat)document.Styles[this.formatName].ParagraphFormat.Clone();
+                    txt.Format = document.Styles[this.formatName].ParagraphFormat.Clone();
+                    if (this.Font.IsModified)
+                    {
+                        txt.Format.Alignment = this.font.Justification.ToMigraDoc();
+                    }
                     break;
                 case BlockTypes.List:
-                    Md.Style style = document.AddStyle("List-" + this.listType.ToString(), "Normal");
-                    style.ParagraphFormat.LeftIndent = "0.5cm";
-
                     Md.ListType listType = (Md.ListType)this.listType;
-
                     for (int idx = 0; idx < listItems.Count; ++idx)
                     {
                         Md.ListInfo listinfo = new Md.ListInfo();
@@ -199,6 +203,7 @@ namespace PdfPlus
                         listItem.Style = "List";
                         listItem.Format.ListInfo = listinfo;
                     }
+
                     break;
                 case BlockTypes.Table:
                     Md.Tables.Table table = document.LastSection.AddTable();

@@ -16,6 +16,7 @@ namespace PdfPlus
 {
     public class Document : IGH_Goo
     {
+
         #region members
 
         public PageLayouts PageLayout = PageLayouts.Single;
@@ -28,6 +29,7 @@ namespace PdfPlus
 
         public Document()
         {
+
         }
 
         public Document(Document document)
@@ -35,14 +37,14 @@ namespace PdfPlus
             CopyFrom(document);
         }
 
-        public Document(List<Page> pages)
-        {
-            this.AddPages(pages);
-        }
-
         public Document(Page page)
         {
             this.AddPages(page);
+        }
+
+        public Document(List<Page> pages)
+        {
+            this.AddPages(pages);
         }
 
         #endregion
@@ -200,6 +202,12 @@ namespace PdfPlus
             footnote.ParagraphFormat.LeftIndent = 12;
             footnote.ParagraphFormat.RightIndent = 12;
             footnote.ParagraphFormat.Font.Italic = true;
+
+            #endregion
+
+            #region List
+
+            Md.Style list = doc.Styles["List"];
 
             #endregion
 
@@ -382,5 +390,6 @@ namespace PdfPlus
         }
 
         #endregion
+
     }
 }

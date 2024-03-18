@@ -257,23 +257,26 @@ namespace PdfPlus
 
         public Pf.PdfDocument RenderBlocks(Pf.PdfDocument document)
         {
+            if (this.blocks.Count > 0)
+            {
+                var clone = (Pf.PdfPage)this.baseObject.Clone();
 
-            var clone = (Pf.PdfPage)this.baseObject.Clone();
-
-            Md.Document doc = Document.DefaultDocument();
-            Md.Section section = doc.Sections.AddSection();
-            doc = this.SetPage(doc);
+                Md.Document doc = Document.DefaultDocument();
+                Md.Section section = doc.Sections.AddSection();
+                doc = this.SetPage(doc);
 
 
-            foreach (Block block in blocks) block.Render(doc);
+                foreach (Block block in blocks) block.Render(doc);
 
-            Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
-            pdfDocumentRenderer.Document = doc;
-            pdfDocumentRenderer.PdfDocument = document;
+                Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
+                pdfDocumentRenderer.Document = doc;
+                pdfDocumentRenderer.PdfDocument = document;
 
-            pdfDocumentRenderer.RenderDocument();
+                pdfDocumentRenderer.RenderDocument();
 
-            return pdfDocumentRenderer.PdfDocument;
+                return pdfDocumentRenderer.PdfDocument;
+            }
+                return document;
         }
 
         protected void Render(Pf.PdfPage page)

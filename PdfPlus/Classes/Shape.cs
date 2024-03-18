@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PdfPlus
 {
-    public class Shape
+    public class Shape: Element
     {
         #region members
         public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
@@ -29,16 +29,12 @@ namespace PdfPlus
 
         string xAxis = string.Empty;
         string yAxis = string.Empty;
-        Justification justification = Justification.None;
-
-        protected Graphic graphic = new Graphic();
-        protected Font font = new Font();
+        Alignment alignment = Alignment.None;
 
         protected Sd.Bitmap image = new Sd.Bitmap(10, 10);
         protected string imagePath = "";
 
         protected string content = string.Empty;
-        protected Alignment alignment = Alignment.Left;
 
         protected Rg.Point3d location = new Rg.Point3d();
         protected Rg.Polyline polyline = new Rg.Polyline();
@@ -55,10 +51,17 @@ namespace PdfPlus
 
         #region constructors
 
-        public Shape(Shape shape)
+        protected Shape():base()
         {
-            this.graphic = new Graphic(shape.graphic);
-            this.font = new Font(shape.font);
+            this.elementType = ElementTypes.Shape;
+        }
+
+        protected Shape(Block block):base(block)
+        {
+        }
+
+        public Shape(Shape shape):base(shape)
+        {
 
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
@@ -67,7 +70,7 @@ namespace PdfPlus
             SetData(shape.data);
             this.xAxis = shape.xAxis;
             this.yAxis = shape.yAxis;
-            this.justification = shape.justification;
+            this.alignment = shape.alignment;
 
             this.content = shape.content;
             this.alignment = shape.alignment;
@@ -87,184 +90,233 @@ namespace PdfPlus
         }
 
         #region text
-        public Shape(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
-        {
-            shapeType = ShapeType.TextBox;
 
-            this.content = content;
-            this.alignment = alignment;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
-            this.font = new Font(font);
+        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextBox;
+
+            shape.content = content;
+            shape.alignment = alignment;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+            shape.font = new Font(font);
+
+            return shape;
         }
 
-        public Shape(string content, Rg.Point3d location, Font font)
+        public static Shape CreateText(string content, Rg.Point3d location, Font font)
         {
-            shapeType = ShapeType.TextObj;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextObj;
 
-            this.content = content;
-            this.location = new Rg.Point3d(location);
-            this.font = new Font(font);
+            shape.content = content;
+            shape.location = new Rg.Point3d(location);
+            shape.font = new Font(font);
+
+            return shape;
         }
 
-        public Shape(string link, Rg.Rectangle3d boundary, LinkTypes type)
+        public static Shape CreateLink(string link, Rg.Rectangle3d boundary, LinkTypes type)
         {
-            this.shapeType = ShapeType.LinkObj;
-            this.linkType = type;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.LinkObj;
+            shape.linkType = type;
 
-            this.content = link;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.content = link;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+
+            return shape;
         }
 
         #endregion
 
         #region image
 
-        public Shape(Sd.Bitmap bitmap, Rg.Rectangle3d boundary, string path = "")
+        public static Shape CreateImage(Sd.Bitmap bitmap, Rg.Rectangle3d boundary, string path = "")
         {
-            shapeType = ShapeType.ImageFrame;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ImageFrame;
 
-            this.image = new Sd.Bitmap(bitmap);
-            this.imagePath = path;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+            shape.image = new Sd.Bitmap(bitmap);
+            shape.imagePath = path;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+
+            return shape;
         }
 
-        public Shape(Sd.Bitmap bitmap, Rg.Point3d location, double scale = 1.0, string path = "")
+        public static Shape CreateImage(Sd.Bitmap bitmap, Rg.Point3d location, double scale = 1.0, string path = "")
         {
-            shapeType = ShapeType.ImageObj;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ImageObj;
 
-            this.image = new Sd.Bitmap(bitmap);
-            this.imagePath = path;
-            this.location = new Rg.Point3d(location);
+            shape.image = new Sd.Bitmap(bitmap);
+            shape.imagePath = path;
+            shape.location = new Rg.Point3d(location);
             Rg.Plane plane = Rg.Plane.WorldXY;
             double factor = 72.0/96.0;
             plane.Origin = location - new Rg.Vector3d(0, bitmap.Height * factor * scale, 0);
-            this.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X+bitmap.Width * factor * scale, location.Y+bitmap.Height * factor * scale, 0));
+            shape.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X+bitmap.Width * factor * scale, location.Y+bitmap.Height * factor * scale, 0));
+
+            return shape;
         }
 
         #endregion
 
         #region chart
 
-        public Shape(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary)
+        public static Shape CreateChart(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary)
         {
-            shapeType = ShapeType.ChartObj;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
-            this.chartType = chartType;
-            SetData(data);
-        }
-        public Shape(DataSet data, ChartTypes chartType, Rg.Rectangle3d boundary)
-        {
-            shapeType = ShapeType.ChartObj;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
-            this.chartType = chartType;
-            SetData(new List<DataSet> { data });
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ChartObj;
+
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.chartType = chartType;
+            shape.SetData(data);
+
+            return shape;
         }
 
-        public Shape(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary, string title)
+        public static Shape CreateChart(DataSet data, ChartTypes chartType, Rg.Rectangle3d boundary)
         {
-            shapeType = ShapeType.ChartObj;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
-            this.chartType = chartType;
-            SetData(data);
-            this.content = title; ;
-            ;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ChartObj;
+
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.chartType = chartType;
+            shape.SetData(new List<DataSet> { data });
+
+            return shape;
         }
+
+        public static Shape CreateChart(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary, string title)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ChartObj;
+
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.chartType = chartType;
+            shape.SetData(data);
+
+            return shape;
+        }
+
         #endregion
 
         #region geometry
 
-        public Shape(Rg.Polyline polyline, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Polyline polyline, Graphic graphic)
         {
-            shapeType = ShapeType.Polyline;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Polyline;
 
-            this.polyline = polyline.Duplicate();
+            shape.polyline = polyline.Duplicate();
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Line line, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Line line, Graphic graphic)
         {
-            shapeType = ShapeType.Line;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Line;
 
-            this.line = new Rg.Line(line.From, line.To);
+            shape.line = new Rg.Line(line.From, line.To);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Arc arc, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Arc arc, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = arc.ToNurbsCurve();
-            this.curve.MakePiecewiseBezier(true);
+            shape.curve = arc.ToNurbsCurve();
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Circle circle, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Circle circle, Graphic graphic)
         {
-            shapeType = ShapeType.Circle;
-            this.circle = new Rg.Circle(circle.Plane, circle.Radius);
-            this.boundary = new Rg.Rectangle3d(circle.Plane, new Rg.Interval(-circle.Radius, circle.Radius), new Rg.Interval(-circle.Radius, circle.Radius));
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Circle;
 
-            this.graphic = new Graphic(graphic);
+            shape.circle = new Rg.Circle(circle.Plane, circle.Radius);
+            shape.boundary = new Rg.Rectangle3d(circle.Plane, new Rg.Interval(-circle.Radius, circle.Radius), new Rg.Interval(-circle.Radius, circle.Radius));
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
-        public Shape(Rg.Ellipse ellipse, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Ellipse ellipse, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = ellipse.ToNurbsCurve();
-            this.curve.MakePiecewiseBezier(true);
+            shape.curve = ellipse.ToNurbsCurve();
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.BezierCurve bezier, Graphic graphic)
+        public static Shape CreateGeometry(Rg.BezierCurve bezier, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = bezier.ToNurbsCurve();
+            shape.curve = bezier.ToNurbsCurve();
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Curve curve, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Curve curve, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = new Rg.NurbsCurve(curve.ToNurbsCurve());
-            this.curve.MakePiecewiseBezier(true);
+            shape.curve = new Rg.NurbsCurve(curve.ToNurbsCurve());
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.NurbsCurve curve, Graphic graphic)
+        public static Shape CreateGeometry(Rg.NurbsCurve curve, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = new Rg.NurbsCurve(curve);
-            this.curve.MakePiecewiseBezier(true);
+            shape.curve = new Rg.NurbsCurve(curve);
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Brep brep, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Brep brep, Graphic graphic)
         {
-            shapeType = ShapeType.Brep;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Brep;
 
-            this.brep = brep.DuplicateBrep();
+            shape.brep = brep.DuplicateBrep();
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Mesh mesh, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Mesh mesh, Graphic graphic)
         {
-            shapeType = ShapeType.Mesh;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Mesh;
 
-            this.mesh = mesh.DuplicateMesh();
+            shape.mesh = mesh.DuplicateMesh();
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
         #endregion
@@ -345,18 +397,6 @@ namespace PdfPlus
             set { this.font.Style = value; }
         }
 
-        public virtual Graphic Graphic
-        {
-            get { return new Graphic(graphic); }
-            set { this.graphic = new Graphic(value); }
-        }
-
-        public virtual Font Font
-        {
-            get { return new Font(font); }
-            set { this.font = new Font(value); }
-        }
-
         public virtual string XAxis
         {
             get { return this.xAxis; }
@@ -379,10 +419,10 @@ namespace PdfPlus
             get { return (this.yAxis != string.Empty); }
         }
 
-        public virtual Justification Justification
+        public virtual Alignment Alignment
         {
-            get { return this.justification; }
-            set { this.justification = value; }
+            get { return this.alignment; }
+            set { this.alignment = value; }
         }
 
         public virtual string TextContent
@@ -747,14 +787,16 @@ namespace PdfPlus
                     break;
 
                 case ShapeType.TextObj:
-                    graph.DrawString(this.content, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf());
+                    Pd.XStringFormat format = new Pd.XStringFormat();
+                    format.Alignment = font.Justification.ToPdfLine();
+                    graph.DrawString(this.content, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf(), format);
                     break;
 
                 case ShapeType.TextBox:
                     Pd.XFont pdfFont = font.ToPdf();
 
                     Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
-                    textFormatter.Alignment = this.alignment.ToPdf();
+                    textFormatter.Alignment = this.Font.Justification.ToPdf();
                     textFormatter.LayoutRectangle = this.boundary.ToPdf();
                     textFormatter.Text = this.content;
                     textFormatter.Font = pdfFont;
@@ -781,9 +823,9 @@ namespace PdfPlus
                 case ShapeType.ChartObj:
                     Pc.Chart chart = CombinationChart();
 
-                    if (this.justification != Justification.None)
+                    if (this.alignment != Alignment.None)
                     {
-                        chart.Legend.Docking = this.justification.ToPdf();
+                        chart.Legend.Docking = this.alignment.ToPdf();
                         chart.Legend.Font.Color = this.font.Color.ToPdf();
                         chart.Legend.Font.Name = this.font.Family;
                         chart.Legend.Font.Size = this.font.Size;

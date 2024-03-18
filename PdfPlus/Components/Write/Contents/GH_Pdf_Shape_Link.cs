@@ -69,7 +69,7 @@ namespace PdfPlus.Components.Write.Contents
             Rectangle3d boundary = new Rectangle3d();
             if (!DA.GetData(2, ref boundary)) return;
 
-            Shape shape = new Shape(link, boundary, (Shape.LinkTypes)type);
+            Shape shape = Shape.CreateLink(link, boundary, (Shape.LinkTypes)type);
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);
