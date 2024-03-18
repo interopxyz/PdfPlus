@@ -13,6 +13,7 @@ using Mr = MigraDoc.Rendering;
 
 using Rg = Rhino.Geometry;
 using Grasshopper.Kernel.Types;
+using System.Drawing;
 
 namespace PdfPlus
 {
@@ -209,14 +210,67 @@ namespace PdfPlus
             return document;
         }
 
+        public Md.Document SetPage(Md.Document document)
+        {
+            switch (this.baseObject.Size)
+            {
+                default:
+                    document.LastSection.PageSetup.PageWidth = this.baseObject.Width.ToMigraDoc();
+                    document.LastSection.PageSetup.PageHeight = this.baseObject.Height.ToMigraDoc();
+                    break;
+                case PdfSharp.PageSize.A0:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.A0;
+                    break;
+                case PdfSharp.PageSize.A1:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.A1;
+                    break;
+                case PdfSharp.PageSize.A2:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.A2;
+                    break;
+                case PdfSharp.PageSize.A3:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.A3;
+                    break;
+                case PdfSharp.PageSize.A4:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.A4;
+                    break;
+                case PdfSharp.PageSize.A5:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.A5;
+                    break;
+                case PdfSharp.PageSize.Letter:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.Letter;
+                    break;
+                case PdfSharp.PageSize.Ledger:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.Ledger;
+                    break;
+                case PdfSharp.PageSize.Legal:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.Legal;
+                    break;
+                case PdfSharp.PageSize.Tabloid:
+                    document.LastSection.PageSetup.PageFormat = Md.PageFormat.P11x17;
+                    break;
+            }
+
+            document.LastSection.PageSetup.Orientation = this.baseObject.Orientation.ToMigraDoc();
+
+            return document;
+        }
+
         public Pf.PdfDocument RenderBlocks(Pf.PdfDocument document)
         {
 
             var clone = (Pf.PdfPage)this.baseObject.Clone();
 
             Md.Document doc = new Md.Document();
-            
             Md.Section section = doc.Sections.AddSection();
+            doc = this.SetPage(doc);
+
+            Md.Style style = doc.Styles["Heading1"];
+            style.Font.Name = "Times New Roman";
+            style.Font.Size = 16;
+            style.Font.Color = Md.Color.FromArgb(255,255,0,0);
+            style.ParagraphFormat.PageBreakBefore = true;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.KeepWithNext = true;
 
             foreach (Block block in blocks) block.Render(doc);
 

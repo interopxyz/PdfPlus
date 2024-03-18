@@ -1,4 +1,5 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,8 @@ namespace PdfPlus.Components.Write.Blocks
         /// Initializes a new instance of the GH_Pdf_Blk_PageBreak class.
         /// </summary>
         public GH_Pdf_Blk_PageBreak()
-          : base("Page Break Block", "Brk Blk",
-              "Create a page break block",
+          : base("Break Block", "Brk Blk",
+              "Create a break block",
               Constants.ShortName, Constants.MigraDoc)
         {
         }
@@ -30,6 +31,16 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddIntegerParameter("Type", "T", "The break type", GH_ParamAccess.item, 0);
+            pManager[0].Optional = true;
+            pManager.AddIntegerParameter("Count", "C", "The number of repetitions of the break", GH_ParamAccess.item, 1);
+            pManager[1].Optional = true;
+
+
+            Param_Integer paramA = (Param_Integer)pManager[0];
+            paramA.AddNamedValue("Line", 0);
+            paramA.AddNamedValue("Page", 1);
+
         }
 
         /// <summary>
@@ -46,7 +57,20 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Block block = Block.CreatePageBreak();
+            int type = 0;
+            DA.GetData(0, ref type);
+
+            int count = 1;
+            DA.GetData(1, ref count);
+            if (count < 1) count = 1;
+
+            Block block = Block.CreatePageBreak(count);
+            switch (type)
+            {
+                case 0:
+                    block = Block.CreateLineBreak(count);
+                    break;
+            }
 
             DA.SetData(0, block);
         }

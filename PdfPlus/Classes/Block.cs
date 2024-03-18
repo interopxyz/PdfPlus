@@ -23,19 +23,22 @@ namespace PdfPlus
 
         #region members
 
-        public enum BlockTypes { None, PageBreak, Text, List, Table, Image };
+        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Image };
         private BlockTypes blockType = BlockTypes.None;
 
         public enum PathTypes { }
 
         //Text
-        public enum FormatTypes { Normal, Heading1, Heading2, Heading3,Heading4, Heading5, Heading6, Heading7,Heading8,Heading9,List,Footnote,Header,Footer,Hyperlink,Custom };
+        public enum FormatTypes { Normal, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Heading7, Heading8, Heading9, List, Footnote, Header, Footer, Hyperlink, Custom };
         private FormatTypes formatType = FormatTypes.Normal;
         private string formatName = "Normal";
         private string paragraph = string.Empty;
 
+        //Break
+        private int breakCount = 1;
+
         //List
-        public enum ListTypes { Dot,Circle,Square,Number,NumberAlt,Letter}
+        public enum ListTypes { Dot, Circle, Square, Number, NumberAlt, Letter }
         private ListTypes listType = ListTypes.Dot;
         private List<string> listItems = new List<string>();
 
@@ -63,6 +66,9 @@ namespace PdfPlus
             this.formatType = block.formatType;
             this.formatName = block.formatName;
 
+            //break
+            this.breakCount = block.breakCount;
+
             //list
             this.listType = block.listType;
             foreach (string item in block.listItems) this.listItems.Add(item);
@@ -83,10 +89,20 @@ namespace PdfPlus
 
         #region break
 
-        public static Block CreatePageBreak()
+        public static Block CreatePageBreak(int count = 1)
         {
             Block block = new Block();
             block.blockType = BlockTypes.PageBreak;
+            block.breakCount = count;
+
+            return block;
+        }
+
+        public static Block CreateLineBreak(int count = 1)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.LineBreak;
+            block.breakCount = count;
 
             return block;
         }
@@ -133,7 +149,7 @@ namespace PdfPlus
             foreach (List<string> set in items)
             {
                 block.tableContents.Add(new List<string>());
-                foreach(string item in set) block.tableContents[i].Add(item);
+                foreach (string item in set) block.tableContents[i].Add(item);
                 i++;
             }
 
@@ -154,18 +170,22 @@ namespace PdfPlus
 
         public Md.Document Render(Md.Document document)
         {
-            
+            Md.Paragraph txt;
             switch (this.blockType)
             {
+                case BlockTypes.LineBreak:
+                    txt = document.LastSection.AddParagraph();
+                    for(int i =0;i<this.breakCount;i++) txt.AddLineBreak();
+                    break;
                 case BlockTypes.PageBreak:
-                    document.AddSection();
+                    for (int i = 0; i < this.breakCount; i++) document.LastSection.AddPageBreak();
                     break;
                 case BlockTypes.Text:
-                    Md.Paragraph txt = document.LastSection.AddParagraph();
-                    txt.AddFormattedText(this.paragraph, document.Styles[this.formatName].Font);
+                    txt = document.LastSection.AddParagraph(this.paragraph);
+                    txt.Format = (Md.ParagraphFormat)document.Styles[this.formatName].ParagraphFormat.Clone();
                     break;
                 case BlockTypes.List:
-                    Md.Style style = document.AddStyle("List-"+this.listType.ToString(), "Normal");
+                    Md.Style style = document.AddStyle("List-" + this.listType.ToString(), "Normal");
                     style.ParagraphFormat.LeftIndent = "0.5cm";
 
                     Md.ListType listType = (Md.ListType)this.listType;
@@ -221,7 +241,7 @@ namespace PdfPlus
 
         public override string ToString()
         {
-            return "Block | "+this.blockType.ToString();
+            return "Block | " + this.blockType.ToString();
         }
 
 

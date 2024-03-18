@@ -14,6 +14,8 @@ using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
 using Pc = PdfSharp.Charting;
 
+using Md = MigraDoc.DocumentObjectModel;
+
 using System.IO;
 using System.Windows.Media.Imaging;
 using Grasshopper.Kernel.Types;
@@ -276,6 +278,8 @@ namespace PdfPlus
         }
 
         #endregion
+
+        #region Pdf Sharp
 
         public static double GetValue(this Pd.XUnit input, Units unit)
         {
@@ -720,5 +724,38 @@ namespace PdfPlus
 
         #endregion
 
+        #endregion
+
+        #region MigraDoc
+
+        public static Md.Unit ToMigraDoc(this Pd.XUnit input)
+        {
+            switch (input.Type)
+            {
+                default:
+                    return new Md.Unit(input.Point, Md.UnitType.Point);
+                case Pd.XGraphicsUnit.Millimeter:
+                    return new Md.Unit(input.Millimeter, Md.UnitType.Millimeter);
+                case Pd.XGraphicsUnit.Centimeter:
+                    return new Md.Unit(input.Centimeter, Md.UnitType.Centimeter);
+                case Pd.XGraphicsUnit.Inch:
+                    return new Md.Unit(input.Inch, Md.UnitType.Inch);
+                case Pd.XGraphicsUnit.Presentation:
+                    return new Md.Unit(input.Presentation, Md.UnitType.Pica);
+            }
+        }
+
+        public static Md.Orientation ToMigraDoc(this Ps.PageOrientation input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Orientation.Landscape;
+                case Ps.PageOrientation.Portrait:
+                    return Md.Orientation.Portrait;
+            }
+        }
+
+        #endregion
     }
 }
