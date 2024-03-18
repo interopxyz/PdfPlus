@@ -260,17 +260,10 @@ namespace PdfPlus
 
             var clone = (Pf.PdfPage)this.baseObject.Clone();
 
-            Md.Document doc = new Md.Document();
+            Md.Document doc = Document.DefaultDocument();
             Md.Section section = doc.Sections.AddSection();
             doc = this.SetPage(doc);
 
-            Md.Style style = doc.Styles["Heading1"];
-            style.Font.Name = "Times New Roman";
-            style.Font.Size = 16;
-            style.Font.Color = Md.Color.FromArgb(255,255,0,0);
-            style.ParagraphFormat.PageBreakBefore = true;
-            style.ParagraphFormat.SpaceAfter = 6;
-            style.ParagraphFormat.KeepWithNext = true;
 
             foreach (Block block in blocks) block.Render(doc);
 

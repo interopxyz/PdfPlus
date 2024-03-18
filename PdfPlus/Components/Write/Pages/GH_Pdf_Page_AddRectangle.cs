@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_AddRectangle()
           : base("Add Page Boundary", "Page Rect",
               "Create a new PDF Page from a boundary rectangle in Point units",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Pages)
         {
         }
 

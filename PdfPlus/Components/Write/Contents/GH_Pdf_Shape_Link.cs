@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Write.Contents
         public GH_Pdf_Shape_Link()
           : base("Link Region", "Link",
               "Create a link to a document, hyperlink, or page within a rectangular boundary",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfPlus.Components.Write.Contents
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>

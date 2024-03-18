@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_Frames()
           : base("Page Boundaries", "Boundaries",
               "Get or modify the boundaries of a page",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Pages)
         {
         }
 

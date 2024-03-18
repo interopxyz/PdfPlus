@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_AddMetric()
           : base("Add Page Metric", "Page Metric",
               "Create a new PDF Page from a standard metric page size",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Pages)
         {
         }
 

@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddTextPt()
           : base("Text Point", "Txt Pt",
               "Create a Text Shape at a point location",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>

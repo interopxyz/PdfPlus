@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Write.Blocks
         public GH_Pdf_Blk_Text()
           : base("Text Block", "Txt Blk",
               "Create a text block",
-              Constants.ShortName, Constants.MigraDoc)
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -79,7 +79,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Pdf_Block_Text;
             }
         }
 

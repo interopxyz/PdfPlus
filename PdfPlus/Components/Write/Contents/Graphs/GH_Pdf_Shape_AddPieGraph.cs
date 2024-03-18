@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_GraphPie : GH_Pdf__Base
+    public class GH_Pdf_Shape_AddPieGraph : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Shape_GraphPie class.
         /// </summary>
-        public GH_Pdf_Shape_GraphPie()
+        public GH_Pdf_Shape_AddPieGraph()
           : base("Add Pie Chart", "Pie",
               "Create a Chart Shape within a rectangular boundary",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -23,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.septenary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>

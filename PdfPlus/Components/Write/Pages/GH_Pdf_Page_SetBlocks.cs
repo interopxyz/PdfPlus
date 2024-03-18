@@ -16,7 +16,7 @@ namespace PdfPlus.Components.Write.Pages
         public GH_Pdf_Page_SetBlocks()
           : base("Set Blocks", "Set Blk",
               "Sequentially place a list of Blocks to PDF Pages.",
-              Constants.ShortName, Constants.MigraDoc)
+              Constants.ShortName, Constants.Blocks)
         {
         }
 

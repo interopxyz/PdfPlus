@@ -7,15 +7,15 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_GraphData : GH_Component
+    public class GH_Pdf_Format_DataSet : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Shape_GraphData class.
         /// </summary>
-        public GH_Pdf_Shape_GraphData()
+        public GH_Pdf_Format_DataSet()
           : base("Graph Data", "Data",
               "Compile data points into a Data Set",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Formats)
         {
         }
 
@@ -24,7 +24,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.septenary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.PDF_ChartData_01;
+                return Properties.Resources.Pdf_Format_Data;
             }
         }
 

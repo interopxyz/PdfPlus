@@ -8,15 +8,15 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_EditGraphics : GH_Pdf__Base
+    public class GH_Pdf_Format_Graphic : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_EditGraphics class.
         /// </summary>
-        public GH_Pdf_Shape_EditGraphics()
-          : base("Shape Graphics", "Shp Graphics",
-              "Edit shape graphical attributes",
-              Constants.ShortName, Constants.PdfSharp)
+        public GH_Pdf_Format_Graphic()
+          : base("Set Graphics", "Set Graphics",
+              "Edit shape or block graphical attributes",
+              Constants.ShortName, Constants.Formats)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quarternary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Content_Geometry_01;
+                return Properties.Resources.Pdf_Format_Graphics;
             }
         }
 

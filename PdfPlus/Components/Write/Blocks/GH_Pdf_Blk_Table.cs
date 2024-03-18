@@ -15,7 +15,7 @@ namespace PdfPlus.Components.Write.Documents
         public GH_Pdf_Doc_Blk_Table()
           : base("Table Block", "Tbl Blk",
               "Create a table block",
-              Constants.ShortName, Constants.MigraDoc)
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -95,7 +95,7 @@ namespace PdfPlus.Components.Write.Documents
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Pdf_Block_Table;
             }
         }
 

@@ -29,7 +29,7 @@ namespace PdfPlus
         public enum PathTypes { }
 
         //Text
-        public enum FormatTypes { Normal, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Heading7, Heading8, Heading9, List, Footnote, Header, Footer, Hyperlink, Custom };
+        public enum FormatTypes { Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, List };
         private FormatTypes formatType = FormatTypes.Normal;
         private string formatName = "Normal";
         private string paragraph = string.Empty;

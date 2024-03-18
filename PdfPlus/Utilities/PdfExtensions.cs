@@ -756,6 +756,11 @@ namespace PdfPlus
             }
         }
 
+        public static Md.Color ToMigraDoc(this Sd.Color input)
+        {
+            return Md.Color.FromArgb(input.A, input.R, input.G, input.B);
+        }
+
         #endregion
     }
 }

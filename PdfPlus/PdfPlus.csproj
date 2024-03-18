@@ -76,15 +76,15 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Text.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf__Base.cs" />
-    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddGraph.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddBasicGraph.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImage.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImagePt.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddTextBox.cs" />
     <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddTextPt.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_EditFont.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_EditGraphics.cs" />
-    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphData.cs" />
-    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphPie.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Font.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Graphic.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
+    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddPieGraph.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Add.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Table.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
@@ -217,6 +217,27 @@
       <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
       <Name>PdfSharp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-Font.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Text.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Table.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-List.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Break.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-Graphics.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-Data.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_Add()
           : base("Add Page", "Page",
               "Create a new PDF Page from a width and height",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Pages)
         {
         }
 

@@ -14,7 +14,7 @@ namespace PdfPlus.Components.Write.Blocks
         public GH_Pdf_Blk_List()
           : base("List Block", "Lst Blk",
               "Create a bulleted or numbered list block",
-              Constants.ShortName, Constants.MigraDoc)
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -77,7 +77,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Pdf_Block_List;
             }
         }
 

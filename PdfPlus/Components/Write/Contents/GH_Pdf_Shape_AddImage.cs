@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Shape_AddImage()
           : base("Image Frame", "Img Frame",
               "Create an Image Shape within a rectangular boundary",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>

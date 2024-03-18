@@ -18,7 +18,7 @@ namespace PdfPlus.Components
         public GH_Pdf__Base()
           : base("Base", "Base",
               "Create a Text Shape at a point location",
-              Constants.ShortName, Constants.PdfSharp)
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
