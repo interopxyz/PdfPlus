@@ -73,9 +73,19 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Block_Column {
+        internal static System.Drawing.Bitmap Pdf_Block_Chart_Basic {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Block_Column", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Block_Chart_Basic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Block_Chart_Pie {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Block_Chart_Pie", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +113,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Block_Pie {
+        internal static System.Drawing.Bitmap Pdf_Block_Size {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Block_Pie", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Block_Size", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +143,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PDF_Border_01 {
+        internal static System.Drawing.Bitmap Pdf_Document_Add {
             get {
-                object obj = ResourceManager.GetObject("PDF_Border_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Document_Add", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +153,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PDF_Chart_01 {
+        internal static System.Drawing.Bitmap Pdf_Document_Save {
             get {
-                object obj = ResourceManager.GetObject("PDF_Chart_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Document_Save", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,129 +163,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PDF_ChartData_01 {
+        internal static System.Drawing.Bitmap Pdf_Format_DataSet {
             get {
-                object obj = ResourceManager.GetObject("PDF_ChartData_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_AddContent_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_AddContent_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_AddContent2_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_AddContent2_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_Font_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_Font_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_Geometry_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_Geometry_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_Image_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_Image_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_ImagePt_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_ImagePt_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_Text_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_Text_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Content_TextPt_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Content_TextPt_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Document_Add_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Document_Add_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Document_Save_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Document_Save_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Document_Save2_01 {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Document_Save2_01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Format_Data {
-            get {
-                object obj = ResourceManager.GetObject("Pdf_Format_Data", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Format_DataSet", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -293,9 +183,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Format_Graphics {
+        internal static System.Drawing.Bitmap Pdf_Format_Graphic {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Format_Graphics", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Format_Graphic", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -303,9 +193,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PDF_Link_01 {
+        internal static System.Drawing.Bitmap Pdf_Format_QuickData {
             get {
-                object obj = ResourceManager.GetObject("PDF_Link_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Format_QuickData", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -313,9 +203,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_Add_01 {
+        internal static System.Drawing.Bitmap Pdf_Page_Add_Custom {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_Add_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Add_Custom", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -323,9 +213,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_Boundary_01 {
+        internal static System.Drawing.Bitmap Pdf_Page_Add_Imperial {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_Boundary_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Add_Imperial", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -333,9 +223,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_Explode_01 {
+        internal static System.Drawing.Bitmap Pdf_Page_Add_Metric {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_Explode_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Add_Metric", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -343,9 +233,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_Imperial_01 {
+        internal static System.Drawing.Bitmap Pdf_Page_Add_Rect {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_Imperial_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Add_Rect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -353,9 +243,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_Metric_01 {
+        internal static System.Drawing.Bitmap Pdf_Page_Deconstruct {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_Metric_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Deconstruct", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -363,9 +253,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_SetBlocks {
+        internal static System.Drawing.Bitmap Pdf_Page_Margins {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_SetBlocks", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Margins", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -373,9 +263,9 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Pdf_Page_SetShapes {
+        internal static System.Drawing.Bitmap Pdf_Page_Set_Blocks {
             get {
-                object obj = ResourceManager.GetObject("Pdf_Page_SetShapes", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Set_Blocks", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -383,9 +273,79 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PDF_PieGraph_01 {
+        internal static System.Drawing.Bitmap Pdf_Page_Set_Shapes {
             get {
-                object obj = ResourceManager.GetObject("PDF_PieGraph_01", resourceCulture);
+                object obj = ResourceManager.GetObject("Pdf_Page_Set_Shapes", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Chart_Basic {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Chart_Basic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Chart_Pie {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Chart_Pie", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Image_Point {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Image_Point", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Image_Rect {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Image_Rect", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Link {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Link", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Text_Point {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Text_Point", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Text_Rect {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Text_Rect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

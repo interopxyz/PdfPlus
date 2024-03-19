@@ -26,6 +26,10 @@ namespace PdfPlus
         public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image };
         protected BlockTypes blockType = BlockTypes.None;
 
+        //Formatting
+        protected double width = 0;
+        protected double height = 0;
+
         //Text
         public enum FormatTypes { Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption };
         protected FormatTypes formatType = FormatTypes.Normal;
@@ -41,10 +45,6 @@ namespace PdfPlus
 
         //Table
         protected List<List<string>> tableContents = new List<List<string>>();
-
-        //Image
-        protected double width = 0;
-        protected double height = 0;
 
         #endregion
 
@@ -82,10 +82,11 @@ namespace PdfPlus
                 i++;
             }
 
-            //image
+            //format
             this.width = block.width;
             this.height = block.height;
-
+            this.alignment = block.alignment;
+            this.justification = block.justification;
         }
 
         #region break
@@ -159,7 +160,6 @@ namespace PdfPlus
 
         #endregion
 
-
         #region chart
 
         public static Block CreateChart(List<DataSet> data, ChartTypes chartType = ChartTypes.Line)
@@ -169,6 +169,9 @@ namespace PdfPlus
             block.chartType = chartType;
 
             block.SetData(data);
+            block.width = 400;
+            block.height = 200;
+            block.justification = Justification.Center;
 
             return block;
         }
@@ -280,26 +283,56 @@ namespace PdfPlus
                     break;
 
                 case BlockTypes.Chart:
-                    Md.Shapes.Charts.Chart chart = new Md.Shapes.Charts.Chart();
-
-                    chart.Left = 0;
-                    chart.Width = Md.Unit.FromCentimeter(8);
-                    chart.Height = Md.Unit.FromCentimeter(8);
-
                     Md.Shapes.Charts.ChartType ct = this.chartType.ToMigraDoc();
+
+                    Md.Shapes.Charts.Chart chart = document.LastSection.AddChart(ct);
+
+                    //Chart Area
+                    chart.Left = this.Justification.ToMigraDocShapePosition();
+                    chart.Width = this.Width;
+                    chart.Height = this.Height;
+
+                    //Series
                     foreach (DataSet d in this.data)
                     {
                         Md.Shapes.Charts.Series series = chart.SeriesCollection.AddSeries();
+                        series.HasDataLabel = d.LabelData;
+                        series.Name = d.Title;
                         series.ChartType = ct;
+                        series.MarkerStyle = Md.Shapes.Charts.MarkerStyle.None;
                         series.Add(d.Values.ToArray());
+                        series.FillFormat
+                    }
+
+                    //Legend
+                    if (this.alignment != Alignment.None)
+                    {
+                        Md.Shapes.Charts.Legend legend = null;
+
+                        switch (this.alignment)
+                        {
+                            default:
+                                legend = chart.LeftArea.AddLegend();
+                                break;
+                            case Alignment.Right:
+                                legend = chart.RightArea.AddLegend();
+                                break;
+                            case Alignment.Bottom:
+                                legend = chart.BottomArea.AddLegend();
+                                break;
+                            case Alignment.Top:
+                                legend = chart.TopArea.AddLegend();
+                                break;
+                        }
+
+
                     }
 
 
+                    //Axis
                     chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Outside;
 
                     chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Outside;
-
-                    document.LastSection.Add(chart);
 
                     break;
                 case BlockTypes.Image:
@@ -326,7 +359,7 @@ namespace PdfPlus
                             img.Height = this.height;
                         }
                     }
-                    img.Left = this.font.Justification.ToMigraDocShapePosition();
+                    img.Left = this.Justification.ToMigraDocShapePosition();
                     break;
             }
 

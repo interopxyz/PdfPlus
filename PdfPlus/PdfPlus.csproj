@@ -74,6 +74,7 @@
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartBasic.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_EditSize.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_PageBreak.cs" />
@@ -127,83 +128,7 @@
     <None Include="Resources\PdfPlus-16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Content-Geometry-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-Text-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-Image-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-AddContent-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-AddContent2-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Imperial-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Metric-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Add-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Document_Add-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Document_Save2-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Document_Save-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Explode-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-AddContent-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-Font-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-AddContent4-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-TextPt-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-ImagePt-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Boundary-01.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Components\Read\" />
-    <Folder Include="Components\Write\Shapes\Graphs\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PDF_Chart-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PDF_ChartData-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PDF_PieGraph-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PDF_Border-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\PDF_Link-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-SetShapes.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-SetBlocks.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Format-Font.png" />
@@ -221,37 +146,94 @@
     <None Include="Resources\Pdf-Block-Break.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Format-Graphics.png" />
+    <None Include="Resources\Pdf-Block-Image.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Format-Data.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\assorted\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
+    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
       <Project>{6318a852-ef6b-486f-8547-3d7e736d7943}</Project>
       <Name>MigraDoc.DocumentObjectModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\assorted\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
+    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
       <Project>{a0b7940a-0bfc-476d-a204-73f7c0f88fde}</Project>
       <Name>MigraDoc.Rendering</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\assorted\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
       <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
       <Name>PdfSharp.Charting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\assorted\PDFsharp\src\PdfSharp\PdfSharp.csproj">
+    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
       <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
       <Name>PdfSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Block-Image.png" />
+    <None Include="Resources\Pdf-Page-Add_Rect.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Block-Column.png" />
+    <None Include="Resources\Pdf-Page-Deconstruct.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Block-Pie.png" />
+    <None Include="Resources\Pdf-Page-Margins.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Set_Blocks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Set_Shapes.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Chart_Basic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Chart_Pie.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Image_Point.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Image_Rect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Link.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Text_Point.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Text_Rect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Chart_Basic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Chart_Pie.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Size.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-DataSet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-Graphic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Custom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Imperial.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Metric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-QuickData.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

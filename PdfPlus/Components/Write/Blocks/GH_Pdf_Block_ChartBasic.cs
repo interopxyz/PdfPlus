@@ -34,7 +34,12 @@ namespace PdfPlus.Components.Write.Blocks
             pManager.AddGenericParameter("DataSet", "Ds", "Chart Data to visualize", GH_ParamAccess.list);
             pManager.AddIntegerParameter("Type", "T", "The chart format to be displayed", GH_ParamAccess.item, 4);
             pManager[1].Optional = true;
-
+            pManager.AddTextParameter("X Axis", "X", "Optional X Axis title for the Graph", GH_ParamAccess.item, "X Axis");
+            pManager[2].Optional = true;
+            pManager.AddTextParameter("Y Axis", "Y", "Optional Y Axis title for the Graph", GH_ParamAccess.item, "Y Axis");
+            pManager[3].Optional = true;
+            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
+            pManager[4].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
             paramA.AddNamedValue("Bar", 0);
@@ -43,6 +48,12 @@ namespace PdfPlus.Components.Write.Blocks
             paramA.AddNamedValue("ColumnStacked", 3);
             paramA.AddNamedValue("Line", 4);
             paramA.AddNamedValue("Area", 5);
+
+            Param_Integer paramB = (Param_Integer)pManager[4];
+            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
+            {
+                paramB.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -67,6 +78,15 @@ namespace PdfPlus.Components.Write.Blocks
 
             Block block = Block.CreateChart(data, (Element.ChartTypes)type);
 
+            string x = string.Empty;
+            if (DA.GetData(2, ref x)) block.XAxis = x;
+
+            string y = string.Empty;
+            if (DA.GetData(3, ref y)) block.YAxis = y;
+
+            int alignment = 0;
+            if (DA.GetData(4, ref alignment)) block.Alignment = (Alignment)alignment;
+
             DA.SetData(0, block);
         }
 
@@ -79,7 +99,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Column;
+                return Properties.Resources.Pdf_Block_Chart_Basic;
             }
         }
         

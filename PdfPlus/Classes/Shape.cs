@@ -17,24 +17,12 @@ namespace PdfPlus
     public class Shape: Element
     {
         #region members
+
         public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
         protected ShapeType shapeType = ShapeType.None;
 
         public enum LinkTypes { Hyperlink,Filepath,Page};
         protected LinkTypes linkType = LinkTypes.Hyperlink;
-        
-        Alignment alignment = Alignment.None;
-
-        protected Rg.Point3d location = new Rg.Point3d();
-        protected Rg.Polyline polyline = new Rg.Polyline();
-        protected Rg.Line line = new Rg.Line();
-        protected Rg.Arc arc = new Rg.Arc();
-        protected Rg.Circle circle = new Rg.Circle();
-        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
-        protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
-
-        protected Rg.Brep brep = new Rg.Brep();
-        protected Rg.Mesh mesh = new Rg.Mesh();
 
         #endregion
 
@@ -45,30 +33,10 @@ namespace PdfPlus
             this.elementType = ElementTypes.Shape;
         }
 
-        protected Shape(Block block):base(block)
-        {
-        }
-
         public Shape(Shape shape):base(shape)
         {
-
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
-
-            this.alignment = shape.alignment;
-
-            this.text = shape.text;
-            this.alignment = shape.alignment;
-
-            this.location = new Rg.Point3d(shape.location);
-            this.polyline = shape.polyline.Duplicate();
-            this.boundary = new Rg.Rectangle3d(shape.boundary.Plane, shape.boundary.Corner(0), shape.boundary.Corner(2));
-            this.line = new Rg.Line(shape.line.From, shape.line.To);
-            this.curve = new Rg.NurbsCurve(shape.curve);
-            this.circle = new Rg.Circle(shape.circle.Plane, shape.circle.Radius);
-
-            this.brep = shape.brep.DuplicateBrep();
-            this.mesh = shape.mesh.DuplicateMesh();
         }
 
         #region text
@@ -310,168 +278,6 @@ namespace PdfPlus
         public virtual ShapeType Type
         {
             get { return this.shapeType; }
-        }
-
-        public virtual ChartTypes ChartType
-        {
-            get { return chartType; }
-        }
-
-        public virtual Sd.Color FontColor
-        {
-            get { return this.font.Color; }
-            set { this.font.Color = value; }
-        }
-
-        public virtual string FontFamily
-        {
-            get { return this.font.Family; }
-            set { this.font.Family = value; }
-        }
-
-        public virtual double FontSize
-        {
-            get { return this.font.Size; }
-            set { this.font.Size = value; }
-        }
-
-        public virtual bool IsBold
-        {
-            get { return this.font.IsBold; }
-        }
-
-        public virtual bool IsItalic
-        {
-            get { return this.font.IsItalic; }
-        }
-
-        public virtual bool IsUnderlined
-        {
-            get { return this.font.IsUnderlined; }
-        }
-
-        public virtual bool IsStrikeout
-        {
-            get { return this.font.IsStrikeout; }
-        }
-
-        public virtual Sd.Color FillColor
-        {
-            get { return this.graphic.Color; }
-            set { this.graphic.Color = value; }
-        }
-
-        public virtual Sd.Color StrokeColor
-        {
-            get { return this.graphic.Stroke; }
-            set { this.graphic.Stroke = value; }
-        }
-
-        public virtual double StrokeWeight
-        {
-            get { return this.graphic.Weight; }
-            set { this.graphic.Weight = value; }
-        }
-
-        public virtual FontStyle Style
-        {
-            get { return this.font.Style; }
-            set { this.font.Style = value; }
-        }
-
-        public virtual string XAxis
-        {
-            get { return this.xAxis; }
-            set { this.xAxis = value; }
-        }
-
-        public virtual string YAxis
-        {
-            get { return this.yAxis; }
-            set { this.yAxis = value; }
-        }
-
-        public virtual bool HasXAxis
-        {
-            get { return (this.xAxis != string.Empty); }
-        }
-
-        public virtual bool HasYAxis
-        {
-            get { return (this.yAxis != string.Empty); }
-        }
-
-        public virtual Alignment Alignment
-        {
-            get { return this.alignment; }
-            set { this.alignment = value; }
-        }
-
-        public virtual string TextContent
-        {
-            get { return this.text; }
-        }
-
-        public virtual Rg.Point3d Location
-        {
-            get { return this.location; }
-        }
-
-        public virtual Rg.Rectangle3d Boundary
-        {
-            get { return this.boundary; }
-        }
-
-        public virtual Rg.Line Line
-        {
-            get { return this.line; }
-        }
-
-        public virtual Rg.Arc Arc
-        {
-            get { return this.arc; }
-        }
-
-        public virtual Rg.Ellipse Ellipse
-        {
-            get { return new Rg.Ellipse(this.boundary.Plane,this.boundary.Width,this.boundary.Height); }
-        }
-
-        public virtual Rg.Polyline Polyline
-        {
-            get { return this.polyline; }
-        }
-        public virtual Rg.Circle Circle
-        {
-            get { return this.circle; }
-        }
-        public virtual Rg.Brep Brep
-        {
-            get { return this.brep; }
-        }
-
-        public virtual Rg.Mesh Mesh
-        {
-            get { return this.mesh; }
-        }
-
-        public virtual Rg.NurbsCurve Bezier
-        {
-            get {
-                Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
-                nurbs.MakePiecewiseBezier(true);
-                return nurbs; 
-            }
-        }
-
-        public virtual Sd.Bitmap Image
-        {
-            get { return new Sd.Bitmap(this.imageObject); }
-        }
-
-        public virtual string ImagePath
-        {
-            get { return imageName; }
         }
 
         #endregion

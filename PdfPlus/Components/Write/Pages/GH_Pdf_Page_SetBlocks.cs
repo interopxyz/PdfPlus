@@ -25,7 +25,7 @@ namespace PdfPlus.Components.Write.Pages
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.quinary; }
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace PdfPlus.Components.Write.Pages
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_SetBlocks;
+                return Properties.Resources.Pdf_Page_Set_Blocks;
             }
         }
 

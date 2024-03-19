@@ -64,7 +64,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Explode_01;
+                return Properties.Resources.Pdf_Page_Deconstruct;
             }
         }
 

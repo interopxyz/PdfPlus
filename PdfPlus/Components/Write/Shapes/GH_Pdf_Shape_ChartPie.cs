@@ -38,7 +38,7 @@ namespace PdfPlus.Components
             pManager[2].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[2];
-            foreach (Justification value in Enum.GetValues(typeof(Justification)))
+            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
             }
@@ -83,7 +83,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.PDF_PieGraph_01;
+                return Properties.Resources.Pdf_Shape_Chart_Pie;
             }
         }
 

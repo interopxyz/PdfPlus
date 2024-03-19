@@ -133,7 +133,7 @@ namespace PdfPlus.Components
                 {
                     case Shape.ShapeType.TextObj:
                         plane.Origin = shape.Location;
-                        Rhino.Display.Text3d text = new Rhino.Display.Text3d(shape.TextContent, plane, shape.FontSize * factor);
+                        Rhino.Display.Text3d text = new Rhino.Display.Text3d(shape.Text, plane, shape.FontSize * factor);
                         text.FontFace = shape.FontFamily;
                         text.Bold = shape.IsBold;
                         text.Italic = shape.IsItalic;
@@ -151,7 +151,7 @@ namespace PdfPlus.Components
                         plane.Origin = c[0]+new Vector3d(0,-4,0);
                         args.Display.Draw3dText("Preview Purposes Only", activeColor, plane, messageSize, messageFont);
                         plane.Origin = c[3] - new Vector3d(0, shape.FontSize * factor * 1.5, 0);
-                        List<string> lines = BreakLines(shape.TextContent, shape.FontFamily, shape.FontSize, shape.Boundary.Width);
+                        List<string> lines = BreakLines(shape.Text, shape.FontFamily, shape.FontSize, shape.Boundary.Width);
                         foreach (string line in lines)
                         {
                             Rhino.Display.Text3d txt = new Rhino.Display.Text3d(line, plane, shape.FontSize * 72.0 / 100.0);

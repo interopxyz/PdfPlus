@@ -1,4 +1,5 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,14 @@ namespace PdfPlus.Components.Write.Blocks
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("DataSet", "Ds", "A single Chart Data Set to visualize", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -67,7 +76,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Pie;
+                return Properties.Resources.Pdf_Block_Chart_Pie;
             }
         }
 
