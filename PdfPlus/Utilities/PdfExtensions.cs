@@ -247,16 +247,33 @@ namespace PdfPlus
             {
                 default:
                     return Pd.XUnit.FromMillimeter(value);
-                    break;
                 case Units.Centimeter:
                     return Pd.XUnit.FromCentimeter(value);
-                    break;
                 case Units.Inch:
                     return Pd.XUnit.FromInch(value);
-                    break;
                 case Units.Point:
                     return Pd.XUnit.FromPoint(value);
-                    break;
+            }
+        }
+
+        public static Md.Shapes.Charts.ChartType ToMigraDoc(this Element.ChartTypes input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Shapes.Charts.ChartType.Line;
+                case Element.ChartTypes.Area:
+                    return Md.Shapes.Charts.ChartType.Area2D;
+                case Element.ChartTypes.Bar:
+                    return Md.Shapes.Charts.ChartType.Bar2D;
+                case Element.ChartTypes.BarStacked:
+                    return Md.Shapes.Charts.ChartType.BarStacked2D;
+                case Element.ChartTypes.Column:
+                    return Md.Shapes.Charts.ChartType.Column2D;
+                case Element.ChartTypes.ColumnStacked:
+                    return Md.Shapes.Charts.ChartType.ColumnStacked2D;
+                case Element.ChartTypes.Pie:
+                    return Md.Shapes.Charts.ChartType.Pie2D;
             }
         }
 
@@ -618,13 +635,6 @@ namespace PdfPlus
             return stream;
         }
 
-        public static Byte[] ToByteArray(this Sd.Bitmap input)
-        {
-            MemoryStream stream = new MemoryStream();
-
-            input.Save(stream, Sd.Imaging.ImageFormat.Png);
-            return stream.ToArray();
-        }
 
         #endregion
 
@@ -739,7 +749,7 @@ namespace PdfPlus
                 if (input.HasFamily) format.Font.Name = input.Family;
                 if (input.HasSize)format.Font.Size = input.Size;
                 if (input.HasColor) format.Font.Color = input.Color.ToMigraDoc();
-                if (input.HasJustification) format.Alignment = input.Justification.ToMigraDoc();
+                if (input.HasJustification) format.Alignment = input.Justification.ToMigraDocParagraphAlignment();
                 if (input.HasStyle)
                 {
                     format.Font.Bold = input.IsBold;
@@ -753,7 +763,7 @@ namespace PdfPlus
             return format;
         }
 
-        public static Md.ParagraphAlignment ToMigraDoc(this Justification input)
+        public static Md.ParagraphAlignment ToMigraDocParagraphAlignment(this Justification input)
         {
             switch (input)
             {
@@ -765,6 +775,19 @@ namespace PdfPlus
                     return Md.ParagraphAlignment.Center;
                 case Justification.Justify:
                     return Md.ParagraphAlignment.Justify;
+            }
+        }
+
+        public static Md.Shapes.ShapePosition ToMigraDocShapePosition(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Shapes.ShapePosition.Left;
+                case Justification.Right:
+                    return Md.Shapes.ShapePosition.Right;
+                case Justification.Center:
+                    return Md.Shapes.ShapePosition.Center;
             }
         }
 
@@ -781,6 +804,32 @@ namespace PdfPlus
 
         #region images
 
+        public static byte[] ToByteArray(this Sd.Bitmap input)
+        {
+            MemoryStream stream = new MemoryStream();
+
+            input.Save(stream, Sd.Imaging.ImageFormat.Png);
+            stream.Position = 0;
+            byte[] buffer = stream.ToArray();
+            stream.Close();
+
+            return buffer;
+        }
+
+        public static string ToBase64String(this Sd.Bitmap input, string prefix = "")
+        {
+            MemoryStream stream = new MemoryStream();
+            
+            input.Save(stream, Sd.Imaging.ImageFormat.Png);
+            stream.Position = 0;
+            byte[] buffer = stream.ToArray();
+            stream.Close();
+
+            string output = Convert.ToBase64String(buffer);
+            buffer = null;
+
+            return prefix+output;
+        }
 
         #endregion
 

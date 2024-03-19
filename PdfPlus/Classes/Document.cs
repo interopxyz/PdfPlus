@@ -205,6 +205,18 @@ namespace PdfPlus
 
             #endregion
 
+            #region Caption
+
+            Md.Style caption = doc.Styles.AddStyle("Caption", "Normal");
+            caption.Font.Name = "Arial";
+            caption.Font.Size = 8;
+            caption.Font.Color = Sd.Color.Black.ToMigraDoc();
+            caption.ParagraphFormat.SpaceAfter = 12;
+            caption.ParagraphFormat.LeftIndent = 12;
+            caption.ParagraphFormat.RightIndent = 12;
+
+            #endregion
+
             #region List
 
             Md.Style list = doc.Styles["List"];

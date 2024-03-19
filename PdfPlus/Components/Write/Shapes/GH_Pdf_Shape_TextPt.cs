@@ -1,5 +1,4 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
@@ -9,14 +8,14 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_AddTextBox : GH_Pdf__Base
+    public class GH_Pdf_Shape_TextPt : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddText class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
         /// </summary>
-        public GH_Pdf_Shape_AddTextBox()
-          : base("Text Box", "Txt Box",
-              "Create a Text Shape within a rectangular boundary",
+        public GH_Pdf_Shape_TextPt()
+          : base("Text Point", "Txt Pt",
+              "Create a Text Shape at a point location",
               Constants.ShortName, Constants.Shapes)
         {
         }
@@ -34,16 +33,8 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
+            pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
             pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Alignment", "A", "The paragraph alignment", GH_ParamAccess.item,0);
-            pManager[2].Optional = true;
-
-            Param_Integer paramA = (Param_Integer)pManager[2];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
-            {
-                paramA.AddNamedValue(value.ToString(), (int)value);
-            }
         }
 
         /// <summary>
@@ -51,7 +42,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output,GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -60,17 +51,13 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Rectangle3d boundary = new Rectangle3d();
-            if (!DA.GetData(0, ref boundary)) return;
+            Point3d location = new Point3d();
+            if (!DA.GetData(0, ref location)) return;
 
             string content = string.Empty;
             if (!DA.GetData(1, ref content)) return;
 
-            int alignment = 0;
-            if (!DA.GetData(2, ref alignment)) return;
-
-
-            Shape shape = Shape.CreateText(content, boundary,(Alignment)alignment, new Font());
+            Shape shape = Shape.CreateText(content, location, new Font());
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);
@@ -85,7 +72,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Content_Text_01;
+                return Properties.Resources.Pdf_Content_TextPt_01;
             }
         }
 
@@ -94,7 +81,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("7ecff30f-8500-4d86-96a1-e4effdcc81c2"); }
+            get { return new Guid("81f60353-b223-4c36-b46e-588733aadcac"); }
         }
     }
 }

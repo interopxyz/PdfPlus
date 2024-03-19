@@ -1,20 +1,19 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Data;
-using Grasshopper.Kernel.Types;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Documents
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Doc_Blk_Table : GH_Component
+    public class GH_Pdf_Block_List : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_Blk_Table class.
+        /// Initializes a new instance of the GH_Pdf_Blk_List class.
         /// </summary>
-        public GH_Pdf_Doc_Blk_Table()
-          : base("Table Block", "Tbl Blk",
-              "Create a table block",
+        public GH_Pdf_Block_List()
+          : base("List Block", "Lst Blk",
+              "Create a bulleted or numbered list block",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -32,7 +31,16 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Text Tree", "T", "A datatree of text values", GH_ParamAccess.tree);
+            pManager.AddTextParameter("List Items", "T", "A list of text to display", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Bullet Type", "B", "The list bullet type", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (Block.ListTypes value in Enum.GetValues(typeof(Block.ListTypes)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -49,41 +57,15 @@ namespace PdfPlus.Components.Write.Documents
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            List<string> items = new List<string>();
+            DA.GetDataList(0, items);
 
-            GH_Structure<GH_String> ghData = new GH_Structure<GH_String>();
+            int type = 0;
+            DA.GetData(1, ref type);
 
-            if (!DA.GetDataTree(0, out ghData)) return;
-
-            Dictionary<int, List<List<string>>> dataSets = new Dictionary<int, List<List<string>>>();
-            List<List<string>> dataSet = new List<List<string>>();
-
-            dataSets.Add(0, new List<List<string>>());
-            int i = 0;
-            foreach (GH_Path path in ghData.Paths)
-            {
-                if (path.Length > 1)
-                {
-                    if (!dataSets.ContainsKey(path[0])) dataSets.Add(path[0], new List<List<string>>());
-                    dataSets[path[0]].Add(ghData.Branches[i].ToStringList());
-                }
-                else
-                {
-                    dataSets[0].Add(ghData.Branches[i].ToStringList());
-                }
-                i++;
-            }
-
-            int rc = this.RunCount - 1;
-            if (rc > (dataSets.Keys.Count - 1)) rc = dataSets.Keys.Count - 1;
-            foreach (List<string> data in dataSets[rc])
-            {
-                dataSet.Add(data);
-            }
-
-            Block block = Block.CreateTable(dataSet);
+            Block block = Block.CreateList(items,(Block.ListTypes)type);
 
             DA.SetData(0, block);
-
         }
 
         /// <summary>
@@ -95,7 +77,7 @@ namespace PdfPlus.Components.Write.Documents
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Table;
+                return Properties.Resources.Pdf_Block_List;
             }
         }
 
@@ -104,7 +86,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("621a662a-fefb-45ab-997d-efc8d4259ebc"); }
+            get { return new Guid("0e512243-8cec-406b-bb6b-4a6f16e2456d"); }
         }
     }
 }

@@ -72,23 +72,25 @@
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
     <Compile Include="Classes\Shape.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Image.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_List.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_PageBreak.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Text.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartBasic.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_PageBreak.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf__Base.cs" />
-    <Compile Include="Components\Write\Shapes\Graphs\GH_Pdf_Shape_AddBasicGraph.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_AddImage.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_AddImagePt.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_AddTextBox.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_AddTextPt.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartBasic.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Image.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ImagePt.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_TextBox.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_TextPt.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Font.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Graphic.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
-    <Compile Include="Components\Write\Shapes\Graphs\GH_Pdf_Shape_AddPieGraph.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartPie.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Add.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Blk_Table.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Table.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Add.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_SetBlocks.cs" />
@@ -180,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\Read\" />
+    <Folder Include="Components\Write\Shapes\Graphs\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\PDF_Chart-01.png" />
@@ -224,22 +227,31 @@
     <None Include="Resources\Pdf-Format-Data.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
+    <ProjectReference Include="..\..\..\assorted\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
       <Project>{6318a852-ef6b-486f-8547-3d7e736d7943}</Project>
       <Name>MigraDoc.DocumentObjectModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
+    <ProjectReference Include="..\..\..\assorted\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
       <Project>{a0b7940a-0bfc-476d-a204-73f7c0f88fde}</Project>
       <Name>MigraDoc.Rendering</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
+    <ProjectReference Include="..\..\..\assorted\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
       <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
       <Name>PdfSharp.Charting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
+    <ProjectReference Include="..\..\..\assorted\PDFsharp\src\PdfSharp\PdfSharp.csproj">
       <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
       <Name>PdfSharp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Column.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Pie.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

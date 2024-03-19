@@ -1,19 +1,18 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Blk_PageBreak : GH_Component
+    public class GH_Pdf_Block_ChartPie : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_PageBreak class.
+        /// Initializes a new instance of the GH_Pdf_Blk_ChartPie class.
         /// </summary>
-        public GH_Pdf_Blk_PageBreak()
-          : base("Break Block", "Brk Blk",
-              "Create a break block",
+        public GH_Pdf_Block_ChartPie()
+          : base("Pie Chart Block", "Pie Blk",
+              "Create a pie chart block",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -23,7 +22,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -31,16 +30,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Type", "T", "The break type", GH_ParamAccess.item, 0);
-            pManager[0].Optional = true;
-            pManager.AddIntegerParameter("Count", "C", "The number of repetitions of the break", GH_ParamAccess.item, 1);
-            pManager[1].Optional = true;
-
-
-            Param_Integer paramA = (Param_Integer)pManager[0];
-            paramA.AddNamedValue("Line", 0);
-            paramA.AddNamedValue("Page", 1);
-
+            pManager.AddGenericParameter("DataSet", "Ds", "A single Chart Data Set to visualize", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -57,20 +47,13 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int type = 0;
-            DA.GetData(0, ref type);
+            string text = string.Empty;
+            DA.GetData(0, ref text);
 
-            int count = 1;
-            DA.GetData(1, ref count);
-            if (count < 1) count = 1;
+            int formatting = 0;
+            DA.GetData(1, ref formatting);
 
-            Block block = Block.CreatePageBreak(count);
-            switch (type)
-            {
-                case 0:
-                    block = Block.CreateLineBreak(count);
-                    break;
-            }
+            Block block = Block.CreateText(text, (Block.FormatTypes)formatting);
 
             DA.SetData(0, block);
         }
@@ -84,7 +67,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Break;
+                return Properties.Resources.Pdf_Block_Pie;
             }
         }
 
@@ -93,7 +76,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("c8f9c9fa-6c24-4934-88af-20b0aeb788f9"); }
+            get { return new Guid("f959474e-0a17-44d8-9ae3-dd921e5a94db"); }
         }
     }
 }

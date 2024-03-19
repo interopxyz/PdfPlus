@@ -6,17 +6,17 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Write.Blocks
+namespace PdfPlus.Components
 {
-    public class GH_Pdf_Blk_Image : GH_Component
+    public class GH_Pdf_Shape_ImagePt : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_Image class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddImagePt class.
         /// </summary>
-        public GH_Pdf_Blk_Image()
-          : base("Image Block", "Img Blk",
-              "Create an image block",
-              Constants.ShortName, Constants.Blocks)
+        public GH_Pdf_Shape_ImagePt()
+          : base("Image Point", "Img Pt",
+              "Create an Image Shape at a point location",
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -34,6 +34,9 @@ namespace PdfPlus.Components.Write.Blocks
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Image", "I", "The System.Drawing.Bitmap or Image Filepath to display", GH_ParamAccess.item);
+            pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Scale", "S", "A unitized scale factor (0-1) for the image", GH_ParamAccess.item, 1.0);
+            pManager[2].Optional = true;
         }
 
         /// <summary>
@@ -41,7 +44,8 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The image boundary in points", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -55,11 +59,24 @@ namespace PdfPlus.Components.Write.Blocks
             string path = "";
 
             if (!DA.GetData(0, ref goo)) return;
-            if (!goo.TryGetBitmap(ref bitmap, ref path)) return;
+            if (!goo.TryGetBitmap(ref bitmap,ref path)) return;
 
-            Block block = Block.CreateImage(bitmap);
+            Point3d p = new Point3d();
+            if (!DA.GetData(1, ref p)) return;
 
-            DA.SetData(0, block);
+            double scale = 1.0;
+            DA.GetData(2, ref scale);
+
+            double w = bitmap.Width * (72.0 / 96.0) * scale;
+            double h = bitmap.Height * (72.0 / 96.0) * scale;
+
+            Rectangle3d rect = new Rectangle3d(Plane.WorldXY, p, new Point3d(p.X + w, p.Y + h, 0));
+
+            Shape shape = Shape.CreateImage(bitmap, rect, path);
+
+            prev_shapes.Add(shape);
+            DA.SetData(0, shape);
+            DA.SetData(1, shape.Boundary);
         }
 
         /// <summary>
@@ -71,7 +88,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Pdf_Content_ImagePt_01;
             }
         }
 
@@ -80,7 +97,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("1bccdc38-d2d7-4076-b827-da6cce74b558"); }
+            get { return new Guid("d640f163-bd2c-449b-855f-014dbdef46ad"); }
         }
     }
 }

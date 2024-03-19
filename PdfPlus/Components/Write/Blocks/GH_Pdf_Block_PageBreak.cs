@@ -1,22 +1,20 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Shape_AddImage : GH_Pdf__Base
+    public class GH_Pdf_Block_PageBreak : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddImage class.
+        /// Initializes a new instance of the GH_Pdf_Blk_PageBreak class.
         /// </summary>
-        public GH_Pdf_Shape_AddImage()
-          : base("Image Frame", "Img Frame",
-              "Create an Image Shape within a rectangular boundary",
-              Constants.ShortName, Constants.Shapes)
+        public GH_Pdf_Block_PageBreak()
+          : base("Break Block", "Brk Blk",
+              "Create a break block",
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -33,8 +31,16 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Image", "I", "The System.Drawing.Bitmap or Image Filepath to display", GH_ParamAccess.item);
-            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Type", "T", "The break type", GH_ParamAccess.item, 0);
+            pManager[0].Optional = true;
+            pManager.AddIntegerParameter("Count", "C", "The number of repetitions of the break", GH_ParamAccess.item, 1);
+            pManager[1].Optional = true;
+
+
+            Param_Integer paramA = (Param_Integer)pManager[0];
+            paramA.AddNamedValue("Line", 0);
+            paramA.AddNamedValue("Page", 1);
+
         }
 
         /// <summary>
@@ -42,7 +48,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,20 +57,22 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            IGH_Goo goo = null;
-            Sd.Bitmap bitmap = null;
-            string path = "";
-            
-            if (!DA.GetData(0, ref goo)) return;
-            if (!goo.TryGetBitmap(ref bitmap, ref path)) return;
+            int type = 0;
+            DA.GetData(0, ref type);
 
-            Rectangle3d boundary = new Rectangle3d();
-            if (!DA.GetData(1, ref boundary)) return;
+            int count = 1;
+            DA.GetData(1, ref count);
+            if (count < 1) count = 1;
 
-            Shape shape = Shape.CreateImage(bitmap, boundary, path);
+            Block block = Block.CreatePageBreak(count);
+            switch (type)
+            {
+                case 0:
+                    block = Block.CreateLineBreak(count);
+                    break;
+            }
 
-            prev_shapes.Add(shape);
-            DA.SetData(0, shape);
+            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -76,7 +84,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Content_Image_01;
+                return Properties.Resources.Pdf_Block_Break;
             }
         }
 
@@ -85,7 +93,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("e191f171-6313-4342-959c-db8ab28cdd0c"); }
+            get { return new Guid("c8f9c9fa-6c24-4934-88af-20b0aeb788f9"); }
         }
     }
 }

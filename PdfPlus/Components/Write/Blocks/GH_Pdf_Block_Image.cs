@@ -1,19 +1,22 @@
 ﻿using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+using Sd = System.Drawing;
+
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Blk_List : GH_Component
+    public class GH_Pdf_Block_Image : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_List class.
+        /// Initializes a new instance of the GH_Pdf_Blk_Image class.
         /// </summary>
-        public GH_Pdf_Blk_List()
-          : base("List Block", "Lst Blk",
-              "Create a bulleted or numbered list block",
+        public GH_Pdf_Block_Image()
+          : base("Image Block", "Img Blk",
+              "Create an image block",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -31,13 +34,17 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("List Items", "T", "A list of text to display", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Bullet Type", "B", "The list bullet type", GH_ParamAccess.item, 0);
+            pManager.AddGenericParameter("Image", "I", "The System.Drawing.Bitmap or Image Filepath to display", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Width", "W", "Optional image width override", GH_ParamAccess.item, 0);
             pManager[1].Optional = true;
+            pManager.AddNumberParameter("Height", "H", "Optional image height override", GH_ParamAccess.item, 0);
+            pManager[2].Optional = true;
+            pManager.AddIntegerParameter("Justification", "J", "Optional image justification on page", GH_ParamAccess.item, 0);
+            pManager[3].Optional = true;
 
 
-            Param_Integer paramA = (Param_Integer)pManager[1];
-            foreach (Block.ListTypes value in Enum.GetValues(typeof(Block.ListTypes)))
+            Param_Integer paramA = (Param_Integer)pManager[3];
+            foreach (Justification value in Enum.GetValues(typeof(Justification)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
             }
@@ -57,14 +64,33 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<string> items = new List<string>();
-            DA.GetDataList(0, items);
+            IGH_Goo goo = null;
+            Sd.Bitmap bitmap = null;
+            string path = "";
 
-            int type = 0;
-            DA.GetData(1, ref type);
+            if (!DA.GetData(0, ref goo)) return;
+            if (!goo.TryGetBitmap(ref bitmap, ref path)) return;
 
-            Block block = Block.CreateList(items,(Block.ListTypes)type);
+            Block block = null;
+            if (path != "")
+            {
+                block = Block.CreateImage(path);
+            }
+            else
+            {
+                block = Block.CreateImage(bitmap);
+            }
 
+            double width = 0;
+            if (DA.GetData(1, ref width)) block.Width = width;
+
+            double height = 0;
+            if (DA.GetData(2, ref width)) block.Height = height;
+
+            Font font = block.Font;
+            int justification = 0;
+            if (DA.GetData(3, ref justification)) font.Justification = (Justification)justification;
+            block.Font = font;
             DA.SetData(0, block);
         }
 
@@ -77,7 +103,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_List;
+                return Properties.Resources.Pdf_Block_Image;
             }
         }
 
@@ -86,7 +112,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("0e512243-8cec-406b-bb6b-4a6f16e2456d"); }
+            get { return new Guid("1bccdc38-d2d7-4076-b827-da6cce74b558"); }
         }
     }
 }

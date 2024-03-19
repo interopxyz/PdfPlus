@@ -73,9 +73,39 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Block_Column {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Block_Column", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Block_Image {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Block_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Pdf_Block_List {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Block_List", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Block_Pie {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Block_Pie", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

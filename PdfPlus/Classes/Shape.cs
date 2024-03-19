@@ -22,19 +22,8 @@ namespace PdfPlus
 
         public enum LinkTypes { Hyperlink,Filepath,Page};
         protected LinkTypes linkType = LinkTypes.Hyperlink;
-
-        public enum ChartTypes { Bar, BarStacked, Column, ColumnStacked, Line, Area, Pie };
-        protected ChartTypes chartType = ChartTypes.ColumnStacked;
-        protected List<DataSet> data = new List<DataSet>();
-
-        string xAxis = string.Empty;
-        string yAxis = string.Empty;
+        
         Alignment alignment = Alignment.None;
-
-        protected Sd.Bitmap image = new Sd.Bitmap(10, 10);
-        protected string imagePath = "";
-
-        protected string content = string.Empty;
 
         protected Rg.Point3d location = new Rg.Point3d();
         protected Rg.Polyline polyline = new Rg.Polyline();
@@ -66,17 +55,10 @@ namespace PdfPlus
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
 
-            this.chartType = shape.chartType;
-            SetData(shape.data);
-            this.xAxis = shape.xAxis;
-            this.yAxis = shape.yAxis;
             this.alignment = shape.alignment;
 
-            this.content = shape.content;
+            this.text = shape.text;
             this.alignment = shape.alignment;
-
-            this.image = new Sd.Bitmap(shape.image);
-            this.imagePath = shape.imagePath;
 
             this.location = new Rg.Point3d(shape.location);
             this.polyline = shape.polyline.Duplicate();
@@ -96,7 +78,7 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
-            shape.content = content;
+            shape.text = content;
             shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
@@ -109,7 +91,7 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextObj;
 
-            shape.content = content;
+            shape.text = content;
             shape.location = new Rg.Point3d(location);
             shape.font = new Font(font);
 
@@ -122,7 +104,7 @@ namespace PdfPlus
             shape.shapeType = ShapeType.LinkObj;
             shape.linkType = type;
 
-            shape.content = link;
+            shape.text = link;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
 
             return shape;
@@ -137,8 +119,8 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.ImageFrame;
 
-            shape.image = new Sd.Bitmap(bitmap);
-            shape.imagePath = path;
+            shape.imageObject = new Sd.Bitmap(bitmap);
+            shape.imageName = path;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
 
             return shape;
@@ -149,8 +131,8 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.ImageObj;
 
-            shape.image = new Sd.Bitmap(bitmap);
-            shape.imagePath = path;
+            shape.imageObject = new Sd.Bitmap(bitmap);
+            shape.imageName = path;
             shape.location = new Rg.Point3d(location);
             Rg.Plane plane = Rg.Plane.WorldXY;
             double factor = 72.0/96.0;
@@ -427,7 +409,7 @@ namespace PdfPlus
 
         public virtual string TextContent
         {
-            get { return this.content; }
+            get { return this.text; }
         }
 
         public virtual Rg.Point3d Location
@@ -484,12 +466,12 @@ namespace PdfPlus
 
         public virtual Sd.Bitmap Image
         {
-            get { return new Sd.Bitmap(this.image); }
+            get { return new Sd.Bitmap(this.imageObject); }
         }
 
         public virtual string ImagePath
         {
-            get { return imagePath; }
+            get { return imageName; }
         }
 
         #endregion
@@ -660,14 +642,6 @@ namespace PdfPlus
                 return output;
         }
 
-        public void SetData(List<DataSet> data)
-        {
-            foreach (DataSet d in data)
-            {
-                this.data.Add(new DataSet(d));
-            }
-        }
-
         public void AlignContent(Page page, bool translate = true)
         {
 
@@ -779,7 +753,7 @@ namespace PdfPlus
 
                 case ShapeType.ImageFrame:
                 case ShapeType.ImageObj:
-                    Stream stream = image.ToStream();
+                    Stream stream = imageObject.ToStream();
                     Pd.XImage xImageA = Pd.XImage.FromStream(stream);
 
                     graph.DrawImage(xImageA, this.boundary.ToPdf());
@@ -789,7 +763,7 @@ namespace PdfPlus
                 case ShapeType.TextObj:
                     Pd.XStringFormat format = new Pd.XStringFormat();
                     format.Alignment = font.Justification.ToPdfLine();
-                    graph.DrawString(this.content, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf(), format);
+                    graph.DrawString(this.text, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf(), format);
                     break;
 
                 case ShapeType.TextBox:
@@ -798,23 +772,23 @@ namespace PdfPlus
                     Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
                     textFormatter.Alignment = this.Font.Justification.ToPdf();
                     textFormatter.LayoutRectangle = this.boundary.ToPdf();
-                    textFormatter.Text = this.content;
+                    textFormatter.Text = this.text;
                     textFormatter.Font = pdfFont;
 
-                    textFormatter.DrawString(this.content, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+                    textFormatter.DrawString(this.text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
                     break;
                 case ShapeType.LinkObj:
                     switch (this.linkType)
                     {
                         case LinkTypes.Hyperlink:
-                            page.AddWebLink(boundary.ToPdfRect(coordinateframe), this.content);
+                            page.AddWebLink(boundary.ToPdfRect(coordinateframe), this.text);
                             break;
                         case LinkTypes.Filepath:
-                            page.AddFileLink(boundary.ToPdfRect(coordinateframe), this.content);
+                            page.AddFileLink(boundary.ToPdfRect(coordinateframe), this.text);
                             break;
                         case LinkTypes.Page:
                             int index = 0;
-                            bool isInt = int.TryParse(this.content, out index);
+                            bool isInt = int.TryParse(this.text, out index);
                             if(isInt) page.AddDocumentLink(boundary.ToPdfRect(coordinateframe), index + 1);
 
                             break;

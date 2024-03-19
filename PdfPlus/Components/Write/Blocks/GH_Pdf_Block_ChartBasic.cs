@@ -1,21 +1,19 @@
 ﻿using Grasshopper.Kernel;
-using MigraDoc.Rendering;
-using MigraDoc.DocumentObjectModel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-using Grasshopper.Kernel.Parameters;
 
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Blk_Text : GH_Component
+    public class GH_Pdf_Block_ChartBasic : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_Text class.
+        /// Initializes a new instance of the GH_Pdf_Blk_ChartLine class.
         /// </summary>
-        public GH_Pdf_Blk_Text()
-          : base("Text Block", "Txt Blk",
-              "Create a text block",
+        public GH_Pdf_Block_ChartBasic()
+          : base("Basic Chart Block", "Cht Blk",
+              "Create a basic chart block",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -25,7 +23,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -33,16 +31,18 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Formatting", "F", "Optional predefined text formatting", GH_ParamAccess.item, 0);
+            pManager.AddGenericParameter("DataSet", "Ds", "Chart Data to visualize", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Type", "T", "The chart format to be displayed", GH_ParamAccess.item, 4);
             pManager[1].Optional = true;
 
 
             Param_Integer paramA = (Param_Integer)pManager[1];
-            foreach (Block.FormatTypes value in Enum.GetValues(typeof(Block.FormatTypes)))
-            {
-                paramA.AddNamedValue(value.ToString(), (int)value);
-            }
+            paramA.AddNamedValue("Bar", 0);
+            paramA.AddNamedValue("BarStacked", 1);
+            paramA.AddNamedValue("Column", 2);
+            paramA.AddNamedValue("ColumnStacked", 3);
+            paramA.AddNamedValue("Line", 4);
+            paramA.AddNamedValue("Area", 5);
         }
 
         /// <summary>
@@ -59,13 +59,13 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string text = string.Empty;
-            DA.GetData(0, ref text);
+            List<DataSet> data = new List<DataSet>();
+            if (!DA.GetDataList(0, data)) return;
 
-            int formatting = 0;
-            DA.GetData(1, ref formatting);
+            int type = 4;
+            DA.GetData(1, ref type);
 
-            Block block = Block.CreateText(text,(Block.FormatTypes)formatting);
+            Block block = Block.CreateChart(data, (Element.ChartTypes)type);
 
             DA.SetData(0, block);
         }
@@ -79,16 +79,17 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Text;
+                return Properties.Resources.Pdf_Block_Column;
             }
         }
+        
 
         /// <summary>
         /// Gets the unique ID for this component. Do not change this ID after release.
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("4e9ff875-26bb-4365-a839-1fbccccae6bd"); }
+            get { return new Guid("59db45ad-3851-4d74-a6fa-b2007b55cf50"); }
         }
     }
 }

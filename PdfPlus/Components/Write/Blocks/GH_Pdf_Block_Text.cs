@@ -1,22 +1,22 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
+using MigraDoc.Rendering;
+using MigraDoc.DocumentObjectModel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using Grasshopper.Kernel.Parameters;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Shape_AddTextPt : GH_Pdf__Base
+    public class GH_Pdf_Block_Text : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
+        /// Initializes a new instance of the GH_Pdf_Blk_Text class.
         /// </summary>
-        public GH_Pdf_Shape_AddTextPt()
-          : base("Text Point", "Txt Pt",
-              "Create a Text Shape at a point location",
-              Constants.ShortName, Constants.Shapes)
+        public GH_Pdf_Block_Text()
+          : base("Text Block", "Txt Blk",
+              "Create a text block",
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -33,8 +33,15 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
+            pManager.AddTextParameter("Text Content", "T", "The text content to display", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Formatting", "F", "Optional predefined text formatting", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (Block.FormatTypes value in Enum.GetValues(typeof(Block.FormatTypes)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -42,7 +49,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,16 +58,15 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Point3d location = new Point3d();
-            if (!DA.GetData(0, ref location)) return;
+            string text = string.Empty;
+            DA.GetData(0, ref text);
 
-            string content = string.Empty;
-            if (!DA.GetData(1, ref content)) return;
+            int formatting = 0;
+            DA.GetData(1, ref formatting);
 
-            Shape shape = Shape.CreateText(content, location, new Font());
+            Block block = Block.CreateText(text,(Block.FormatTypes)formatting);
 
-            prev_shapes.Add(shape);
-            DA.SetData(0, shape);
+            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -72,7 +78,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Content_TextPt_01;
+                return Properties.Resources.Pdf_Block_Text;
             }
         }
 
@@ -81,7 +87,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("81f60353-b223-4c36-b46e-588733aadcac"); }
+            get { return new Guid("4e9ff875-26bb-4365-a839-1fbccccae6bd"); }
         }
     }
 }
