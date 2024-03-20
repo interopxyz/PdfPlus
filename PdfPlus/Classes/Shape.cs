@@ -159,8 +159,22 @@ namespace PdfPlus
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.Polyline;
-
+            shape.boundingBox = polyline.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.polyline = polyline.Duplicate();
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
+        }
+
+        public static Shape CreateGeometry(Rg.Rectangle3d rectangle, Graphic graphic)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Polyline;
+
+            shape.boundingBox = rectangle.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.polyline = rectangle.ToPolyline();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -171,6 +185,8 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.Line;
 
+            shape.boundingBox = line.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.line = new Rg.Line(line.From, line.To);
             shape.graphic = new Graphic(graphic);
 
@@ -182,6 +198,8 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.Bezier;
 
+            shape.boundingBox = arc.BoundingBox();
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.curve = arc.ToNurbsCurve();
             shape.curve.MakePiecewiseBezier(true);
             shape.graphic = new Graphic(graphic);
@@ -194,8 +212,9 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.Circle;
 
+            shape.boundingBox = circle.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.circle = new Rg.Circle(circle.Plane, circle.Radius);
-            shape.boundary = new Rg.Rectangle3d(circle.Plane, new Rg.Interval(-circle.Radius, circle.Radius), new Rg.Interval(-circle.Radius, circle.Radius));
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -207,6 +226,9 @@ namespace PdfPlus
             shape.shapeType = ShapeType.Bezier;
 
             shape.curve = ellipse.ToNurbsCurve();
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+
             shape.curve.MakePiecewiseBezier(true);
             shape.graphic = new Graphic(graphic);
 
@@ -219,6 +241,9 @@ namespace PdfPlus
             shape.shapeType = ShapeType.Bezier;
 
             shape.curve = bezier.ToNurbsCurve();
+
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -230,6 +255,9 @@ namespace PdfPlus
             shape.shapeType = ShapeType.Bezier;
 
             shape.curve = new Rg.NurbsCurve(curve.ToNurbsCurve());
+
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.curve.MakePiecewiseBezier(true);
             shape.graphic = new Graphic(graphic);
 
@@ -242,6 +270,9 @@ namespace PdfPlus
             shape.shapeType = ShapeType.Bezier;
 
             shape.curve = new Rg.NurbsCurve(curve);
+
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.curve.MakePiecewiseBezier(true);
             shape.graphic = new Graphic(graphic);
 
@@ -254,6 +285,9 @@ namespace PdfPlus
             shape.shapeType = ShapeType.Brep;
 
             shape.brep = brep.DuplicateBrep();
+
+            shape.boundingBox = shape.brep.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -265,6 +299,9 @@ namespace PdfPlus
             shape.shapeType = ShapeType.Mesh;
 
             shape.mesh = mesh.DuplicateMesh();
+
+            shape.boundingBox = shape.mesh.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -502,60 +539,154 @@ namespace PdfPlus
             }
         }
 
+        #region geometry rendering
+
+        public Shape Transform(Rg.Transform transform)
+        {
+            Shape shape = new Shape(this);
+
+            shape.boundary.Transform(transform);
+            shape.boundingBox.Transform(transform);
+
+            switch (this.shapeType)
+            {
+                case ShapeType.Line:
+                    shape.line.Transform(transform);
+                    break;
+                case ShapeType.Polyline:
+                    shape.polyline.Transform(transform);
+                    break;
+                case ShapeType.Circle:
+                    shape.circle.Transform(transform);
+                    break;
+                case ShapeType.Bezier:
+                    shape.curve.Transform(transform);
+                    break;
+                case ShapeType.Brep:
+                    shape.brep.Transform(transform);
+                    break;
+                case ShapeType.Mesh:
+                    shape.mesh.Transform(transform);
+                    break;
+            }
+            return shape;
+        }
+
+        public Pd.XGraphics RenderGeometry(Pd.XGraphics graph)
+        {
+            switch (this.shapeType)
+            {
+                case ShapeType.Line:
+                    graph = this.RenderLine(graph);
+                    break;
+                case ShapeType.Polyline:
+                    graph = this.RenderPolyline(graph);
+                    break;
+                case ShapeType.Circle:
+                    graph = this.RenderEllipse(graph);
+                    break;
+                case ShapeType.Ellipse:
+                    graph = this.RenderEllipse(graph);
+                    break;
+                case ShapeType.Bezier:
+                    graph = this.RenderBezier(graph);
+                    break;
+                case ShapeType.Brep:
+                    graph = this.RenderBrep(graph);
+                    break;
+                case ShapeType.Mesh:
+                    graph = this.RenderMesh(graph);
+                    break;
+            }
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderLine(Pd.XGraphics graph)
+        {
+            graph.DrawLine(graphic.ToPdf(), line.From.ToPdf(), line.To.ToPdf());
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderPolyline(Pd.XGraphics graph)
+        {
+            Pd.XGraphicsPath plinePath = new Pd.XGraphicsPath();
+
+            plinePath.StartFigure();
+            plinePath.AddLines(polyline.ToPdf().ToArray());
+            if (polyline.IsClosed) plinePath.CloseFigure();
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderEllipse(Pd.XGraphics graph)
+        {
+            graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderBezier(Pd.XGraphics graph)
+        {
+            graph.DrawBeziers(graphic.ToPdf(), curve.ToBezierPolyline().ToPdf().ToArray());
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderBrep(Pd.XGraphics graph)
+        {
+            Pd.XGraphicsPath crvPath = new Pd.XGraphicsPath();
+
+            List<Rg.Curve> curves = Rg.NurbsCurve.JoinCurves(brep.DuplicateNakedEdgeCurves(true, true)).ToList();
+            foreach (Rg.Curve curve in curves)
+            {
+                Rg.NurbsCurve nurbs = curve.ToNurbsCurve();
+                crvPath.StartFigure();
+                crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
+                if (nurbs.IsClosed) crvPath.CloseFigure();
+            }
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderMesh(Pd.XGraphics graph)
+        {
+            Pd.XGraphicsPath polyPath = new Pd.XGraphicsPath();
+
+            List<Rg.Polyline> polylines = this.mesh.GetNakedEdges().ToList();
+            foreach (Rg.Polyline pline in polylines)
+            {
+                polyPath.StartFigure();
+                polyPath.AddLines(pline.ToPdf().ToArray());
+                if (pline.IsClosed) polyPath.CloseFigure();
+            }
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath);
+            return graph;
+        }
+
+        #endregion
+
         public void Render(Pd.XGraphics graph, Pf.PdfPage page, Rg.Plane coordinateframe)
         {
             switch (this.shapeType)
             {
                 case ShapeType.Line:
-                    graph.DrawLine(graphic.ToPdf(), line.From.ToPdf(), line.To.ToPdf());
+                    graph = this.RenderLine(graph);
                     break;
-
                 case ShapeType.Polyline:
-                    Pd.XGraphicsPath plinePath = new Pd.XGraphicsPath();
-
-                    plinePath.StartFigure();
-                    plinePath.AddLines(polyline.ToPdf().ToArray());
-                        if (polyline.IsClosed) plinePath.CloseFigure();
-                    graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
+                    graph = this.RenderPolyline(graph);
                     break;
-
                 case ShapeType.Circle:
-                    graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+                    graph = this.RenderEllipse(graph);
                     break;
-
                 case ShapeType.Ellipse:
-                    graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+                    graph = this.RenderEllipse(graph);
                     break;
-
                 case ShapeType.Bezier:
-                    graph.DrawBeziers(graphic.ToPdf(), curve.ToBezierPolyline().ToPdf().ToArray());
+                    graph = this.RenderBezier(graph);
                     break;
-
                 case ShapeType.Brep:
-                    Pd.XGraphicsPath crvPath = new Pd.XGraphicsPath();
-
-                    List<Rg.Curve> curves = Rg.NurbsCurve.JoinCurves(brep.DuplicateNakedEdgeCurves(true, true)).ToList();
-                    foreach (Rg.Curve curve in curves)
-                    {
-                        Rg.NurbsCurve nurbs = curve.ToNurbsCurve();
-                        crvPath.StartFigure();
-                        crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
-                        if (nurbs.IsClosed) crvPath.CloseFigure();
-                    }
-                    graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
+                    graph = this.RenderBrep(graph);
                     break;
-
                 case ShapeType.Mesh:
-                    Pd.XGraphicsPath polyPath = new Pd.XGraphicsPath();
-
-                    List<Rg.Polyline> polylines = this.mesh.GetNakedEdges().ToList();
-                    foreach (Rg.Polyline pline in polylines)
-                    {
-                        polyPath.StartFigure();
-                        polyPath.AddLines(pline.ToPdf().ToArray());
-                        if (pline.IsClosed) polyPath.CloseFigure();
-                    }
-                    graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath);
+                    graph = this.RenderMesh(graph);
                     break;
 
                 case ShapeType.ImageFrame:

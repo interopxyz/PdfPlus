@@ -5,7 +5,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Formatting
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Format_DataSetFast : GH_Component
     {

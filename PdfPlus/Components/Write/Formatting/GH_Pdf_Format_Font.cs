@@ -81,7 +81,7 @@ namespace PdfPlus.Components
             if (!DA.GetData(0, ref goo)) return;
             Element elem = null;
             bool isElement = goo.TryGetElement(ref elem);
-            if (isElement) font = elem.Font;
+            if (isElement) font = new Font(elem.Font);
 
             string family = "Arial";
             if (DA.GetData(1, ref family)) font.Family = family;

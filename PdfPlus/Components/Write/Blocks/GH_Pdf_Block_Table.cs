@@ -5,7 +5,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Documents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Block_Table : GH_Component
     {

@@ -40,12 +40,12 @@ namespace PdfPlus
         protected Sd.Bitmap imageObject = null;
 
         //Geometry
+        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
+        protected Rg.BoundingBox boundingBox = new Rg.BoundingBox();
         protected Rg.Point3d location = new Rg.Point3d();
         protected Rg.Polyline polyline = new Rg.Polyline();
         protected Rg.Line line = new Rg.Line();
-        protected Rg.Arc arc = new Rg.Arc();
         protected Rg.Circle circle = new Rg.Circle();
-        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
         protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
 
         protected Rg.Brep brep = new Rg.Brep();
@@ -85,9 +85,10 @@ namespace PdfPlus
             if (element.imageObject != null) this.imageObject = new Sd.Bitmap(element.imageObject);
 
             //Geoemtry
+            this.boundary = new Rg.Rectangle3d(element.boundary.Plane, element.boundary.Corner(0), element.boundary.Corner(2));
+            this.boundingBox = new Rg.BoundingBox(element.boundingBox.GetCorners());
             this.location = new Rg.Point3d(element.location);
             this.polyline = element.polyline.Duplicate();
-            this.boundary = new Rg.Rectangle3d(element.boundary.Plane, element.boundary.Corner(0), element.boundary.Corner(2));
             this.line = new Rg.Line(element.line.From, element.line.To);
             this.curve = new Rg.NurbsCurve(element.curve);
             this.circle = new Rg.Circle(element.circle.Plane, element.circle.Radius);
@@ -227,22 +228,22 @@ namespace PdfPlus
         //Geometry
         public virtual Rg.Point3d Location
         {
-            get { return this.location; }
+            get { return new Rg.Point3d(this.location); }
         }
 
         public virtual Rg.Rectangle3d Boundary
         {
-            get { return this.boundary; }
+            get { return new Rg.Rectangle3d(this.boundary.Plane,this.boundary.Width,this.boundary.Height) ; }
+        }
+
+        public virtual Rg.BoundingBox BoundingBox
+        {
+            get { return new Rg.BoundingBox(this.boundingBox.GetCorners()); }
         }
 
         public virtual Rg.Line Line
         {
-            get { return this.line; }
-        }
-
-        public virtual Rg.Arc Arc
-        {
-            get { return this.arc; }
+            get { return new Rg.Line(this.line.From,this.line.To); }
         }
 
         public virtual Rg.Ellipse Ellipse
@@ -252,20 +253,20 @@ namespace PdfPlus
 
         public virtual Rg.Polyline Polyline
         {
-            get { return this.polyline; }
+            get { return new Rg.Polyline(this.polyline); }
         }
         public virtual Rg.Circle Circle
         {
-            get { return this.circle; }
+            get { return new Rg.Circle(this.circle.Plane,this.circle.Radius); }
         }
         public virtual Rg.Brep Brep
         {
-            get { return this.brep; }
+            get { return this.brep.DuplicateBrep(); }
         }
 
         public virtual Rg.Mesh Mesh
         {
-            get { return this.mesh; }
+            get { return this.mesh.DuplicateMesh(); }
         }
 
         public virtual Rg.NurbsCurve Bezier
@@ -274,7 +275,7 @@ namespace PdfPlus
             {
                 Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
                 nurbs.MakePiecewiseBezier(true);
-                return nurbs;
+                return nurbs.DuplicateCurve().ToNurbsCurve();
             }
         }
 

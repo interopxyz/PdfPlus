@@ -4,7 +4,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Contents
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Shape_Link : GH_Pdf__Base
     {

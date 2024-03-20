@@ -265,14 +265,39 @@ namespace PdfPlus
                 Md.Section section = doc.Sections.AddSection();
                 doc = this.SetPage(doc);
 
-
-                foreach (Block block in blocks) block.Render(doc);
+                List<Block> drawings = new List<Block>();
+                foreach (Block block in blocks)
+                {
+                    block.Render(doc);
+                    if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
+                }
 
                 Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
                 pdfDocumentRenderer.Document = doc;
                 pdfDocumentRenderer.PdfDocument = document;
 
-                pdfDocumentRenderer.RenderDocument();
+                List<Rg.Rectangle3d> boundaries = new List<Rg.Rectangle3d>();
+                pdfDocumentRenderer.PrepareRenderPages();
+                int count = pdfDocumentRenderer.PageCount;
+                int j = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    pdfDocumentRenderer.RenderPages(i+1, i+1);
+                    Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i+1);
+                    Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
+
+                    foreach (Mr.RenderInfo info in infos)
+                    {
+                        if(info.DocumentObject.Tag != null)
+                        {
+                            Rg.Rectangle3d r = info.LayoutInfo.ContentArea.ToRectangle3d();
+                            drawings[j].Drawing.Render(graph, r);
+                            //graph.DrawRectangle(new Pd.XPen(Pd.XColor.FromArgb(255, 0, 0),3), new Pd.XRect(r.Plane.OriginX, r.Plane.OriginY, r.Width, r.Height));
+                            j++;
+                        }
+
+                    }
+                }
 
                 return pdfDocumentRenderer.PdfDocument;
             }

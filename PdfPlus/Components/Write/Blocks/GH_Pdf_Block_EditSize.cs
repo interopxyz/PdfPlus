@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Write.Blocks
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Block_EditSize : GH_Component
     {

@@ -15,6 +15,7 @@ using Pl = PdfSharp.Drawing.Layout;
 using Pc = PdfSharp.Charting;
 
 using Md = MigraDoc.DocumentObjectModel;
+using Mr = MigraDoc.Rendering;
 
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -27,6 +28,103 @@ namespace PdfPlus
     {
         #region Grasshopper 
 
+        public static bool TryGetGeometricShape(this IGH_Goo goo, ref Shape shape)
+        {
+            bool isValid = false;
+            switch (goo.TypeName)
+            {
+                case "Curve":
+                    Rg.Curve curve;
+                    isValid = true;
+
+                    if (goo.CastTo<Rg.Curve>(out curve))
+                    {
+                        string type = goo.ToString();
+
+                        switch (type)
+                        {
+                            default:
+                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), new Graphic());
+                                break;
+                            case "Polyline Curve":
+                                Rg.Polyline pline;
+                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, new Graphic());
+                                break;
+                            case "Line-like Curve":
+                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
+                                break;
+                            case "Elliptical Curve":
+                                Rg.Ellipse ellipse;
+                                curve.TryGetEllipse(out ellipse);
+                                shape = Shape.CreateGeometry(ellipse, new Graphic());
+                                break;
+                        }
+                        isValid = true;
+                    }
+                    break;
+                case "Arc":
+                    Rg.Arc arc;
+
+                    if (goo.CastTo<Rg.Arc>(out arc))
+                    {
+                        shape = Shape.CreateGeometry(arc, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Circle":
+                    Rg.Circle circle;
+
+                    if (goo.CastTo<Rg.Circle>(out circle))
+                    {
+                        shape = Shape.CreateGeometry(circle, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Line":
+                    Rg.Line line;
+
+                    if (goo.CastTo<Rg.Line>(out line))
+                    {
+                        shape = Shape.CreateGeometry(line, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Rectangle":
+                    Rg.Rectangle3d rect;
+                    if (goo.CastTo<Rg.Rectangle3d>(out rect))
+                    {
+                        shape = Shape.CreateGeometry(rect, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Surface":
+                    Rg.Surface surface;
+                    if (goo.CastTo<Rg.Surface>(out surface))
+                    {
+                        Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
+                        shape = Shape.CreateGeometry(srfBrep, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Brep":
+                    Rg.Brep brep;
+                    if (goo.CastTo<Rg.Brep>(out brep))
+                    {
+                        shape = Shape.CreateGeometry(brep, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Mesh":
+                    Rg.Mesh mesh;
+                    if (goo.CastTo<Rg.Mesh>(out mesh))
+                    {
+                        shape = Shape.CreateGeometry(mesh, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+            }
+            return isValid;
+        }
         public static bool TryGetShape(this IGH_Goo goo, ref Shape shape)
         {
             Shape shp;
@@ -39,90 +137,8 @@ namespace PdfPlus
             }
             else
             {
-                switch (goo.TypeName)
-                {
-                    case "Curve":
-                        Rg.Curve curve;
-                        isValid = true;
-
-                        if (goo.CastTo<Rg.Curve>(out curve))
-                        {
-                            string type = goo.ToString();
-
-                            switch (type)
-                            {
-                                default:
-                                    shape = Shape.CreateGeometry(curve.ToNurbsCurve(), new Graphic());
-                                    break;
-                                case "Polyline Curve":
-                                    Rg.Polyline pline;
-                                    if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, new Graphic());
-                                    break;
-                                case "Line-like Curve":
-                                    shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
-                                    break;
-                                case "Elliptical Curve":
-                                    Rg.Ellipse ellipse;
-                                    curve.TryGetEllipse(out ellipse);
-                                    shape = Shape.CreateGeometry(ellipse, new Graphic());
-                                    break;
-                            }
-                            isValid = true;
-                        }
-                        break;
-                    case "Arc":
-                        Rg.Arc arc;
-
-                        if (goo.CastTo<Rg.Arc>(out arc))
-                        {
-                            shape = Shape.CreateGeometry(arc, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Circle":
-                        Rg.Circle circle;
-
-                        if (goo.CastTo<Rg.Circle>(out circle))
-                        {
-                            shape = Shape.CreateGeometry(circle, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Line":
-                        Rg.Line line;
-
-                        if (goo.CastTo<Rg.Line>(out line))
-                        {
-                            shape = Shape.CreateGeometry(line, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Surface":
-                        Rg.Surface surface;
-                        if (goo.CastTo<Rg.Surface>(out surface))
-                        {
-                            Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
-                            shape = Shape.CreateGeometry(srfBrep, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Brep":
-                        Rg.Brep brep;
-                        if (goo.CastTo<Rg.Brep>(out brep))
-                        {
-                            shape = Shape.CreateGeometry(brep, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Mesh":
-                        Rg.Mesh mesh;
-                        if (goo.CastTo<Rg.Mesh>(out mesh))
-                        {
-                            shape = Shape.CreateGeometry(mesh, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                }
+                isValid = goo.TryGetGeometricShape(ref shp);
+                if (isValid) shape = new Shape(shp);
             }
             return isValid;
         }
@@ -137,6 +153,12 @@ namespace PdfPlus
                 block = new Block(blk);
                 isValid = true;
             }
+            else
+            {
+                Shape shp = null;
+                isValid = goo.TryGetGeometricShape(ref shp);
+                if (isValid) block = Block.CreateDrawing(shp);
+            }
 
             return isValid;
         }
@@ -150,6 +172,12 @@ namespace PdfPlus
             {
                 element = new Element(elem);
                 isValid = true;
+            }
+            else
+            {
+                Shape shp = null;
+                isValid = goo.TryGetGeometricShape(ref shp);
+                if (isValid) element = shp;
             }
 
             return isValid;
@@ -293,6 +321,10 @@ namespace PdfPlus
                     return "";
             }
         }
+
+        #region render geometry
+
+        #endregion
 
         #region charts
 
@@ -829,6 +861,15 @@ namespace PdfPlus
             buffer = null;
 
             return prefix+output;
+        }
+
+        #endregion
+
+        #region geometry
+
+        public static Rg.Rectangle3d ToRectangle3d(this Mr.Area input)
+        {
+            return new Rg.Rectangle3d(new Rg.Plane(new Rg.Point3d(input.X, input.Y, 0), Rg.Vector3d.ZAxis), input.Width, input.Height);
         }
 
         #endregion

@@ -4,7 +4,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Blocks
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Block_PageBreak : GH_Component
     {

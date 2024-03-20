@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Write.Pages
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Page_SetBlocks : GH_Component
     {

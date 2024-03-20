@@ -23,6 +23,11 @@ namespace PdfPlus
     public static class GhExtensions
     {
 
+        public static Rg.Rectangle3d ToRectangle3d(this Rg.BoundingBox input)
+        {
+            return new Rg.Rectangle3d(new Rg.Plane(input.Corner(true, true, true), Rg.Vector3d.ZAxis), input.Diagonal.X, input.Diagonal.Y);
+        }
+
         public static List<string> ToStringList(this List<GH_String> input)
         {
             List<string> output = new List<string>();

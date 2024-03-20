@@ -216,7 +216,7 @@ namespace PdfPlus.Components
                         args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), strokeColor,false);
                         break;
                     case Shape.ShapeType.Arc:
-                        args.Display.DrawArc(shape.Arc, strokeColor, (int)shape.StrokeWeight);
+                        args.Display.DrawCurve(shape.Bezier, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Bezier:
                         args.Display.DrawCurve(shape.Bezier, strokeColor, (int)shape.StrokeWeight);

@@ -83,6 +83,7 @@
     <Compile Include="Classes\Block.cs" />
     <Compile Include="Classes\DataSet.cs" />
     <Compile Include="Classes\Document.cs" />
+    <Compile Include="Classes\Drawing.cs" />
     <Compile Include="Classes\Element.cs" />
     <Compile Include="Classes\Font.cs" />
     <Compile Include="Classes\Graphic.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartBasic.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Drawing.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_EditSize.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />

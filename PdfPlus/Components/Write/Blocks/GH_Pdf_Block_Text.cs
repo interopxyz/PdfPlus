@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using Grasshopper.Kernel.Parameters;
 
-namespace PdfPlus.Components.Write.Blocks
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Block_Text : GH_Component
     {

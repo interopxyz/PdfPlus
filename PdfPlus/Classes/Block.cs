@@ -45,6 +45,9 @@ namespace PdfPlus
         //Table
         protected List<List<string>> tableContents = new List<List<string>>();
 
+        //Geometry
+        protected Drawing drawing = null;
+
         #endregion
 
         #region constructors
@@ -80,6 +83,9 @@ namespace PdfPlus
                 foreach (string item in entry) this.tableContents[i].Add(item);
                 i++;
             }
+
+            //drawing
+            if (block.drawing != null) this.drawing = new Drawing(block.drawing);
 
             //format
             this.width = block.width;
@@ -201,10 +207,40 @@ namespace PdfPlus
 
         #endregion
 
+        #region drawing
+
+        public static Block CreateDrawing(List<Shape> shapes)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Drawing;
+            block.drawing = new Drawing(shapes);
+
+            return block;
+        }
+
+        public static Block CreateDrawing(Shape  shape)
+        {
+            Block block = Block.CreateDrawing(new List<Shape> { shape });
+
+            return block;
+        }
+
+        #endregion
+
         #endregion
 
         #region properties
 
+        public virtual BlockTypes BlockType
+        {
+            get { return this.blockType; }
+        }
+
+        public virtual Drawing Drawing
+        {
+            get { return drawing; }
+        }
+        
         public virtual double Width
         {
             get { return this.width; }
@@ -227,7 +263,6 @@ namespace PdfPlus
             switch (this.blockType)
             {
                 case BlockTypes.LineBreak:
-                    Md.Shapes.TextFrame frame = document.LastSection.AddTextFrame();
                     txt = document.LastSection.AddParagraph();
                     for (int i =0;i<this.breakCount;i++) txt.AddLineBreak();
                     break;
@@ -237,7 +272,6 @@ namespace PdfPlus
                 case BlockTypes.Text:
                     txt = document.LastSection.AddParagraph(this.text);
                     txt.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
-
                     break;
                 case BlockTypes.List:
                     Md.ListType listType = (Md.ListType)this.listType;
@@ -250,7 +284,6 @@ namespace PdfPlus
                         listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
                         listItem.Format.ListInfo = listinfo;
                     }
-
                     break;
                 case BlockTypes.Table:
                     Md.Tables.Table table = document.LastSection.AddTable();
@@ -280,7 +313,6 @@ namespace PdfPlus
                     }
 
                     break;
-
                 case BlockTypes.Chart:
                     Md.Shapes.Charts.ChartType ct = this.chartType.ToMigraDoc();
 
@@ -380,7 +412,37 @@ namespace PdfPlus
                     }
                     img.Left = this.Justification.ToMigraDocShapePosition();
                     break;
-                    case BlockTypes.draw
+                case BlockTypes.Drawing:
+                    Md.Shapes.TextFrame frame = document.LastSection.AddTextFrame();
+
+                    Rg.BoundingBox box = this.drawing.BoundingBox;
+
+                    frame.Width = box.Diagonal.X;
+                    frame.Height = box.Diagonal.Y;
+                    if ((this.width>0) & (this.height > 0))
+                    {
+                        frame.Width = this.width;
+                        frame.Height = this.height;
+                    }
+                    else if (this.width > 0)
+                    {
+                        frame.Width = this.width;
+                        frame.Height = box.Diagonal.Y * (this.Width / box.Diagonal.X);
+
+                    }
+                    else if(this.height > 0)
+                    {
+                        frame.Width = box.Diagonal.X * (this.Height / box.Diagonal.Y);
+                        frame.Height = this.height;
+                    }
+                    else
+                    {
+
+                    }
+
+                    frame.Left = this.Justification.ToMigraDocShapePosition();
+                    frame.Tag = "Drawing";
+                    break;
             }
 
             return document;

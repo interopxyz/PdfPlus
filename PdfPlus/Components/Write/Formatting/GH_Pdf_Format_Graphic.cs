@@ -58,19 +58,14 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            IGH_Goo goo = null;
-            if (!DA.GetData(0, ref goo)) return;
 
             Graphic graphic = new Graphic();
 
-            Shape shape = null;
-            bool isShape = goo.TryGetShape(ref shape);
-            if(isShape)graphic = shape.Graphic;
-
-            DataSet data = null;
-            bool isData = goo.CastTo<DataSet>(out data);
-            if (isData) data = new DataSet(data);
-            if (isData) graphic = data.Graphic;
+        IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Element elem = null;
+        bool isElement = goo.TryGetElement(ref elem);
+            if (isElement) graphic = new Graphic(elem.Graphic);
 
             Sd.Color fill = Sd.Color.Black;
             if (DA.GetData(1, ref fill)) graphic.Color = fill;
@@ -84,17 +79,24 @@ namespace PdfPlus.Components
             string pattern = "1.0,2.0";
             if (DA.GetData(4, ref pattern)) graphic.SetPattern(pattern);
 
-            if (isShape)
+            Shape shape = null;
+            Block block = null;
+            DataSet dataSet = null;
+            if (goo.TryGetShape(ref shape))
             {
                 shape.Graphic = graphic;
                 prev_shapes.Add(shape);
                 DA.SetData(0, shape);
             }
-
-            if (isData)
+            else if (goo.TryGetBlock(ref block))
             {
-                data.Graphic = graphic;
-                DA.SetData(0, data);
+                block.Graphic = graphic;
+                DA.SetData(0, block);
+            }
+            else if (goo.TryGetDataSet(ref dataSet))
+            {
+                dataSet.Graphic = graphic;
+                DA.SetData(0, dataSet);
             }
         }
 
