@@ -72,154 +72,171 @@ namespace PdfPlus
 
         public static Md.Document SetDefaultStyles(Md.Document doc)
         {
+            Font font = Fonts.Normal;
+            Md.Style style = doc.Styles[font.Name];
 
             #region Normal
 
-            Md.Style normal = doc.Styles["Heading1"];
-            normal.Font.Name = "Arial";
-            normal.Font.Size = 11;
-            normal.Font.Color = Sd.Color.Black.ToMigraDoc();
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
 
             #endregion
 
             #region Title
 
-            Md.Style title = doc.Styles.AddStyle("Title", "Normal");
-            title.Font.Name = "Arial";
-            title.Font.Size = 26;
-            title.Font.Color = Sd.Color.Black.ToMigraDoc();
-            title.ParagraphFormat.SpaceAfter = 3;
-            title.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Title;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceAfter = 3;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Subtitle
 
-            Md.Style subtitle = doc.Styles.AddStyle("Subtitle", "Normal");
-            subtitle.Font.Name = "Arial";
-            subtitle.Font.Size = 15;
-            subtitle.Font.Color = Sd.Color.DarkGray.ToMigraDoc();
-            subtitle.ParagraphFormat.SpaceAfter = 16;
-            subtitle.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Subtitle;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceAfter = 16;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Heading1
 
-            Md.Style heading1 = doc.Styles["Heading1"];
-            heading1.Font.Name = "Arial";
-            heading1.Font.Size = 20;
-            heading1.Font.Color = Sd.Color.Black.ToMigraDoc();
-            heading1.ParagraphFormat.SpaceBefore = 20;
-            heading1.ParagraphFormat.SpaceAfter = 6;
-            heading1.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Heading1;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 20;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Heading2
 
-            Md.Style heading2 = doc.Styles["Heading2"];
-            heading2.Font.Name = "Arial";
-            heading2.Font.Size = 16;
-            heading2.Font.Color = Sd.Color.Black.ToMigraDoc();
-            heading2.ParagraphFormat.SpaceBefore = 18;
-            heading2.ParagraphFormat.SpaceAfter = 6;
-            heading2.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Heading2;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 18;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Heading3
 
-            Md.Style heading3 = doc.Styles["Heading3"];
-            heading3.Font.Name = "Arial";
-            heading3.Font.Size = 14;
-            heading3.Font.Color = Sd.Color.Gray.ToMigraDoc();
-            heading3.ParagraphFormat.SpaceBefore = 16;
-            heading3.ParagraphFormat.SpaceAfter = 4;
-            heading3.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Heading3;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 16;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Heading4
 
-            Md.Style heading4 = doc.Styles["Heading4"];
-            heading4.Font.Name = "Arial";
-            heading4.Font.Size = 12;
-            heading4.Font.Color = Sd.Color.Gray.ToMigraDoc();
-            heading4.ParagraphFormat.SpaceBefore = 14;
-            heading4.ParagraphFormat.SpaceAfter = 4;
-            heading4.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Heading4;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 14;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Heading5
 
-            Md.Style heading5 = doc.Styles["Heading5"];
-            heading5.Font.Name = "Arial";
-            heading5.Font.Size = 11;
-            heading5.Font.Color = Sd.Color.Gray.ToMigraDoc();
-            heading5.ParagraphFormat.SpaceBefore = 12;
-            heading5.ParagraphFormat.SpaceAfter = 4;
-            heading5.ParagraphFormat.KeepWithNext = true;
+            font = Fonts.Heading5;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 12;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
 
             #endregion
 
             #region Heading6
 
-            Md.Style heading6 = doc.Styles["Heading6"];
-            heading6.Font.Name = "Arial";
-            heading6.Font.Size = 11;
-            heading6.Font.Color = Sd.Color.Gray.ToMigraDoc();
-            heading6.ParagraphFormat.SpaceBefore = 12;
-            heading6.ParagraphFormat.SpaceAfter = 4;
-            heading6.ParagraphFormat.KeepWithNext = true;
-            heading6.ParagraphFormat.Font.Italic = true;
+            font = Fonts.Heading6;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 12;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
+            style.ParagraphFormat.Font.Italic = true;
 
             #endregion
 
             #region Quote
 
-            Md.Style quote = doc.Styles.AddStyle("Quote", "Normal");
-            quote.Font.Name = "Arial";
-            quote.Font.Size = 11;
-            quote.Font.Color = Sd.Color.DarkGray.ToMigraDoc();
-            quote.ParagraphFormat.SpaceBefore = 12;
-            quote.ParagraphFormat.SpaceAfter = 12;
-            quote.ParagraphFormat.LeftIndent = 18;
-            quote.ParagraphFormat.Borders.Left.Width = new Md.Unit(1, Md.UnitType.Point);
-            quote.ParagraphFormat.Borders.Left.Color = Sd.Color.LightGray.ToMigraDoc();
-            quote.ParagraphFormat.Borders.DistanceFromLeft = new Md.Unit(3, Md.UnitType.Point);
+            font = Fonts.Quote;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 12;
+            style.ParagraphFormat.SpaceAfter = 12;
+            style.ParagraphFormat.LeftIndent = 18;
+            style.ParagraphFormat.Borders.Left.Width = new Md.Unit(1, Md.UnitType.Point);
+            style.ParagraphFormat.Borders.Left.Color = Sd.Color.LightGray.ToMigraDoc();
+            style.ParagraphFormat.Borders.DistanceFromLeft = new Md.Unit(3, Md.UnitType.Point);
+
             #endregion
 
             #region Footnote
 
-            Md.Style footnote = doc.Styles["Footnote"];
-            footnote.Font.Name = "Arial";
-            footnote.Font.Size = 8;
-            footnote.Font.Color = Sd.Color.Black.ToMigraDoc();
-            footnote.ParagraphFormat.SpaceBefore = 6;
-            footnote.ParagraphFormat.SpaceAfter = 6;
-            footnote.ParagraphFormat.LeftIndent = 12;
-            footnote.ParagraphFormat.RightIndent = 12;
-            footnote.ParagraphFormat.Font.Italic = true;
+            font = Fonts.Footnote;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 6;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.LeftIndent = 12;
+            style.ParagraphFormat.RightIndent = 12;
+            style.ParagraphFormat.Font.Italic = true;
 
             #endregion
 
             #region Caption
 
-            Md.Style caption = doc.Styles.AddStyle("Caption", "Normal");
-            caption.Font.Name = "Arial";
-            caption.Font.Size = 8;
-            caption.Font.Color = Sd.Color.Black.ToMigraDoc();
-            caption.ParagraphFormat.SpaceAfter = 12;
-            caption.ParagraphFormat.LeftIndent = 12;
-            caption.ParagraphFormat.RightIndent = 12;
+            font = Fonts.Caption;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceAfter = 12;
+            style.ParagraphFormat.LeftIndent = 12;
+            style.ParagraphFormat.RightIndent = 12;
 
             #endregion
 
             #region List
 
-            Md.Style list = doc.Styles["List"];
+            font = Fonts.List;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
 
             #endregion
 

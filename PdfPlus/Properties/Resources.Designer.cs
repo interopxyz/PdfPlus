@@ -183,6 +183,16 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Format_FontPresets {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Format_FontPresets", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Pdf_Format_Graphic {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Format_Graphic", resourceCulture);

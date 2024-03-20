@@ -24,7 +24,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.secondary; }
+            get { return GH_Exposure.tertiary; }
         }
 
         /// <summary>
@@ -33,12 +33,12 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("Values", "V", "A list of numeric values", GH_ParamAccess.list);
-            pManager.AddColourParameter("Colors", "C", "Optional list of colors corresponding to the values", GH_ParamAccess.list);
-            pManager[1].Optional = true;
+            //pManager.AddColourParameter("Colors", "C", "Optional list of colors corresponding to the values", GH_ParamAccess.list);
+            //pManager[1].Optional = true;
             pManager.AddBooleanParameter("Label", "L", "If true, the datapoints will be labeled", GH_ParamAccess.item,true);
-            pManager[2].Optional = true;
+            pManager[1].Optional = true;
             pManager.AddTextParameter("Title", "T", "An optional name for the series", GH_ParamAccess.item);
-            pManager[3].Optional = true;
+            pManager[2].Optional = true;
         }
 
         /// <summary>
@@ -60,14 +60,14 @@ namespace PdfPlus.Components
 
             DataSet dataSet = new DataSet(values);
 
-            List<Sd.Color> colors = new List<Sd.Color>();
-            if (DA.GetDataList(1, colors)) dataSet.Colors = colors;
+            //List<Sd.Color> colors = new List<Sd.Color>();
+            //if (DA.GetDataList(1, colors)) dataSet.Colors = colors;
 
             bool label = true;
-            if (DA.GetData(2, ref label)) dataSet.LabelData = label;
+            if (DA.GetData(1, ref label)) dataSet.LabelData = label;
 
             string title = string.Empty;
-            if (DA.GetData(3, ref title)) dataSet.Title = title;
+            if (DA.GetData(2, ref title)) dataSet.Title = title;
 
             DA.SetData(0,dataSet);
         }

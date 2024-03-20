@@ -62,7 +62,7 @@ namespace PdfPlus.Components.Write.Blocks
             int formatting = 0;
             DA.GetData(1, ref formatting);
 
-            Block block = Block.CreateText(text, (Block.FormatTypes)formatting);
+            Block block = Block.CreateText(text, (Font.Presets)formatting);
 
             DA.SetData(0, block);
         }

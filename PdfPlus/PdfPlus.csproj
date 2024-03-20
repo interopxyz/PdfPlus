@@ -46,6 +46,22 @@
       <HintPath>packages\Grasshopper.6.18.19266.14201\lib\net45\Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MigraDoc.DocumentObjectModel, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Rendering, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\PdfSharp.Charting.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="Rhino.UI, Version=6.18.19266.14200, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
       <HintPath>packages\RhinoCommon.6.18.19266.14201\lib\net45\Rhino.UI.dll</HintPath>
@@ -79,6 +95,8 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_PageBreak.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf__Base.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartBasic.cs" />
@@ -149,24 +167,6 @@
     <None Include="Resources\Pdf-Block-Image.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.DocumentObjectModel\MigraDoc.DocumentObjectModel.csproj">
-      <Project>{6318a852-ef6b-486f-8547-3d7e736d7943}</Project>
-      <Name>MigraDoc.DocumentObjectModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\other\MigraDoc-1.5\MigraDoc\src\MigraDoc.Rendering\MigraDoc.Rendering.csproj">
-      <Project>{a0b7940a-0bfc-476d-a204-73f7c0f88fde}</Project>
-      <Name>MigraDoc.Rendering</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
-      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
-      <Name>PdfSharp.Charting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
-      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
-      <Name>PdfSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Pdf-Page-Add_Rect.png" />
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +234,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Format-QuickData.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-FontPresets.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

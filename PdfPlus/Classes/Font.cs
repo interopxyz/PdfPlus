@@ -14,8 +14,11 @@ namespace PdfPlus
     public class Font
     {
         #region members
+        public enum Presets { Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption };
 
         protected bool isModified = false;
+
+        protected string name = "None";
 
         protected string family = "Arial";
         protected bool hasFamily = false;
@@ -41,6 +44,8 @@ namespace PdfPlus
         {
             this.isModified = font.isModified;
 
+            this.name = font.name;
+
             this.family = font.family;
             this.hasFamily = font.hasFamily;
             this.size = font.size;
@@ -54,7 +59,23 @@ namespace PdfPlus
             this.hasStyle = font.hasStyle;
         }
 
-        public Font(string family, double size, Sd.Color color)
+        public Font(string name, string family, double size, Sd.Color color, FontStyle style = FontStyle.Regular)
+        {
+            this.isModified = true;
+
+            this.name = name;
+
+            this.family = family;
+            this.hasFamily = true;
+            this.size = size;
+            this.hasSize = true;
+            this.color = color;
+            this.hasColor = true;
+            this.style = style;
+            this.hasStyle = true;
+        }
+
+        public Font(string family, double size, Sd.Color color, FontStyle style = FontStyle.Regular)
         {
             this.isModified = true;
 
@@ -64,8 +85,9 @@ namespace PdfPlus
             this.hasSize = true;
             this.color = color;
             this.hasColor = true;
+            this.style = style;
+            this.hasStyle = true;
         }
-
 
         #endregion
 
@@ -77,6 +99,12 @@ namespace PdfPlus
         public virtual bool HasColor { get { return this.hasColor; } }
         public virtual bool HasStyle { get { return this.hasStyle; } }
         public virtual bool HasJustification { get { return this.hasJustification; } }
+
+        public virtual string Name
+        {
+            get { return this.name; }
+            set { this.name = value; }
+        }
 
         public virtual string Family
         {
@@ -145,7 +173,6 @@ namespace PdfPlus
             }
         }
 
-
         public virtual bool IsItalic
         {
             get
@@ -193,5 +220,23 @@ namespace PdfPlus
 
 
         #endregion
+    }
+
+    public static class Fonts
+    {
+        public static Font Normal { get { return new Font("Normal", "Arial", 11, Sd.Color.Black); } }
+        public static Font Title { get { return new Font("Title", "Arial", 26, Sd.Color.Black); } }
+        public static Font Subtitle { get { return new Font("Subtitle", "Arial", 15, Sd.Color.DarkGray); } }
+        public static Font Heading1 { get { return new Font("Heading1", "Arial", 20, Sd.Color.Black); } }
+        public static Font Heading2 { get { return new Font("Heading2", "Arial", 18, Sd.Color.Black); } }
+        public static Font Heading3 { get { return new Font("Heading3", "Arial", 14, Sd.Color.Gray); } }
+        public static Font Heading4 { get { return new Font("Heading4", "Arial", 12, Sd.Color.Gray); } }
+        public static Font Heading5 { get { return new Font("Heading5", "Arial", 11, Sd.Color.Gray); } }
+        public static Font Heading6 { get { return new Font("Heading6", "Arial", 11, Sd.Color.Gray, FontStyle.Italic); } }
+        public static Font Quote { get { return new Font("Quote", "Arial", 11, Sd.Color.DarkGray); } }
+        public static Font Footnote { get { return new Font("Footnote", "Arial", 8, Sd.Color.Black, FontStyle.Italic); } }
+        public static Font Caption { get { return new Font("Caption", "Arial", 8, Sd.Color.Black); } }
+        public static Font List { get { return new Font("List", "Arial", 11, Sd.Color.Black); } }
+
     }
 }

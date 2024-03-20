@@ -5,18 +5,16 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Formatting
 {
-    public class GH_Pdf_Format_Font : GH_Pdf__Base
+    public class GH_Pdf_Format_FontPresets : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_EditFont class.
+        /// Initializes a new instance of the GH_Pdf_Format_FontPresets class.
         /// </summary>
-        public GH_Pdf_Format_Font()
-          : base("Set Font", "Set Font",
-              "Edit basic shape or block Font properties",
+        public GH_Pdf_Format_FontPresets()
+          : base("Set Graphics", "Set Graphics",
+              "Edit shape or block graphical attributes",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -35,29 +33,14 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Input, GH_ParamAccess.item);
-            pManager.AddTextParameter("Family Name", "F", "Optional font family name", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Font", "F", "Preset fonts", GH_ParamAccess.item,0);
             pManager[1].Optional = true;
-            pManager.AddNumberParameter("Size", "S", "Optional font size", GH_ParamAccess.item);
-            pManager[2].Optional = true;
-            pManager.AddColourParameter("Color", "C", "Optional text color", GH_ParamAccess.item);
-            pManager[3].Optional = true;
-            pManager.AddIntegerParameter("Style", "T", "The font style type", GH_ParamAccess.item);
-            pManager[4].Optional = true;
-            pManager.AddIntegerParameter("Justification", "J", "Text justification", GH_ParamAccess.item);
-            pManager[5].Optional = true;
 
-            Param_Integer paramA = (Param_Integer)pManager[4];
-            foreach (FontStyle value in Enum.GetValues(typeof(FontStyle)))
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            foreach (Font.Presets value in Enum.GetValues(typeof(Font.Presets)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
             }
-
-            Param_Integer paramB = (Param_Integer)pManager[5];
-            foreach (Justification value in Enum.GetValues(typeof(Justification)))
-            {
-                paramB.AddNamedValue(value.ToString(), (int)value);
-            }
-
         }
 
         /// <summary>
@@ -83,20 +66,49 @@ namespace PdfPlus.Components
             bool isElement = goo.TryGetElement(ref elem);
             if (isElement) font = elem.Font;
 
-            string family = "Arial";
-            if (DA.GetData(1, ref family)) font.Family = family;
+            int type = 0;
+            if (DA.GetData(1, ref type))
 
-            double size = 10.0;
-            if (DA.GetData(2, ref size)) font.Size = size;
+                switch ((Font.Presets)type)
+                {
+                    default:
+                        font = Fonts.Normal;
+                        break;
+                    case Font.Presets.Title:
+                        font = Fonts.Title;
+                        break;
+                    case Font.Presets.Subtitle:
+                        font = Fonts.Subtitle;
+                        break;
+                    case Font.Presets.Heading1:
+                        font = Fonts.Heading1;
+                        break;
+                    case Font.Presets.Heading2:
+                        font = Fonts.Heading2;
+                        break;
+                    case Font.Presets.Heading3:
+                        font = Fonts.Heading3;
+                        break;
+                    case Font.Presets.Heading4:
+                        font = Fonts.Heading4;
+                        break;
+                    case Font.Presets.Heading5:
+                        font = Fonts.Heading5;
+                        break;
+                    case Font.Presets.Heading6:
+                        font = Fonts.Heading6;
+                        break;
+                    case Font.Presets.Quote:
+                        font = Fonts.Quote;
+                        break;
+                    case Font.Presets.Caption:
+                        font = Fonts.Caption;
+                        break;
+                    case Font.Presets.Footnote:
+                        font = Fonts.Footnote;
+                        break;
+                }
 
-            Sd.Color color = Sd.Color.Black;
-            if (DA.GetData(3, ref color)) font.Color = color;
-
-            int style = 0;
-            if (DA.GetData(4, ref style)) font.Style = (FontStyle)style;
-
-            int justification = 0;
-            if (DA.GetData(5, ref justification)) font.Justification = (Justification)justification;
 
             Shape shape = null;
             Block block = null;
@@ -128,7 +140,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Format_Font;
+                return Properties.Resources.Pdf_Format_FontPresets;
             }
         }
 
@@ -137,7 +149,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("12d4cdee-bdf3-4e1d-9bf0-efc493a8e190"); }
+            get { return new Guid("61b33e27-7ee2-40ba-a740-c02877df288a"); }
         }
     }
 }

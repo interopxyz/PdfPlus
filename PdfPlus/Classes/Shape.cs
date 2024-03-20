@@ -16,6 +16,7 @@ namespace PdfPlus
 {
     public class Shape: Element
     {
+
         #region members
 
         public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
@@ -569,6 +570,7 @@ namespace PdfPlus
                 case ShapeType.TextObj:
                     Pd.XStringFormat format = new Pd.XStringFormat();
                     format.Alignment = font.Justification.ToPdfLine();
+                    format.LineAlignment = Pd.XLineAlignment.BaseLine;
                     graph.DrawString(this.text, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf(), format);
                     break;
 
@@ -625,6 +627,7 @@ namespace PdfPlus
                     {
                         chart.XAxis.MajorTickMark = Pc.TickMarkType.Outside;
                         chart.XAxis.Title.Caption = this.xAxis;
+                        chart.XAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
                         chart.XAxis.HasMajorGridlines = true;
 
                         chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
@@ -657,6 +660,9 @@ namespace PdfPlus
                     {
                         chart.YAxis.MajorTickMark = Pc.TickMarkType.Outside;
                         chart.YAxis.Title.Caption = this.yAxis;
+                        chart.YAxis.Title.Orientation = 90;
+                        chart.YAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
+                        chart.YAxis.Title.VerticalAlignment = Pc.VerticalAlignment.Center;
                         chart.YAxis.HasMajorGridlines = true;
 
                         chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();

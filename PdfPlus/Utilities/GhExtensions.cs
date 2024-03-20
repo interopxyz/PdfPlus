@@ -31,5 +31,13 @@ namespace PdfPlus
             return output;
         }
 
+        public static List<double> ToNumberList(this List<GH_Number> input)
+        {
+            List<double> output = new List<double>();
+            foreach (GH_Number num in input) output.Add(num.Value);
+
+            return output;
+        }
+
     }
 }

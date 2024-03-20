@@ -23,7 +23,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image };
+        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image, Drawing };
         protected BlockTypes blockType = BlockTypes.None;
 
         //Formatting
@@ -31,8 +31,7 @@ namespace PdfPlus
         protected double height = 0;
 
         //Text
-        public enum FormatTypes { Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption };
-        protected FormatTypes formatType = FormatTypes.Normal;
+        protected Font.Presets formatType = Font.Presets.Normal;
         protected string formatName = "Normal";
 
         //Break
@@ -113,7 +112,7 @@ namespace PdfPlus
 
         #region text
 
-        public static Block CreateText(string content, FormatTypes format = FormatTypes.Normal)
+        public static Block CreateText(string content, Font.Presets format = Font.Presets.Normal)
         {
             Block block = new Block();
             block.blockType = BlockTypes.Text;
@@ -297,11 +296,39 @@ namespace PdfPlus
                     {
                         Md.Shapes.Charts.Series series = chart.SeriesCollection.AddSeries();
                         series.HasDataLabel = d.LabelData;
+                        series.DataLabel.Position = Md.Shapes.Charts.DataLabelPosition.OutsideEnd;
                         series.Name = d.Title;
-                        series.ChartType = ct;
                         series.MarkerStyle = Md.Shapes.Charts.MarkerStyle.None;
                         series.Add(d.Values.ToArray());
-                        series.FillFormat
+                    }
+
+                    //Axis
+                    if (this.HasXAxis)
+                    {
+                        chart.XAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
+                        chart.XAxis.Title.Caption = this.XAxis;
+                        chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Inside;
+                        chart.XAxis.HasMajorGridlines = true;
+                    }
+                    else
+                    {
+                        chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
+                        chart.XAxis.HasMajorGridlines = false;
+                    }
+
+                    if (this.HasYAxis)
+                    {
+                        chart.YAxis.Title.VerticalAlignment = Md.Tables.VerticalAlignment.Center;
+                        chart.YAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
+                        chart.YAxis.Title.Orientation = 90;
+                        chart.YAxis.Title.Caption = this.YAxis;
+                        chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Inside;
+                        chart.YAxis.HasMajorGridlines = true;
+                    }
+                    else
+                    {
+                        chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
+                        chart.YAxis.HasMajorGridlines = false;
                     }
 
                     //Legend
@@ -324,15 +351,7 @@ namespace PdfPlus
                                 legend = chart.TopArea.AddLegend();
                                 break;
                         }
-
-
                     }
-
-
-                    //Axis
-                    chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Outside;
-
-                    chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Outside;
 
                     break;
                 case BlockTypes.Image:
@@ -361,6 +380,7 @@ namespace PdfPlus
                     }
                     img.Left = this.Justification.ToMigraDocShapePosition();
                     break;
+                    case BlockTypes.draw
             }
 
             return document;

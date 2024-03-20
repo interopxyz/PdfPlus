@@ -38,7 +38,7 @@ namespace PdfPlus.Components.Write.Blocks
             pManager[1].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
-            foreach (Block.FormatTypes value in Enum.GetValues(typeof(Block.FormatTypes)))
+            foreach (Font.Presets value in Enum.GetValues(typeof(Font.Presets)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
             }
@@ -64,7 +64,7 @@ namespace PdfPlus.Components.Write.Blocks
             int formatting = 0;
             DA.GetData(1, ref formatting);
 
-            Block block = Block.CreateText(text,(Block.FormatTypes)formatting);
+            Block block = Block.CreateText(text,(Font.Presets)formatting);
 
             DA.SetData(0, block);
         }
