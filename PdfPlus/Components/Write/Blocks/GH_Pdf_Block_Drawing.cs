@@ -73,7 +73,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Pdf_Block_Draw;
             }
         }
 

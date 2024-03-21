@@ -288,7 +288,7 @@ namespace PdfPlus
                 case BlockTypes.Table:
                     Md.Tables.Table table = document.LastSection.AddTable();
                     int rowCount = 0;
-
+                    int colCount = tableContents.Count;
                     //Columns
                     for (int i = 0; i < tableContents.Count; i++)
                     {
@@ -296,10 +296,42 @@ namespace PdfPlus
                         table.AddColumn();
                     }
 
+                    if(this.verticalBorderStyle == BorderStyles.All)
+                    {
+                        table.Columns[0].Borders.Left.Visible = true;
+                        table.Columns[colCount-1].Borders.Right.Visible = true;
+                    }
+
+                    if (this.verticalBorderStyle != BorderStyles.None)
+                    {
+                        table.Columns[0].Borders.Right.Visible = true;
+                        for (int i = 1; i < colCount-1; i++)
+                        {
+                            table.Columns[i].Borders.Left.Visible = true;
+                            table.Columns[i].Borders.Right.Visible = true;
+                        }
+                    }
+
                     //Rows
                     for (int i = 0; i < rowCount; i++)
                     {
                         table.AddRow();
+                    }
+
+                    if (this.horizontalBorderStyle == BorderStyles.All)
+                    {
+                        table.Rows[0].Borders.Top.Visible = true;
+                       
+                        table.Rows[rowCount - 1].Borders.Bottom.Visible = true;
+                    }
+                        if (this.horizontalBorderStyle != BorderStyles.None)
+                    {
+                        table.Rows[0].Borders.Bottom.Visible = true;
+                        for (int i = 1; i < rowCount-1; i++)
+                        {
+                            table.Rows[i].Borders.Top.Visible = true;
+                            table.Rows[i].Borders.Bottom.Visible = true;
+                        }
                     }
 
                     //Cells

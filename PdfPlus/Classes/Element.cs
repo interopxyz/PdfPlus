@@ -18,6 +18,10 @@ namespace PdfPlus
         public enum ElementTypes { Empty, Shape, Block, Data}
         protected ElementTypes elementType = ElementTypes.Empty;
 
+        public enum BorderStyles { None, Interior, All};
+        protected BorderStyles horizontalBorderStyle = BorderStyles.None;
+        protected BorderStyles verticalBorderStyle = BorderStyles.None;
+
         //Formatting
         protected Graphic graphic = new Graphic();
         protected Font font = new Font();
@@ -70,6 +74,9 @@ namespace PdfPlus
 
             this.graphic = new Graphic(element.graphic);
             this.font = new Font(element.font);
+
+            this.horizontalBorderStyle = element.horizontalBorderStyle;
+            this.verticalBorderStyle = element.verticalBorderStyle;
 
             //Text
             this.text = element.text;
@@ -195,6 +202,19 @@ namespace PdfPlus
         {
             get { return this.font.Style; }
             set { this.font.Style = value; }
+        }
+
+        //Table
+        public virtual BorderStyles HorizontalBorderStyle
+        {
+            get { return this.horizontalBorderStyle; }
+            set { this.horizontalBorderStyle = value; }
+        }
+
+        public virtual BorderStyles VerticalBorderStyle
+        {
+            get { return this.verticalBorderStyle; }
+            set { this.verticalBorderStyle = value; }
         }
 
         //Chart

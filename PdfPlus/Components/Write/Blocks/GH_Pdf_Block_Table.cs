@@ -1,5 +1,6 @@
 ﻿using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
@@ -33,6 +34,17 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("Text Tree", "T", "A datatree of text values", GH_ParamAccess.tree);
+            pManager.AddIntegerParameter("Border Style", "B", "Table Border Style", GH_ParamAccess.item, 0);
+            pManager[1].Optional = true;
+
+            Param_Integer paramA = (Param_Integer)pManager[1];
+            paramA.AddNamedValue("All", 0);
+            paramA.AddNamedValue("None", 1);
+            paramA.AddNamedValue("Horizontal", 2);
+            paramA.AddNamedValue("Horizontal Interior", 3);
+            paramA.AddNamedValue("Vertical", 4);
+            paramA.AddNamedValue("Vertical Interior", 5);
+
         }
 
         /// <summary>
@@ -81,6 +93,38 @@ namespace PdfPlus.Components
             }
 
             Block block = Block.CreateTable(dataSet);
+
+            int border = 0;
+            DA.GetData(1, ref border);
+
+            switch (border)
+            {
+                default:
+                    block.HorizontalBorderStyle = Element.BorderStyles.All;
+                    block.VerticalBorderStyle= Element.BorderStyles.All;
+                    break;
+                case 1:
+                    block.HorizontalBorderStyle = Element.BorderStyles.None;
+                    block.VerticalBorderStyle = Element.BorderStyles.None;
+                    break;
+                case 2:
+                    block.HorizontalBorderStyle = Element.BorderStyles.All;
+                    block.VerticalBorderStyle = Element.BorderStyles.None;
+                    break;
+                case 3:
+                    block.HorizontalBorderStyle = Element.BorderStyles.Interior;
+                    block.VerticalBorderStyle = Element.BorderStyles.None;
+                    break;
+                case 4:
+                    block.HorizontalBorderStyle = Element.BorderStyles.None;
+                    block.VerticalBorderStyle = Element.BorderStyles.All;
+                    break;
+                case 5:
+                    block.HorizontalBorderStyle = Element.BorderStyles.None;
+                    block.VerticalBorderStyle = Element.BorderStyles.Interior;
+                    break;
+            }
+
 
             DA.SetData(0, block);
 
