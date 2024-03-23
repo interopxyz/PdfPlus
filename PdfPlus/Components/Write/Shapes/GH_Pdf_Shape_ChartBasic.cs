@@ -36,7 +36,7 @@ namespace PdfPlus.Components
             pManager[1].Optional = true;
             pManager.AddIntegerParameter("Type", "T", "The chart format to be displayed", GH_ParamAccess.item, 4);
             pManager[2].Optional = true;
-            pManager.AddTextParameter("X Axis", "X", "Optional X Axis title for the Graph", GH_ParamAccess.item, "X Axis");
+            pManager.AddTextParameter("X Axis", "X", "Optional X Axis title for the Graph", GH_ParamAccess.item);
             pManager[3].Optional = true;
             pManager.AddTextParameter("Y Axis", "Y", "Optional Y Axis title for the Graph", GH_ParamAccess.item);
             pManager[4].Optional = true;

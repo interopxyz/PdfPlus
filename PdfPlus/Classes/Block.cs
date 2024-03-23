@@ -277,6 +277,7 @@ namespace PdfPlus
 
         public Md.Document Render(Md.Document document)
         {
+            
             Md.Paragraph txt;
             switch (this.blockType)
             {
@@ -304,6 +305,7 @@ namespace PdfPlus
                     }
                     break;
                 case BlockTypes.Table:
+                    #region table
                     Md.Tables.Table table = document.LastSection.AddTable();
                     int colCount = tableContents.Count;
                     int rowCount = 0;
@@ -460,7 +462,7 @@ namespace PdfPlus
                         }
                         table.Columns[0].Borders.Right.Width = table.Columns[0].Borders.Right.Width*2;
                     }
-
+                    #endregion
                     break;
                 case BlockTypes.Chart:
                     #region chart
