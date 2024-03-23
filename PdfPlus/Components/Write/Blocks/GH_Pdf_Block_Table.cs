@@ -38,10 +38,12 @@ namespace PdfPlus.Components
             pManager.AddTextParameter("Text Tree", "T", "A datatree of text values", GH_ParamAccess.tree);
             pManager.AddIntegerParameter("Border Style", "B", "Table border style", GH_ParamAccess.item, 0);
             pManager[1].Optional = true;
-            pManager.AddColourParameter("Alternating Color", "A", "Table alternating row color", GH_ParamAccess.item);
-            pManager[2].Optional = true;
             pManager.AddIntegerParameter("Heading ", "H", "Table Heading formatting", GH_ParamAccess.item, 0);
+            pManager[2].Optional = true;
+            pManager.AddIntegerParameter("Column Fitting", "F", "Table column width "+Environment.NewLine+"(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item,-1);
             pManager[3].Optional = true;
+            pManager.AddColourParameter("Alternating Color", "A", "Table alternating row color", GH_ParamAccess.item);
+            pManager[4].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
             paramA.AddNamedValue("None", 0);
@@ -51,11 +53,16 @@ namespace PdfPlus.Components
             paramA.AddNamedValue("Vertical", 4);
             paramA.AddNamedValue("Vertical Interior", 5);
 
-            Param_Integer paramB = (Param_Integer)pManager[3];
+            Param_Integer paramB = (Param_Integer)pManager[2];
             paramB.AddNamedValue("None", 0);
             paramB.AddNamedValue("Row", 1);
             paramB.AddNamedValue("Column", 2);
             paramB.AddNamedValue("Row / Column", 3);
+
+            Param_Integer paramC = (Param_Integer)pManager[3];
+            paramC.AddNamedValue("Fit Width", -1);
+            paramC.AddNamedValue("Fit Content", 0);
+
         }
 
         /// <summary>
@@ -137,11 +144,8 @@ namespace PdfPlus.Components
                     break;
             }
 
-            Sd.Color color = Sd.Color.Gray;
-            if (DA.GetData(2, ref color)) block.AlternateColor = color;
-
             int headers = 0;
-            DA.GetData(3, ref headers);
+            DA.GetData(2, ref headers);
 
             switch (headers)
             {
@@ -159,6 +163,12 @@ namespace PdfPlus.Components
                     break;
 
             }
+
+            int width = -1;
+            if (DA.GetData(3, ref width)) block.ColumnWidth = width;
+
+            Sd.Color color = Sd.Color.Gray;
+            if (DA.GetData(4, ref color)) block.AlternateColor = color;
 
             DA.SetData(0, block);
 

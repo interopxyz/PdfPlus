@@ -76,6 +76,7 @@ namespace PdfPlus
 
             foreach (Shape shape in this.shapes)
             {
+                shape.Scale = factor;
                 shape.Transform(translate*scale*mirror).RenderGeometry(graph);
             }
 

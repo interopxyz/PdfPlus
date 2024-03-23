@@ -25,6 +25,8 @@ namespace PdfPlus
         public enum LinkTypes { Hyperlink,Filepath,Page};
         protected LinkTypes linkType = LinkTypes.Hyperlink;
 
+        protected double scale = 1.0;
+
         #endregion
 
         #region constructors
@@ -38,6 +40,8 @@ namespace PdfPlus
         {
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
+
+            this.scale = shape.scale;
         }
 
         #region text
@@ -318,6 +322,12 @@ namespace PdfPlus
             get { return this.shapeType; }
         }
 
+        public virtual double Scale
+        {
+            get { return this.scale; }
+            set { this.scale = value; }
+        }
+
         #endregion
 
         #region methods
@@ -568,6 +578,9 @@ namespace PdfPlus
                 case ShapeType.Mesh:
                     shape.mesh.Transform(transform);
                     break;
+                case ShapeType.TextObj:
+                    shape.location.Transform(transform);
+                    break;
             }
             return shape;
         }
@@ -596,6 +609,12 @@ namespace PdfPlus
                     break;
                 case ShapeType.Mesh:
                     graph = this.RenderMesh(graph);
+                    break;
+                case ShapeType.TextObj:
+                    graph = this.RenderTextPoint(graph);
+                    break;
+                case ShapeType.TextBox:
+                    graph = this.RenderTextBoundary(graph);
                     break;
             }
             return graph;
@@ -661,6 +680,30 @@ namespace PdfPlus
             return graph;
         }
 
+        protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
+        {
+            Pd.XStringFormat format = new Pd.XStringFormat();
+            format.Alignment = font.Justification.ToPdfLine();
+            format.LineAlignment = Pd.XLineAlignment.BaseLine;
+            graph.DrawString(this.text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
+
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderTextBoundary(Pd.XGraphics graph)
+        {
+            Pd.XFont pdfFont = font.ToPdf(this.scale);
+
+            Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
+            textFormatter.Alignment = this.Font.Justification.ToPdf();
+            textFormatter.LayoutRectangle = this.boundary.ToPdf();
+            textFormatter.Text = this.text;
+            textFormatter.Font = pdfFont;
+            textFormatter.DrawString(this.text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+
+            return graph;
+        }
+
         #endregion
 
         public void Render(Pd.XGraphics graph, Pf.PdfPage page, Rg.Plane coordinateframe)
@@ -688,33 +731,11 @@ namespace PdfPlus
                 case ShapeType.Mesh:
                     graph = this.RenderMesh(graph);
                     break;
-
-                case ShapeType.ImageFrame:
-                case ShapeType.ImageObj:
-                    Stream stream = imageObject.ToStream();
-                    Pd.XImage xImageA = Pd.XImage.FromStream(stream);
-
-                    graph.DrawImage(xImageA, this.boundary.ToPdf());
-                    stream.Dispose();
-                    break;
-
                 case ShapeType.TextObj:
-                    Pd.XStringFormat format = new Pd.XStringFormat();
-                    format.Alignment = font.Justification.ToPdfLine();
-                    format.LineAlignment = Pd.XLineAlignment.BaseLine;
-                    graph.DrawString(this.text, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf(), format);
+                    graph = this.RenderTextPoint(graph);
                     break;
-
                 case ShapeType.TextBox:
-                    Pd.XFont pdfFont = font.ToPdf();
-
-                    Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
-                    textFormatter.Alignment = this.Font.Justification.ToPdf();
-                    textFormatter.LayoutRectangle = this.boundary.ToPdf();
-                    textFormatter.Text = this.text;
-                    textFormatter.Font = pdfFont;
-
-                    textFormatter.DrawString(this.text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+                    graph = this.RenderTextBoundary(graph);
                     break;
                 case ShapeType.LinkObj:
                     switch (this.linkType)
@@ -732,6 +753,14 @@ namespace PdfPlus
 
                             break;
                     }
+                    break;
+                case ShapeType.ImageFrame:
+                case ShapeType.ImageObj:
+                    Stream stream = imageObject.ToStream();
+                    Pd.XImage xImageA = Pd.XImage.FromStream(stream);
+
+                    graph.DrawImage(xImageA, this.boundary.ToPdf());
+                    stream.Dispose();
                     break;
                 case ShapeType.ChartObj:
                     Pc.Chart chart = CombinationChart();

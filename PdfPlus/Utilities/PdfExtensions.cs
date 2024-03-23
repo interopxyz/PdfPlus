@@ -678,9 +678,9 @@ namespace PdfPlus
 
         #region font
 
-        public static Pd.XFont ToPdf(this Font input)
+        public static Pd.XFont ToPdf(this Font input, double scale = 1.0)
         {
-            return new Pd.XFont(input.Family, input.Size, input.Style.ToPdf());
+            return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf());
         }
 
         public static Pd.XStringAlignment ToPdfLine(this Justification input)

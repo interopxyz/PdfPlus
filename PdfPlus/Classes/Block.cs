@@ -44,6 +44,8 @@ namespace PdfPlus
 
         //Table
         protected List<List<string>> tableContents = new List<List<string>>();
+        protected int columnWidth = -1;
+        protected int rowHeight = -1;
 
         //Geometry
         protected Drawing drawing = null;
@@ -83,6 +85,8 @@ namespace PdfPlus
                 foreach (string item in entry) this.tableContents[i].Add(item);
                 i++;
             }
+            this.columnWidth = block.columnWidth;
+            this.rowHeight = block.rowHeight;
 
             //drawing
             if (block.drawing != null) this.drawing = new Drawing(block.drawing);
@@ -160,7 +164,7 @@ namespace PdfPlus
                 i++;
             }
 
-            block.font.Justification = Justification.Center;
+            block.font = Fonts.Table;
 
             return block;
         }
@@ -255,6 +259,18 @@ namespace PdfPlus
             set { this.height = value; }
         }
 
+        public virtual int ColumnWidth
+        {
+            get { return this.columnWidth; }
+            set { this.columnWidth = value; }
+        }
+
+        public virtual int RowHeight
+        {
+            get { return this.RowHeight; }
+            set { this.rowHeight = value; }
+        }
+
         #endregion
 
         #region methods
@@ -291,8 +307,9 @@ namespace PdfPlus
                     Md.Tables.Table table = document.LastSection.AddTable();
                     int colCount = tableContents.Count;
                     int rowCount = 0;
-                    double columnWidth = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin)/colCount;
-                    
+                    double columnWidth = this.columnWidth;
+                    if(columnWidth<0) columnWidth = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin)/colCount;
+
                     table.TopPadding = 6;
                     table.BottomPadding = 6;
                     table.Format.Alignment = Md.ParagraphAlignment.Justify;
@@ -306,12 +323,15 @@ namespace PdfPlus
                         rowCount = Math.Max(rowCount, tableContents[i].Count);
                         Md.Tables.Column column = table.AddColumn();
                         column.Width = columnWidth;
+                        column.Borders.Left.Visible = false;
                     }
 
                     //Rows
                     for (int i = 0; i < rowCount; i++)
                     {
-                        table.AddRow();
+                        Md.Tables.Row row = table.AddRow();
+                        row.Borders.Color = this.graphic.Stroke.ToMigraDoc();
+                        row.Borders.Visible = false;
                     }
 
                     //Borders
@@ -370,9 +390,28 @@ namespace PdfPlus
                         {
                             Md.Tables.Cell cell = table.Rows[j].Cells[i];
                             cell.Shading.Color = this.FillColor.ToMigraDoc();
+
                             txt = cell.AddParagraph(tableContents[i][j]);
                             txt.Format = this.font.ToMigraDocParagraphFormat(document.Styles["Normal"].ParagraphFormat.Clone());
+
                             contents[i].Add(txt);
+                        }
+                    }
+
+                    if (this.columnWidth == 0)
+                    {
+                        Pf.PdfDocument d = new Pf.PdfDocument();
+                        Pf.PdfPage p = d.AddPage();
+                        Pd.XGraphics gfx = Pd.XGraphics.FromPdfPage(p);
+
+                        for (int i = 0; i < colCount; i++)
+                        {
+                            double txtWidth = 0;
+                            for (int j = 0; j < rowCount; j++)
+                            {
+                                txtWidth = Math.Max(Math.Ceiling(txtWidth), Math.Ceiling(gfx.MeasureString(tableContents[i][j], this.font.ToPdf()).Width));
+                            }
+                            table.Columns[i].Width = txtWidth+8;
                         }
                     }
 

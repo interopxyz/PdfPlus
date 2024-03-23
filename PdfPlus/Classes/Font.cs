@@ -59,7 +59,35 @@ namespace PdfPlus
             this.hasStyle = font.hasStyle;
         }
 
-        public Font(string name, string family, double size, Sd.Color color, FontStyle style = FontStyle.Regular)
+        public Font(string family, double size, Sd.Color color, FontStyle style)
+        {
+            this.isModified = true;
+
+            this.family = family;
+            this.hasFamily = true;
+            this.size = size;
+            this.hasSize = true;
+            this.color = color;
+            this.hasColor = true;
+            this.style = style;
+            this.hasStyle = true;
+        }
+
+        public Font(string name, string family, double size, Sd.Color color)
+        {
+            this.isModified = true;
+
+            this.name = name;
+
+            this.family = family;
+            this.hasFamily = true;
+            this.size = size;
+            this.hasSize = true;
+            this.style = style;
+            this.hasStyle = true;
+        }
+
+        public Font(string name, string family, double size, Sd.Color color, FontStyle style)
         {
             this.isModified = true;
 
@@ -75,9 +103,11 @@ namespace PdfPlus
             this.hasStyle = true;
         }
 
-        public Font(string family, double size, Sd.Color color, FontStyle style = FontStyle.Regular)
+        public Font(string name, string family, double size, Sd.Color color, FontStyle style, Justification justification)
         {
             this.isModified = true;
+
+            this.name = name;
 
             this.family = family;
             this.hasFamily = true;
@@ -87,6 +117,8 @@ namespace PdfPlus
             this.hasColor = true;
             this.style = style;
             this.hasStyle = true;
+            this.justification = justification;
+            this.hasJustification = true;
         }
 
         #endregion
@@ -237,6 +269,7 @@ namespace PdfPlus
         public static Font Footnote { get { return new Font("Footnote", "Arial", 8, Sd.Color.Black, FontStyle.Italic); } }
         public static Font Caption { get { return new Font("Caption", "Arial", 8, Sd.Color.Black); } }
         public static Font List { get { return new Font("List", "Arial", 11, Sd.Color.Black); } }
+        public static Font Table { get { return new Font("Table", "Arial", 9, Sd.Color.Black, FontStyle.Regular, Justification.Center); } }
 
     }
 }
