@@ -160,6 +160,8 @@ namespace PdfPlus
                 i++;
             }
 
+            block.font.Justification = Justification.Center;
+
             return block;
         }
 
@@ -287,29 +289,23 @@ namespace PdfPlus
                     break;
                 case BlockTypes.Table:
                     Md.Tables.Table table = document.LastSection.AddTable();
-                    int rowCount = 0;
                     int colCount = tableContents.Count;
+                    int rowCount = 0;
+                    double columnWidth = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin)/colCount;
+                    
+                    table.TopPadding = 6;
+                    table.BottomPadding = 6;
+                    table.Format.Alignment = Md.ParagraphAlignment.Justify;
+                    Md.Shading shading = new Md.Shading();
+                    shading.Color = this.graphic.Color.ToMigraDoc();
+                    table.Format.Shading = shading;
+
                     //Columns
                     for (int i = 0; i < tableContents.Count; i++)
                     {
                         rowCount = Math.Max(rowCount, tableContents[i].Count);
-                        table.AddColumn();
-                    }
-
-                    if(this.verticalBorderStyle == BorderStyles.All)
-                    {
-                        table.Columns[0].Borders.Left.Visible = true;
-                        table.Columns[colCount-1].Borders.Right.Visible = true;
-                    }
-
-                    if (this.verticalBorderStyle != BorderStyles.None)
-                    {
-                        table.Columns[0].Borders.Right.Visible = true;
-                        for (int i = 1; i < colCount-1; i++)
-                        {
-                            table.Columns[i].Borders.Left.Visible = true;
-                            table.Columns[i].Borders.Right.Visible = true;
-                        }
+                        Md.Tables.Column column = table.AddColumn();
+                        column.Width = columnWidth;
                     }
 
                     //Rows
@@ -318,37 +314,122 @@ namespace PdfPlus
                         table.AddRow();
                     }
 
+                    //Borders
+                    if (this.verticalBorderStyle == BorderStyles.All)
+                    {
+                        table.Columns[0].Borders.Left.Visible = true;
+                        table.Columns[0].Borders.Left.Width = this.graphic.Weight;
+                        table.Columns[colCount - 1].Borders.Right.Visible = true;
+                        table.Columns[colCount - 1].Borders.Right.Width = this.graphic.Weight;
+                        table.Columns[colCount - 1].Borders.Left.Visible = true;
+                        table.Columns[colCount - 1].Borders.Left.Width = this.graphic.Weight;
+                    }
+
+                    if (this.verticalBorderStyle != BorderStyles.None)
+                    {
+                        table.Columns[0].Borders.Right.Visible = true;
+                        table.Columns[0].Borders.Right.Width = this.graphic.Weight;
+                        for (int i = 1; i < colCount - 1; i++)
+                        {
+                            table.Columns[i].Borders.Left.Visible = true;
+                            table.Columns[i].Borders.Left.Width = this.graphic.Weight;
+                            table.Columns[i].Borders.Right.Visible = true;
+                            table.Columns[i].Borders.Right.Width = this.graphic.Weight;
+                        }
+                    }
+
                     if (this.horizontalBorderStyle == BorderStyles.All)
                     {
                         table.Rows[0].Borders.Top.Visible = true;
-                       
+                        table.Rows[0].Borders.Top.Width = this.graphic.Weight;
+                        table.Rows[rowCount - 1].Borders.Top.Visible = true;
+                        table.Rows[rowCount - 1].Borders.Top.Width = this.graphic.Weight;
                         table.Rows[rowCount - 1].Borders.Bottom.Visible = true;
+                        table.Rows[rowCount - 1].Borders.Bottom.Width = this.graphic.Weight;
                     }
-                        if (this.horizontalBorderStyle != BorderStyles.None)
+
+                    if (this.horizontalBorderStyle != BorderStyles.None)
                     {
                         table.Rows[0].Borders.Bottom.Visible = true;
-                        for (int i = 1; i < rowCount-1; i++)
+                        table.Rows[0].Borders.Bottom.Width = this.graphic.Weight;
+                        for (int i = 1; i < rowCount - 1; i++)
                         {
                             table.Rows[i].Borders.Top.Visible = true;
+                            table.Rows[i].Borders.Top.Width = this.graphic.Weight;
                             table.Rows[i].Borders.Bottom.Visible = true;
+                            table.Rows[i].Borders.Bottom.Width = this.graphic.Weight;
                         }
                     }
 
                     //Cells
-                    for (int i = 0; i < tableContents.Count; i++)
+                    List<List<Md.Paragraph>> contents = new List<List<Md.Paragraph>>();
+                    for (int i = 0; i < colCount; i++)
                     {
-                        for (int j = 0; j < tableContents[i].Count; j++)
+                        contents.Add(new List<Md.Paragraph>());
+                        for (int j = 0; j < rowCount; j++)
                         {
-                            txt = table.Rows[j].Cells[i].AddParagraph(tableContents[i][j]);
+                            Md.Tables.Cell cell = table.Rows[j].Cells[i];
+                            cell.Shading.Color = this.FillColor.ToMigraDoc();
+                            txt = cell.AddParagraph(tableContents[i][j]);
                             txt.Format = this.font.ToMigraDocParagraphFormat(document.Styles["Normal"].ParagraphFormat.Clone());
+                            contents[i].Add(txt);
                         }
+                    }
+
+                    //Alternating Colors
+                    if (hasAlternatingColor)
+                    {
+                        int alpha = 255;
+
+                        for (int j = 0; j < colCount; j++)
+                        {
+                            Md.Tables.Cell cell = table.Rows[0].Cells[j];
+                            cell.Shading.Color = this.AlternateColor.ToMigraDoc(alpha);
+                            cell.Format.Shading.Color = Md.Colors.Transparent;
+                        }
+                        if (this.HasXAxis) alpha = 125;
+
+                        for (int i = 2; i < rowCount; i += 2)
+                        {
+                            for (int j = 0; j < colCount; j++)
+                            {
+                                Md.Tables.Cell cell = table.Rows[i].Cells[j];
+                                cell.Shading.Color = this.AlternateColor.ToMigraDoc(alpha);
+                                cell.Format.Shading.Color = Md.Colors.Transparent;
+                            }
+                        }
+
+                    }
+
+                    //Headers
+                    if (HasXAxis)
+                    {
+                        for (int i = 0; i < colCount; i++)
+                        {
+                            contents[i][0].Format.Font.Bold = true;
+                            contents[i][0].Format.Font.Size = contents[i][0].Format.Font.Size * 1.25;
+                        }
+                        table.Rows[0].Borders.Bottom.Width = table.Rows[0].Borders.Bottom.Width*2;
+                    }
+
+                    if (HasYAxis)
+                    {
+                        for (int i = 0; i < rowCount; i++)
+                        {
+                            contents[0][i].Format.Font.Bold = true;
+                            contents[0][i].Format.Font.Size = contents[0][i].Format.Font.Size * 1.25;
+                        }
+                        table.Columns[0].Borders.Right.Width = table.Columns[0].Borders.Right.Width*2;
                     }
 
                     break;
                 case BlockTypes.Chart:
+                    #region chart
                     Md.Shapes.Charts.ChartType ct = this.chartType.ToMigraDoc();
 
                     Md.Shapes.Charts.Chart chart = document.LastSection.AddChart(ct);
+
+                    chart.TopArea.TopPadding = 6;
 
                     //Chart Area
                     chart.Left = this.Justification.ToMigraDocShapePosition();
@@ -443,8 +524,10 @@ namespace PdfPlus
                         }
                     }
                     img.Left = this.Justification.ToMigraDocShapePosition();
+                    #endregion
                     break;
                 case BlockTypes.Drawing:
+                    #region drawing
                     Md.Shapes.TextFrame frame = document.LastSection.AddTextFrame();
 
                     Rg.BoundingBox box = this.drawing.BoundingBox;
@@ -460,20 +543,15 @@ namespace PdfPlus
                     {
                         frame.Width = this.width;
                         frame.Height = box.Diagonal.Y * (this.Width / box.Diagonal.X);
-
                     }
                     else if(this.height > 0)
                     {
                         frame.Width = box.Diagonal.X * (this.Height / box.Diagonal.Y);
                         frame.Height = this.height;
                     }
-                    else
-                    {
-
-                    }
-
                     frame.Left = this.Justification.ToMigraDocShapePosition();
                     frame.Tag = "Drawing";
+                    #endregion
                     break;
             }
 

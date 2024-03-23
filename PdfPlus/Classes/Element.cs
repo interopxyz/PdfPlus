@@ -43,6 +43,10 @@ namespace PdfPlus
         protected string imageName = string.Empty;
         protected Sd.Bitmap imageObject = null;
 
+        //Table
+        protected bool hasAlternatingColor = false;
+        protected Sd.Color alternateColor = Sd.Color.Transparent;
+
         //Geometry
         protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
         protected Rg.BoundingBox boundingBox = new Rg.BoundingBox();
@@ -80,6 +84,10 @@ namespace PdfPlus
 
             //Text
             this.text = element.text;
+
+            //Table
+            this.hasAlternatingColor = element.hasAlternatingColor;
+            this.alternateColor = element.alternateColor;
 
             //Chart
             this.chartType = element.chartType;
@@ -215,6 +223,16 @@ namespace PdfPlus
         {
             get { return this.verticalBorderStyle; }
             set { this.verticalBorderStyle = value; }
+        }
+
+        public virtual Sd.Color AlternateColor
+        {
+            get { return this.alternateColor; }
+            set
+            {
+                this.hasAlternatingColor = true;
+                this.alternateColor = value;
+            }
         }
 
         //Chart

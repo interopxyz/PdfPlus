@@ -6,6 +6,8 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+using Sd = System.Drawing;
+
 namespace PdfPlus.Components
 {
     public class GH_Pdf_Block_Table : GH_Component
@@ -34,17 +36,26 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("Text Tree", "T", "A datatree of text values", GH_ParamAccess.tree);
-            pManager.AddIntegerParameter("Border Style", "B", "Table Border Style", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Border Style", "B", "Table border style", GH_ParamAccess.item, 0);
             pManager[1].Optional = true;
+            pManager.AddColourParameter("Alternating Color", "A", "Table alternating row color", GH_ParamAccess.item);
+            pManager[2].Optional = true;
+            pManager.AddIntegerParameter("Heading ", "H", "Table Heading formatting", GH_ParamAccess.item, 0);
+            pManager[3].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
-            paramA.AddNamedValue("All", 0);
-            paramA.AddNamedValue("None", 1);
+            paramA.AddNamedValue("None", 0);
+            paramA.AddNamedValue("All", 1);
             paramA.AddNamedValue("Horizontal", 2);
             paramA.AddNamedValue("Horizontal Interior", 3);
             paramA.AddNamedValue("Vertical", 4);
             paramA.AddNamedValue("Vertical Interior", 5);
 
+            Param_Integer paramB = (Param_Integer)pManager[3];
+            paramB.AddNamedValue("None", 0);
+            paramB.AddNamedValue("Row", 1);
+            paramB.AddNamedValue("Column", 2);
+            paramB.AddNamedValue("Row / Column", 3);
         }
 
         /// <summary>
@@ -92,6 +103,7 @@ namespace PdfPlus.Components
                 dataSet.Add(data);
             }
 
+
             Block block = Block.CreateTable(dataSet);
 
             int border = 0;
@@ -100,12 +112,12 @@ namespace PdfPlus.Components
             switch (border)
             {
                 default:
-                    block.HorizontalBorderStyle = Element.BorderStyles.All;
-                    block.VerticalBorderStyle= Element.BorderStyles.All;
-                    break;
-                case 1:
                     block.HorizontalBorderStyle = Element.BorderStyles.None;
                     block.VerticalBorderStyle = Element.BorderStyles.None;
+                    break;
+                case 1:
+                    block.HorizontalBorderStyle = Element.BorderStyles.All;
+                    block.VerticalBorderStyle = Element.BorderStyles.All;
                     break;
                 case 2:
                     block.HorizontalBorderStyle = Element.BorderStyles.All;
@@ -125,6 +137,28 @@ namespace PdfPlus.Components
                     break;
             }
 
+            Sd.Color color = Sd.Color.Gray;
+            if (DA.GetData(2, ref color)) block.AlternateColor = color;
+
+            int headers = 0;
+            DA.GetData(3, ref headers);
+
+            switch (headers)
+            {
+                default:
+                    break;
+                case 1:
+                    block.XAxis = "Row";
+                    break;
+                case 2:
+                    block.YAxis = "Column";
+                    break;
+                case 3:
+                    block.XAxis = "Row";
+                    block.YAxis = "Column";
+                    break;
+
+            }
 
             DA.SetData(0, block);
 

@@ -30,6 +30,11 @@ namespace PdfPlus
         protected List<Shape> shapes = new List<Shape>();
         protected List<Block> blocks = new List<Block>();
 
+        protected double left = 72;
+        protected double right = 72;
+        protected double top = 72;
+        protected double bottom = 72;
+
         #endregion
 
         #region constructors
@@ -145,6 +150,36 @@ namespace PdfPlus
             set { this.baseObject.Height = Unit.SetValue(value); }
         }
 
+        public virtual double PointWidth
+        {
+            get { return this.baseObject.Width.Point; }
+        }
+
+        public virtual double PointHeight
+        {
+            get { return this.baseObject.Height.Point; }
+        }
+
+        public virtual double PointMarginLeft
+        {
+            get { return this.left; }
+        }
+
+        public virtual double PointMarginRight
+        {
+            get { return this.right; }
+        }
+
+        public virtual double PointMarginTop
+        {
+            get { return this.top; }
+        }
+
+        public virtual double PointMarginBottom
+        {
+            get { return this.bottom; }
+        }
+
         public virtual Pf.PdfPage BaseObject
         {
             get { return (Pf.PdfPage)baseObject.Clone(); }
@@ -250,6 +285,12 @@ namespace PdfPlus
                     break;
             }
 
+            document.LastSection.PageSetup.PageWidth = this.PointWidth;
+            document.LastSection.PageSetup.PageHeight = this.PointHeight;
+            document.LastSection.PageSetup.LeftMargin = this.PointMarginLeft;
+            document.LastSection.PageSetup.RightMargin = this.PointMarginRight;
+            document.LastSection.PageSetup.TopMargin = this.PointMarginTop;
+            document.LastSection.PageSetup.BottomMargin = this.PointMarginBottom;
             document.LastSection.PageSetup.Orientation = this.baseObject.Orientation.ToMigraDoc();
 
             return document;
