@@ -180,8 +180,6 @@ namespace PdfPlus
             block.chartType = chartType;
 
             block.SetData(data);
-            block.width = 400;
-            block.height = 200;
             block.justification = Justification.Center;
 
             return block;
@@ -474,8 +472,26 @@ namespace PdfPlus
 
                     //Chart Area
                     chart.Left = this.Justification.ToMigraDocShapePosition();
-                    chart.Width = this.Width;
-                    chart.Height = this.Height;
+
+                    if (this.Width <= 0)
+                    {
+                        chart.Width = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin);
+                        if (this.chartType == ChartTypes.Pie) chart.Width = this.Width / 3.0;
+                    }
+                    else
+                    {
+                        chart.Width = this.Width;
+                    }
+
+                    if (this.Height <= 0)
+                    {
+                        chart.Height = chart.Width/2.0;
+                        if (this.chartType == ChartTypes.Pie) chart.Height = chart.Width;
+                    }
+                    else
+                    {
+                        chart.Height = this.Height;
+                    }
 
                     //Series
                     foreach (DataSet d in this.data)
@@ -500,6 +516,8 @@ namespace PdfPlus
                     {
                         chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
                         chart.XAxis.HasMajorGridlines = false;
+                        //chart.YAxis.TickLabels.Font.Size = 0;
+                        //chart.YAxis.TickLabels.Font.Color = Sd.Color.Transparent.ToMigraDoc();
                     }
 
                     if (this.HasYAxis)
@@ -507,14 +525,15 @@ namespace PdfPlus
                         chart.YAxis.Title.VerticalAlignment = Md.Tables.VerticalAlignment.Center;
                         chart.YAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
                         chart.YAxis.Title.Orientation = 90;
-                        chart.YAxis.Title.Caption = this.YAxis;
-                        chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Inside;
+
                         chart.YAxis.HasMajorGridlines = true;
                     }
                     else
                     {
                         chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
                         chart.YAxis.HasMajorGridlines = false;
+                        //chart.YAxis.TickLabels.Font.Size = 0;
+                        //chart.YAxis.TickLabels.Font.Color = Sd.Color.Transparent.ToMigraDoc();
                     }
 
                     //Legend
