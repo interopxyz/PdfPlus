@@ -14,10 +14,12 @@ namespace PdfPlus
 
         protected List<double> values = new List<double>();
         protected List<Sd.Color> colors = new List<Sd.Color>();
-        public bool LabelData = true;
         protected string title = string.Empty;
         protected bool hasTitle = false;
         protected bool hasGraphics = false;
+
+        public enum LabelAlignments { None, Above, End, Middle, Start};
+        protected LabelAlignments labelAlignment = LabelAlignments.None;
 
         #endregion
 
@@ -45,7 +47,7 @@ namespace PdfPlus
             this.hasTitle = dataSet.hasTitle;
             this.Graphic = new Graphic(dataSet.Graphic);
             this.Font = new Font(dataSet.Font);
-            this.LabelData = dataSet.LabelData;
+            this.labelAlignment = dataSet.labelAlignment;
             foreach (double v in dataSet.values) this.values.Add(v);
             foreach (Sd.Color c in dataSet.colors) this.colors.Add(c);
         }
@@ -57,6 +59,11 @@ namespace PdfPlus
         public virtual List<double> Values
         {
             get { return this.values; }
+        }
+
+        public virtual bool HasColors
+        {
+            get { return this.colors.Count > 0; }
         }
 
         public virtual List<Sd.Color> Colors
@@ -86,6 +93,17 @@ namespace PdfPlus
                 title = value;
                 hasTitle = true;
             }
+        }
+
+        public virtual LabelAlignments LabelAlignment
+        {
+            get { return this.labelAlignment; }
+            set { this.labelAlignment = value; }
+        }
+
+        public virtual bool LabelData
+        {
+            get { return this.labelAlignment != LabelAlignments.None; }
         }
 
         #endregion

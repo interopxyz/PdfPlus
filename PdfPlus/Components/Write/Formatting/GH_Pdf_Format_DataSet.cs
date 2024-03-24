@@ -1,4 +1,5 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -33,12 +34,19 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("Values", "V", "A list of numeric values", GH_ParamAccess.list);
-            //pManager.AddColourParameter("Colors", "C", "Optional list of colors corresponding to the values", GH_ParamAccess.list);
-            //pManager[1].Optional = true;
-            pManager.AddBooleanParameter("Label", "L", "If true, the datapoints will be labeled", GH_ParamAccess.item,true);
+            pManager.AddColourParameter("Colors", "C", "Optional list of colors corresponding to the values", GH_ParamAccess.list);
             pManager[1].Optional = true;
-            pManager.AddTextParameter("Title", "T", "An optional name for the series", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Label", "L", "Optional data label position", GH_ParamAccess.item,0);
             pManager[2].Optional = true;
+            pManager.AddTextParameter("Title", "T", "An optional name for the series", GH_ParamAccess.item);
+            pManager[3].Optional = true;
+
+            Param_Integer paramA = (Param_Integer)pManager[2];
+            foreach (DataSet.LabelAlignments value in Enum.GetValues(typeof(DataSet.LabelAlignments)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
+
         }
 
         /// <summary>
@@ -60,14 +68,14 @@ namespace PdfPlus.Components
 
             DataSet dataSet = new DataSet(values);
 
-            //List<Sd.Color> colors = new List<Sd.Color>();
-            //if (DA.GetDataList(1, colors)) dataSet.Colors = colors;
+            List<Sd.Color> colors = new List<Sd.Color>();
+            if (DA.GetDataList(1, colors)) dataSet.Colors = colors;
 
-            bool label = true;
-            if (DA.GetData(1, ref label)) dataSet.LabelData = label;
+            int label = 0;
+            if (DA.GetData(2, ref label)) dataSet.LabelAlignment = (DataSet.LabelAlignments)label;
 
             string title = string.Empty;
-            if (DA.GetData(2, ref title)) dataSet.Title = title;
+            if (DA.GetData(3, ref title)) dataSet.Title = title;
 
             DA.SetData(0,dataSet);
         }

@@ -40,8 +40,10 @@ namespace PdfPlus.Components
             pManager[3].Optional = true;
             pManager.AddTextParameter("Y Axis", "Y", "Optional Y Axis title for the Graph", GH_ParamAccess.item);
             pManager[4].Optional = true;
-            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Grid Lines", "G", "Optional background grid lines", GH_ParamAccess.item, 0);
             pManager[5].Optional = true;
+            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
+            pManager[6].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[2];
             paramA.AddNamedValue("Bar", 0);
@@ -52,9 +54,15 @@ namespace PdfPlus.Components
             paramA.AddNamedValue("Area", 5);
 
             Param_Integer paramB = (Param_Integer)pManager[5];
+            paramB.AddNamedValue("None", 0);
+            paramB.AddNamedValue("Horizontal", 1);
+            paramB.AddNamedValue("Vertial", 2);
+            paramB.AddNamedValue("Horizontal / Vertical", 3);
+
+            Param_Integer paramC = (Param_Integer)pManager[6];
             foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
             {
-                paramB.AddNamedValue(value.ToString(), (int)value);
+                paramC.AddNamedValue(value.ToString(), (int)value);
             }
         }
 
@@ -89,8 +97,13 @@ namespace PdfPlus.Components
             string y = string.Empty;
             if (DA.GetData(4, ref y)) shape.YAxis = y;
 
+            int grid = 0;
+            DA.GetData(5, ref grid);
+            if ((grid == 1) | (grid == 3)) shape.HorizontalBorderStyle = Element.BorderStyles.All;
+            if (grid > 1) shape.VerticalBorderStyle = Element.BorderStyles.All;
+
             int alignment = 0;
-            if (DA.GetData(5, ref alignment)) shape.Alignment = (Alignment)alignment;
+            if (DA.GetData(6, ref alignment)) shape.Alignment = (Alignment)alignment;
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

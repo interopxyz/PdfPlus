@@ -269,6 +269,11 @@ namespace PdfPlus
             set { this.rowHeight = value; }
         }
 
+        public virtual bool IsChartHorizontal
+        {
+            get { return ((this.chartType == ChartTypes.Bar) | (this.chartType == ChartTypes.BarStacked)); }
+        }
+
         #endregion
 
         #region methods
@@ -465,10 +470,12 @@ namespace PdfPlus
                 case BlockTypes.Chart:
                     #region chart
                     Md.Shapes.Charts.ChartType ct = this.chartType.ToMigraDoc();
-
                     Md.Shapes.Charts.Chart chart = document.LastSection.AddChart(ct);
 
-                    chart.TopArea.TopPadding = 6;
+                    chart.TopArea.TopPadding = 15;
+                    chart.BottomArea.BottomPadding = 15;
+                    chart.LeftArea.LeftPadding = 15;
+                    chart.RightArea.RightPadding = 15;
 
                     //Chart Area
                     chart.Left = this.Justification.ToMigraDocShapePosition();
@@ -493,47 +500,103 @@ namespace PdfPlus
                         chart.Height = this.Height;
                     }
 
+                    if (this.graphic.HasColor) chart.FillFormat.Color = this.graphic.Color.ToMigraDoc();
+
                     //Series
                     foreach (DataSet d in this.data)
                     {
                         Md.Shapes.Charts.Series series = chart.SeriesCollection.AddSeries();
-                        series.HasDataLabel = d.LabelData;
-                        series.DataLabel.Position = Md.Shapes.Charts.DataLabelPosition.OutsideEnd;
+
                         series.Name = d.Title;
                         series.MarkerStyle = Md.Shapes.Charts.MarkerStyle.None;
                         series.Add(d.Values.ToArray());
+                        if(d.Graphic.HasColor)series.FillFormat.Color = d.Graphic.Color.ToMigraDoc();
+                        if (d.Graphic.HasStroke)
+                        {
+                            series.LineFormat.Width = d.Graphic.Weight;
+                            series.LineFormat.Color = d.Graphic.Stroke.ToMigraDoc();
+                        }
+
+                    if ((int)this.chartType < 4)
+                    {
+                        if (d.HasColors)
+                            {
+                                List< Md.Shapes.Charts.Point> elements = series.Elements.Cast<Md.Shapes.Charts.Point>().ToList();
+                                for (int i = 0; i < elements.Count; i++)
+                            {
+                                    elements[i].FillFormat.Color = d.Colors[i].ToMigraDoc();
+                                }
+                        }
+
+                    }
+
+                        if (d.LabelData)
+                        {
+                            series.HasDataLabel = true;
+
+                            series.DataLabel.Position = d.LabelAlignment.ToMigraDoc();
+
+                            series.DataLabel.Font = d.Font.ToMigraDoc();
+                            if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Md.Underline.Single;
+                        }
+                        else
+                        {
+                            series.HasDataLabel = false;
+                        }
                     }
 
                     //Axis
+                        chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
                     if (this.HasXAxis)
                     {
+                        chart.XAxis.TickLabels.Font = this.font.ToMigraDoc();
+
                         chart.XAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
+
                         chart.XAxis.Title.Caption = this.XAxis;
-                        chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.Inside;
-                        chart.XAxis.HasMajorGridlines = true;
+                        chart.XAxis.Title.Font = this.font.ToMigraDoc();
+                        if(this.IsChartHorizontal) chart.XAxis.Title.Orientation = 90;
+
                     }
-                    else
+
+                    chart.XAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+                    if (chart.XAxis.HasMajorGridlines)
                     {
-                        chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
-                        chart.XAxis.HasMajorGridlines = false;
-                        //chart.YAxis.TickLabels.Font.Size = 0;
-                        //chart.YAxis.TickLabels.Font.Color = Sd.Color.Transparent.ToMigraDoc();
+                        if (this.graphic.HasStroke)
+                        {
+                            chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                            chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                        }
                     }
 
                     if (this.HasYAxis)
                     {
+                        chart.YAxis.TickLabels.Font = this.font.ToMigraDoc();
+
                         chart.YAxis.Title.VerticalAlignment = Md.Tables.VerticalAlignment.Center;
                         chart.YAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
-                        chart.YAxis.Title.Orientation = 90;
 
-                        chart.YAxis.HasMajorGridlines = true;
-                    }
-                    else
-                    {
+                        chart.YAxis.Title.Caption = this.YAxis;
+                        chart.YAxis.Title.Font = this.font.ToMigraDoc();
+                        if (!this.IsChartHorizontal) chart.YAxis.Title.Orientation = 90;
+
                         chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
-                        chart.YAxis.HasMajorGridlines = false;
-                        //chart.YAxis.TickLabels.Font.Size = 0;
-                        //chart.YAxis.TickLabels.Font.Color = Sd.Color.Transparent.ToMigraDoc();
+                        chart.YAxis.HasMajorGridlines = true;
+                        if (this.graphic.HasStroke)
+                        {
+                            chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                            chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                        }
+                    }
+
+                    chart.YAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+                    if (chart.YAxis.HasMajorGridlines)
+                    {
+                        if (this.graphic.HasStroke)
+                        {
+                            chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                            chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                        }
                     }
 
                     //Legend
@@ -556,6 +619,7 @@ namespace PdfPlus
                                 legend = chart.TopArea.AddLegend();
                                 break;
                         }
+                        legend.Format.Font = this.font.ToMigraDoc();
                     }
 
                     break;

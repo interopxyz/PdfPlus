@@ -15,7 +15,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum ElementTypes { Empty, Shape, Block, Data}
+        public enum ElementTypes { Empty, Shape, Block, Data};
         protected ElementTypes elementType = ElementTypes.Empty;
 
         public enum BorderStyles { None, Interior, All};

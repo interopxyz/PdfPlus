@@ -254,6 +254,21 @@ namespace PdfPlus
 
         #region Pdf Sharp
 
+        public static Pc.DataLabelPosition ToPdf(this DataSet.LabelAlignments input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pc.DataLabelPosition.OutsideEnd;
+                case DataSet.LabelAlignments.End:
+                    return Pc.DataLabelPosition.InsideEnd;
+                case DataSet.LabelAlignments.Middle:
+                    return Pc.DataLabelPosition.Center;
+                case DataSet.LabelAlignments.Start:
+                    return Pc.DataLabelPosition.InsideBase;
+            }
+        }
+
         public static double GetValue(this Pd.XUnit input, Units unit)
         {
             switch (unit)
@@ -738,6 +753,21 @@ namespace PdfPlus
 
         #region units
 
+        public static Md.Shapes.Charts.DataLabelPosition ToMigraDoc(this DataSet.LabelAlignments input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Shapes.Charts.DataLabelPosition.OutsideEnd;
+                case DataSet.LabelAlignments.End:
+                    return Md.Shapes.Charts.DataLabelPosition.InsideEnd;
+                case DataSet.LabelAlignments.Middle:
+                    return Md.Shapes.Charts.DataLabelPosition.Center;
+                case DataSet.LabelAlignments.Start:
+                    return Md.Shapes.Charts.DataLabelPosition.InsideBase;
+            }
+        }
+
         public static Md.Unit ToMigraDoc(this Pd.XUnit input)
         {
             switch (input.Type)
@@ -774,7 +804,21 @@ namespace PdfPlus
 
         #region font
 
-        public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
+        public static Md.Font ToMigraDoc(this Font input)
+        {
+            Md.Font font = new Md.Font();
+            font.Name = input.Family;
+            font.Size = input.Size;
+            font.Color = input.Color.ToMigraDoc();
+            font.Bold = input.IsBold;
+            font.Italic = input.IsItalic;
+            font.Underline = Md.Underline.None;
+            if (input.IsUnderlined) font.Underline = Md.Underline.Single;
+
+            return font;
+        }
+
+            public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
         {
             if (input.IsModified)
             {

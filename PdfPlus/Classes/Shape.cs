@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PdfPlus
 {
-    public class Shape: Element
+    public class Shape : Element
     {
 
         #region members
@@ -22,7 +22,7 @@ namespace PdfPlus
         public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
         protected ShapeType shapeType = ShapeType.None;
 
-        public enum LinkTypes { Hyperlink,Filepath,Page};
+        public enum LinkTypes { Hyperlink, Filepath, Page };
         protected LinkTypes linkType = LinkTypes.Hyperlink;
 
         protected double scale = 1.0;
@@ -31,12 +31,12 @@ namespace PdfPlus
 
         #region constructors
 
-        protected Shape():base()
+        protected Shape() : base()
         {
             this.elementType = ElementTypes.Shape;
         }
 
-        public Shape(Shape shape):base(shape)
+        public Shape(Shape shape) : base(shape)
         {
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
@@ -108,9 +108,9 @@ namespace PdfPlus
             shape.imageName = path;
             shape.location = new Rg.Point3d(location);
             Rg.Plane plane = Rg.Plane.WorldXY;
-            double factor = 72.0/96.0;
+            double factor = 72.0 / 96.0;
             plane.Origin = location - new Rg.Vector3d(0, bitmap.Height * factor * scale, 0);
-            shape.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X+bitmap.Width * factor * scale, location.Y+bitmap.Height * factor * scale, 0));
+            shape.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X + bitmap.Width * factor * scale, location.Y + bitmap.Height * factor * scale, 0));
 
             return shape;
         }
@@ -342,7 +342,7 @@ namespace PdfPlus
                 Rg.Plane plane = Rg.Plane.WorldXY;
                 double radius = Math.Min(this.boundary.Width, this.boundary.Height) * 0.4;
                 Rg.Point3d center = this.boundary.Center;
-                Rg.Point3d corner = new Rg.Point3d(center.X-radius,center.Y-radius,center.Z);
+                Rg.Point3d corner = new Rg.Point3d(center.X - radius, center.Y - radius, center.Z);
                 int count = data.Count;
                 Rg.Interval bounds = data.Bounds();
                 int s = 0;
@@ -350,7 +350,7 @@ namespace PdfPlus
                 double space = (step / count);
                 int total = 0;
                 double w = 0;
-                foreach (DataSet ds in data)total = Math.Max(total, ds.Values.Count);
+                foreach (DataSet ds in data) total = Math.Max(total, ds.Values.Count);
 
                 switch (this.chartType)
                 {
@@ -362,7 +362,7 @@ namespace PdfPlus
                         clrs.Add(Sd.Color.Black);
 
                         List<double> vals = this.data[0].Values.ReMapStack();
-                        
+
                         foreach (double t in vals)
                         {
                             output.Add(new Rg.Line(center, circle.PointAt(t)).ToNurbsCurve());
@@ -372,19 +372,19 @@ namespace PdfPlus
 
                         break;
                     case ChartTypes.Area:
-                        foreach(DataSet ds in data)
+                        foreach (DataSet ds in data)
                         {
                             List<double> areaVals = ds.Values.ReMap(bounds);
                             Rg.Polyline plot = new Rg.Polyline();
-                            int lineCount = areaVals.Count-1;
+                            int lineCount = areaVals.Count - 1;
                             double i = 0;
                             plot.Add(corner);
                             foreach (double t in areaVals)
                             {
-                                plot.Add(corner + new Rg.Vector3d((double)(i/ lineCount) *radius*2, t * radius*2, 0));
+                                plot.Add(corner + new Rg.Vector3d((double)(i / lineCount) * radius * 2, t * radius * 2, 0));
                                 i++;
                             }
-                            plot.Add(corner + new Rg.Vector3d(radius*2, 0, 0));
+                            plot.Add(corner + new Rg.Vector3d(radius * 2, 0, 0));
                             plot.Add(corner);
 
                             output.Add(plot.ToNurbsCurve());
@@ -393,15 +393,15 @@ namespace PdfPlus
 
                         break;
                     case ChartTypes.Line:
-                        foreach(DataSet ds in data)
+                        foreach (DataSet ds in data)
                         {
                             List<double> lineVals = ds.Values.ReMap(bounds);
                             Rg.Polyline plot = new Rg.Polyline();
-                            int lineCount = lineVals.Count-1;
+                            int lineCount = lineVals.Count - 1;
                             double i = 0;
                             foreach (double t in lineVals)
                             {
-                                plot.Add(corner + new Rg.Vector3d((double)(i/ lineCount) *radius*2, t * radius*2, 0));
+                                plot.Add(corner + new Rg.Vector3d((double)(i / lineCount) * radius * 2, t * radius * 2, 0));
                                 i++;
                             }
 
@@ -411,7 +411,7 @@ namespace PdfPlus
 
                         break;
                     case ChartTypes.Column:
-                        step = radius*2 / total;
+                        step = radius * 2 / total;
                         space = (step / count);
                         foreach (DataSet ds in data)
                         {
@@ -420,7 +420,7 @@ namespace PdfPlus
                             double i = 0;
                             foreach (double t in lineVals)
                             {
-                                double x = s* space+ i* step;
+                                double x = s * space + i * step;
                                 Rg.Point3d ptX = corner + new Rg.Vector3d(x, 0, 0);
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(x, t * (radius * 2 - 1) + 1, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(space * 0.9, 0, 0);
@@ -442,9 +442,9 @@ namespace PdfPlus
                             foreach (double t in lineVals)
                             {
                                 double y = s * space + i * step;
-                                Rg.Point3d ptX = corner + new Rg.Vector3d(0,y, 0);
-                                Rg.Point3d ptY = corner + new Rg.Vector3d(t * (radius * 2 - 1) + 1,y, 0);
-                                Rg.Vector3d vcX = new Rg.Vector3d(0, space*0.9, 0);
+                                Rg.Point3d ptX = corner + new Rg.Vector3d(0, y, 0);
+                                Rg.Point3d ptY = corner + new Rg.Vector3d(t * (radius * 2 - 1) + 1, y, 0);
+                                Rg.Vector3d vcX = new Rg.Vector3d(0, space * 0.9, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
                                 clrs.Add(ds.Colors[(int)i]);
                                 i++;
@@ -454,16 +454,16 @@ namespace PdfPlus
                         break;
                     case ChartTypes.BarStacked:
                         List<List<double>> barValues = data.ReMapSet();
-                        
+
                         total = barValues.Count;
                         w = 1.0 / total * radius * 2.0;
                         foreach (List<double> barVals in barValues)
                         {
-                            for(int i=0;i< barVals.Count-1;i++)
+                            for (int i = 0; i < barVals.Count - 1; i++)
                             {
-                                double y = (double)s / total*radius*2.0;
-                                Rg.Point3d ptX = corner + new Rg.Vector3d(barVals[i] * (radius * 2 - 1) + Convert.ToInt32(i > 0),y, 0);
-                                Rg.Point3d ptY = corner + new Rg.Vector3d(barVals[i + 1] * (radius * 2 - 1) + 1,y, 0);
+                                double y = (double)s / total * radius * 2.0;
+                                Rg.Point3d ptX = corner + new Rg.Vector3d(barVals[i] * (radius * 2 - 1) + Convert.ToInt32(i > 0), y, 0);
+                                Rg.Point3d ptY = corner + new Rg.Vector3d(barVals[i + 1] * (radius * 2 - 1) + 1, y, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(0, w * 0.9, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
                                 clrs.Add(this.data[i].Colors[(int)s]);
@@ -484,7 +484,7 @@ namespace PdfPlus
                                 Rg.Point3d ptX = corner + new Rg.Vector3d(x, barVals[i] * (radius * 2 - 1) + Convert.ToInt32(i > 0), 0);
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(x, barVals[i + 1] * (radius * 2 - 1) + 1, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(w * 0.9, 0, 0);
-                                output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX,ptY,ptY+vcX,ptX+vcX,ptX} ).ToNurbsCurve());
+                                output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
                                 clrs.Add(this.data[i].Colors[(int)s]);
                             }
                             s++;
@@ -493,7 +493,7 @@ namespace PdfPlus
                 }
             }
             colors = clrs;
-                return output;
+            return output;
         }
 
         public void AlignContent(Page page, bool translate = true)
@@ -738,15 +738,16 @@ namespace PdfPlus
                 chart.XAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
                 chart.XAxis.HasMajorGridlines = true;
 
+                if (this.graphic.HasStroke) { 
                 chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
                 chart.XAxis.LineFormat.Width = this.graphic.Weight;
-
                 chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
                 chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                }
 
                 chart.XAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
                 chart.XAxis.TickLabels.Font.Name = this.FontFamily;
-                chart.XAxis.TickLabels.Font.Size = this.FontSize*this.scale;
+                chart.XAxis.TickLabels.Font.Size = this.FontSize * this.scale;
                 chart.XAxis.TickLabels.Font.Bold = this.font.IsBold;
                 chart.XAxis.TickLabels.Font.Italic = this.font.IsItalic;
                 if (this.font.IsUnderlined) chart.XAxis.TickLabels.Font.Underline = Pc.Underline.Single;
@@ -773,11 +774,13 @@ namespace PdfPlus
                 chart.YAxis.Title.VerticalAlignment = Pc.VerticalAlignment.Center;
                 chart.YAxis.HasMajorGridlines = true;
 
+                if (this.graphic.HasStroke)
+                {
                 chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
                 chart.YAxis.LineFormat.Width = this.graphic.Weight;
-
                 chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
                 chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                }
 
                 chart.YAxis.TickLabels.Format = "#.####";
                 chart.YAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
@@ -858,7 +861,7 @@ namespace PdfPlus
                         case LinkTypes.Page:
                             int index = 0;
                             bool isInt = int.TryParse(this.text, out index);
-                            if(isInt) page.AddDocumentLink(boundary.ToPdfRect(coordinateframe), index + 1);
+                            if (isInt) page.AddDocumentLink(boundary.ToPdfRect(coordinateframe), index + 1);
 
                             break;
                     }
@@ -893,10 +896,10 @@ namespace PdfPlus
                         series.Name = d.Title;
 
                         if (d.Graphic.HasStroke)
-                        { 
-                        series.LineFormat.Visible = true;
-                        series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
-                        series.LineFormat.Width = d.Graphic.Weight;
+                        {
+                            series.LineFormat.Visible = true;
+                            series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
+                            series.LineFormat.Width = d.Graphic.Weight;
 
                         }
 
@@ -910,25 +913,32 @@ namespace PdfPlus
                         series.MarkerSize = d.Graphic.Weight * 2;
 
                         series.Add(d.Values.ToArray());
-                        series.HasDataLabel = d.LabelData;
 
-                        series.DataLabel.Font.Color = d.Font.Color.ToPdf();
-                        series.DataLabel.Font.Name = d.Font.Family;
-                        series.DataLabel.Font.Size = d.Font.Size;
-                        series.DataLabel.Font.Bold = d.Font.IsBold;
-                        series.DataLabel.Font.Italic = d.Font.IsItalic;
-                        if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Pc.Underline.Single;
+                        if (d.LabelData)
+                        {
+                            series.HasDataLabel = true;
+
+                            series.DataLabel.Position = d.LabelAlignment.ToPdf();
+
+                            series.DataLabel.Font.Color = d.Font.Color.ToPdf();
+                            series.DataLabel.Font.Name = d.Font.Family;
+                            series.DataLabel.Font.Size = d.Font.Size;
+                            series.DataLabel.Font.Bold = d.Font.IsBold;
+                            series.DataLabel.Font.Italic = d.Font.IsItalic;
+                            if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Pc.Underline.Single;
+                        }
+                        else
+                        {
+                            series.HasDataLabel = false;
+                        }
 
                         if ((int)this.chartType < 4)
                         {
-                            if (d.Graphic.HasColor)
+                            if (d.HasColors)
                             {
-                                if (d.Colors.Count > 0)
+                                for (int p = 0; p < series.Elements.Count; p++)
                                 {
-                                    for (int p = 0; p < series.Elements.Count; p++)
-                                    {
-                                        series.Elements[p].FillFormat.Color = d.Colors[p].ToPdf();
-                                    }
+                                    series.Elements[p].FillFormat.Color = d.Colors[p].ToPdf();
                                 }
                             }
 
