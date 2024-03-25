@@ -33,7 +33,7 @@ namespace PdfPlus
         protected string text = string.Empty;
 
         //Chart
-        public enum ChartTypes { Bar, BarStacked, Column, ColumnStacked, Line, Area, Pie };
+        public enum ChartTypes { Column, ColumnStacked, Bar, BarStacked, Line, Area, Pie };
         protected ChartTypes chartType = ChartTypes.ColumnStacked;
         protected List<DataSet> data = new List<DataSet>();
         protected string xAxis = string.Empty;
@@ -261,6 +261,11 @@ namespace PdfPlus
         public virtual bool HasYAxis
         {
             get { return (this.yAxis != string.Empty); }
+        }
+
+        public virtual bool IsChartHorizontal
+        {
+            get { return ((int)this.chartType < 2); }
         }
 
         //Geometry

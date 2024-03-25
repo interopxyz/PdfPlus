@@ -247,6 +247,7 @@ namespace PdfPlus
 
         public Md.Document SetPage(Md.Document document)
         {
+            document.LastSection.PageSetup.Orientation = this.baseObject.Orientation.ToMigraDoc();
             switch (this.baseObject.Size)
             {
                 default:
@@ -284,14 +285,20 @@ namespace PdfPlus
                     document.LastSection.PageSetup.PageFormat = Md.PageFormat.P11x17;
                     break;
             }
-
-            document.LastSection.PageSetup.PageWidth = this.PointWidth;
-            document.LastSection.PageSetup.PageHeight = this.PointHeight;
+            if(this.baseObject.Orientation == PdfSharp.PageOrientation.Landscape)
+            {
+            document.LastSection.PageSetup.PageWidth = this.PointHeight;
+            document.LastSection.PageSetup.PageHeight = this.PointWidth;
+            }
+            else
+            {
+                document.LastSection.PageSetup.PageWidth = this.PointWidth;
+                document.LastSection.PageSetup.PageHeight = this.PointHeight;
+            }
             document.LastSection.PageSetup.LeftMargin = this.PointMarginLeft;
             document.LastSection.PageSetup.RightMargin = this.PointMarginRight;
             document.LastSection.PageSetup.TopMargin = this.PointMarginTop;
             document.LastSection.PageSetup.BottomMargin = this.PointMarginBottom;
-            document.LastSection.PageSetup.Orientation = this.baseObject.Orientation.ToMigraDoc();
 
             return document;
         }

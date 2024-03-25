@@ -731,78 +731,85 @@ namespace PdfPlus
             chart.Font.Italic = this.font.IsItalic;
             if (this.font.IsUnderlined) chart.Font.Underline = Pc.Underline.Single;
 
+            //X Axis
+            chart.XAxis.MajorTickMark = Pc.TickMarkType.None;
+            chart.XAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
+            chart.XAxis.TickLabels.Font.Name = this.FontFamily;
+            chart.XAxis.TickLabels.Font.Size = this.FontSize * this.scale;
+            chart.XAxis.TickLabels.Font.Bold = this.font.IsBold;
+            chart.XAxis.TickLabels.Font.Italic = this.font.IsItalic;
+            if (this.font.IsUnderlined) chart.XAxis.TickLabels.Font.Underline = Pc.Underline.Single;
             if (this.HasXAxis)
             {
-                chart.XAxis.MajorTickMark = Pc.TickMarkType.Outside;
-                chart.XAxis.Title.Caption = this.xAxis;
                 chart.XAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
-                chart.XAxis.HasMajorGridlines = true;
 
-                if (this.graphic.HasStroke) { 
-                chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                chart.XAxis.LineFormat.Width = this.graphic.Weight;
-                chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
-                }
-
-                chart.XAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
-                chart.XAxis.TickLabels.Font.Name = this.FontFamily;
-                chart.XAxis.TickLabels.Font.Size = this.FontSize * this.scale;
-                chart.XAxis.TickLabels.Font.Bold = this.font.IsBold;
-                chart.XAxis.TickLabels.Font.Italic = this.font.IsItalic;
-                if (this.font.IsUnderlined) chart.XAxis.TickLabels.Font.Underline = Pc.Underline.Single;
-
+                chart.XAxis.Title.Caption = this.xAxis;
                 chart.XAxis.Title.Font.Color = this.FontColor.ToPdf();
                 chart.XAxis.Title.Font.Name = this.FontFamily;
                 chart.XAxis.Title.Font.Size = this.FontSize * this.scale;
                 chart.XAxis.Title.Font.Bold = this.font.IsBold;
                 chart.XAxis.Title.Font.Italic = this.font.IsItalic;
                 if (this.font.IsUnderlined) chart.XAxis.Title.Font.Underline = Pc.Underline.Single;
-            }
-            else
-            {
-                chart.XAxis.HasMajorGridlines = false;
-                chart.XAxis.MajorTickMark = Pc.TickMarkType.None;
-            }
-
-            if (this.HasYAxis)
-            {
-                chart.YAxis.MajorTickMark = Pc.TickMarkType.Outside;
-                chart.YAxis.Title.Caption = this.yAxis;
-                chart.YAxis.Title.Orientation = 90;
-                chart.YAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
-                chart.YAxis.Title.VerticalAlignment = Pc.VerticalAlignment.Center;
-                chart.YAxis.HasMajorGridlines = true;
+                if (!this.IsChartHorizontal) chart.XAxis.Title.Orientation = 90;
 
                 if (this.graphic.HasStroke)
                 {
-                chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                chart.YAxis.LineFormat.Width = this.graphic.Weight;
-                chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                    chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.XAxis.LineFormat.Width = this.graphic.Weight;
                 }
+            }
 
-                chart.YAxis.TickLabels.Format = "#.####";
-                chart.YAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
-                chart.YAxis.TickLabels.Font.Name = this.FontFamily;
-                chart.YAxis.TickLabels.Font.Size = this.FontSize * this.scale;
-                chart.YAxis.TickLabels.Font.Bold = this.font.IsBold;
-                chart.YAxis.TickLabels.Font.Italic = this.font.IsItalic;
-                if (this.font.IsUnderlined) chart.YAxis.TickLabels.Font.Underline = Pc.Underline.Single;
+            chart.XAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+            if ((int)this.chartType < 2) chart.XAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+            if (chart.XAxis.HasMajorGridlines)
+            {
+                if (this.graphic.HasStroke)
+                {
+                    chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                }
+            }
 
+            //Y Axis
+            chart.YAxis.MajorTickMark = Pc.TickMarkType.None;
+            chart.YAxis.TickLabels.Format = "#.####";
+            chart.YAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
+            chart.YAxis.TickLabels.Font.Name = this.FontFamily;
+            chart.YAxis.TickLabels.Font.Size = this.FontSize * this.scale;
+            chart.YAxis.TickLabels.Font.Bold = this.font.IsBold;
+            chart.YAxis.TickLabels.Font.Italic = this.font.IsItalic;
+            if (this.font.IsUnderlined) chart.YAxis.TickLabels.Font.Underline = Pc.Underline.Single;
+            if (this.HasYAxis)
+            {
+                chart.YAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
+                chart.YAxis.Title.VerticalAlignment = Pc.VerticalAlignment.Center;
+
+                chart.YAxis.Title.Caption = this.yAxis;
                 chart.YAxis.Title.Font.Color = this.FontColor.ToPdf();
                 chart.YAxis.Title.Font.Name = this.FontFamily;
                 chart.YAxis.Title.Font.Size = this.FontSize * this.scale;
                 chart.YAxis.Title.Font.Bold = this.font.IsBold;
                 chart.YAxis.Title.Font.Italic = this.font.IsItalic;
                 if (this.font.IsUnderlined) chart.YAxis.Title.Font.Underline = Pc.Underline.Single;
-            }
-            else
-            {
-                chart.YAxis.HasMajorGridlines = false;
-                chart.YAxis.MajorTickMark = Pc.TickMarkType.None;
+                if (this.IsChartHorizontal) chart.YAxis.Title.Orientation = 90;
+
+                if (this.graphic.HasStroke)
+                {
+                    chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.YAxis.LineFormat.Width = this.graphic.Weight;
+                }
             }
 
+            chart.YAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+            if ((int)this.chartType < 2) chart.YAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+            if (chart.YAxis.HasMajorGridlines)
+            {
+                if (this.graphic.HasStroke)
+                {
+                    chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                }
+            }
 
             Pc.ChartFrame frame = new Pc.ChartFrame();
             frame.Location = new Pd.XPoint(boundary.Corner(0).X, boundary.Corner(3).Y);
@@ -891,60 +898,62 @@ namespace PdfPlus
                 default:
                     foreach (DataSet d in this.data)
                     {
-                        Pc.Series series = chart.SeriesCollection.AddSeries();
-                        series.ChartType = cType;
-                        series.Name = d.Title;
-
-                        if (d.Graphic.HasStroke)
+                        if (d.IsNumeric)
                         {
-                            series.LineFormat.Visible = true;
-                            series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
-                            series.LineFormat.Width = d.Graphic.Weight;
+                            Pc.Series series = chart.SeriesCollection.AddSeries();
+                            series.ChartType = cType;
+                            series.Name = d.Title;
 
-                        }
-
-                        if (d.Graphic.HasColor)
-                        {
-                            series.FillFormat.Visible = true;
-                            series.FillFormat.Color = d.Graphic.Color.ToPdf();
-                        }
-
-                        series.MarkerStyle = Pc.MarkerStyle.Circle;
-                        series.MarkerSize = d.Graphic.Weight * 2;
-
-                        series.Add(d.Values.ToArray());
-
-                        if (d.LabelData)
-                        {
-                            series.HasDataLabel = true;
-
-                            series.DataLabel.Position = d.LabelAlignment.ToPdf();
-
-                            series.DataLabel.Font.Color = d.Font.Color.ToPdf();
-                            series.DataLabel.Font.Name = d.Font.Family;
-                            series.DataLabel.Font.Size = d.Font.Size;
-                            series.DataLabel.Font.Bold = d.Font.IsBold;
-                            series.DataLabel.Font.Italic = d.Font.IsItalic;
-                            if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Pc.Underline.Single;
-                        }
-                        else
-                        {
-                            series.HasDataLabel = false;
-                        }
-
-                        if ((int)this.chartType < 4)
-                        {
-                            if (d.HasColors)
+                            if (d.Graphic.HasStroke)
                             {
-                                for (int p = 0; p < series.Elements.Count; p++)
+                                series.LineFormat.Visible = true;
+                                series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
+                                series.LineFormat.Width = d.Graphic.Weight;
+
+                            }
+
+                            if (d.Graphic.HasColor)
+                            {
+                                series.FillFormat.Visible = true;
+                                series.FillFormat.Color = d.Graphic.Color.ToPdf();
+                            }
+
+                            series.MarkerStyle = Pc.MarkerStyle.Circle;
+                            series.MarkerSize = d.Graphic.Weight * 2;
+
+                            series.Add(d.Values.ToArray());
+
+                            if (d.LabelData)
+                            {
+                                series.HasDataLabel = true;
+
+                                series.DataLabel.Position = d.LabelAlignment.ToPdf();
+
+                                series.DataLabel.Font.Color = d.Font.Color.ToPdf();
+                                series.DataLabel.Font.Name = d.Font.Family;
+                                series.DataLabel.Font.Size = d.Font.Size;
+                                series.DataLabel.Font.Bold = d.Font.IsBold;
+                                series.DataLabel.Font.Italic = d.Font.IsItalic;
+                                if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Pc.Underline.Single;
+                            }
+                            else
+                            {
+                                series.HasDataLabel = false;
+                            }
+
+                            if ((int)this.chartType < 4)
+                            {
+                                if (d.HasColors)
                                 {
-                                    series.Elements[p].FillFormat.Color = d.Colors[p].ToPdf();
+                                    for (int p = 0; p < series.Elements.Count; p++)
+                                    {
+                                        series.Elements[p].FillFormat.Color = d.Colors[p].ToPdf();
+                                    }
                                 }
+
                             }
 
                         }
-
-
                     }
                     break;
                 case ChartTypes.Pie:

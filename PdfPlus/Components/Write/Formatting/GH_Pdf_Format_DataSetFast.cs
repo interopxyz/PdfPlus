@@ -32,7 +32,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Number Tree", "N", "A datatree of number values", GH_ParamAccess.tree);
+            pManager.AddTextParameter("Data Tree", "N", "A datatree of text or number values. (Only use numbers for charts)", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -50,36 +50,35 @@ namespace PdfPlus.Components
         protected override void SolveInstance(IGH_DataAccess DA)
         {
 
-            GH_Structure<GH_Number> ghData = new GH_Structure<GH_Number>();
+            GH_Structure<GH_String> ghData = new GH_Structure<GH_String>();
 
             if (!DA.GetDataTree(0, out ghData)) return;
 
-            Dictionary<int, List<List<double>>> dataSet = new Dictionary<int, List<List<double>>>();
+            Dictionary<int, List<List<string>>> dataSet = new Dictionary<int, List<List<string>>>();
             List<DataSet> dataSets = new List<DataSet>();
 
-            dataSet.Add(0, new List<List<double>>());
+            dataSet.Add(0, new List<List<string>>());
             int i = 0;
             foreach (GH_Path path in ghData.Paths)
             {
                 if (path.Length > 1)
                 {
-                    if (!dataSet.ContainsKey(path[0])) dataSet.Add(path[0], new List<List<double>>());
-                    dataSet[path[0]].Add(ghData.Branches[i].ToNumberList());
+                    if (!dataSet.ContainsKey(path[0])) dataSet.Add(path[0], new List<List<string>>());
+                    dataSet[path[0]].Add(ghData.Branches[i].ToStringList());
                 }
                 else
                 {
-                    dataSet[0].Add(ghData.Branches[i].ToNumberList());
+                    dataSet[0].Add(ghData.Branches[i].ToStringList());
                 }
                 i++;
             }
 
             int rc = this.RunCount - 1;
             if (rc > (dataSet.Keys.Count - 1)) rc = dataSet.Keys.Count - 1;
-            foreach (List<double> data in dataSet[rc])
+            foreach (List<string> data in dataSet[rc])
             {
                 dataSets.Add(new DataSet(data));
             }
-
 
             DA.SetDataList(0, dataSets);
 

@@ -33,7 +33,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Values", "V", "A list of numeric values", GH_ParamAccess.list);
+            pManager.AddTextParameter("Values", "V", "A list of numeric values", GH_ParamAccess.list);
             pManager.AddColourParameter("Colors", "C", "Optional list of colors corresponding to the values", GH_ParamAccess.list);
             pManager[1].Optional = true;
             pManager.AddIntegerParameter("Label", "L", "Optional data label position", GH_ParamAccess.item,0);
@@ -63,8 +63,10 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<double> values = new List<double>();
+            List<string> values = new List<string>();
             if (!DA.GetDataList(0, values)) return;
+
+
 
             DataSet dataSet = new DataSet(values);
 

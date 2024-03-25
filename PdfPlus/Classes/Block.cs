@@ -43,7 +43,6 @@ namespace PdfPlus
         protected List<string> listItems = new List<string>();
 
         //Table
-        protected List<List<string>> tableContents = new List<List<string>>();
         protected int columnWidth = -1;
         protected int rowHeight = -1;
 
@@ -54,12 +53,12 @@ namespace PdfPlus
 
         #region constructors
 
-        public Block():base()
+        public Block() : base()
         {
             this.elementType = ElementTypes.Block;
         }
 
-        public Block(Block block):base(block)
+        public Block(Block block) : base(block)
         {
             this.graphic = new Graphic(block.graphic);
             this.font = new Font(block.font);
@@ -78,13 +77,6 @@ namespace PdfPlus
             foreach (string item in block.listItems) this.listItems.Add(item);
 
             //table
-            int i = 0;
-            foreach (List<string> entry in block.tableContents)
-            {
-                this.tableContents.Add(new List<string>());
-                foreach (string item in entry) this.tableContents[i].Add(item);
-                i++;
-            }
             this.columnWidth = block.columnWidth;
             this.rowHeight = block.rowHeight;
 
@@ -159,8 +151,24 @@ namespace PdfPlus
             int i = 0;
             foreach (List<string> set in items)
             {
-                block.tableContents.Add(new List<string>());
-                foreach (string item in set) block.tableContents[i].Add(item);
+                block.data.Add(new DataSet(set));
+                i++;
+            }
+
+            block.font = Fonts.Table;
+
+            return block;
+        }
+
+        public static Block CreateTable(List<DataSet> datasets)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Table;
+
+            int i = 0;
+            foreach (DataSet d in datasets)
+            {
+                block.data.Add(new DataSet(d));
                 i++;
             }
 
@@ -222,7 +230,7 @@ namespace PdfPlus
             return block;
         }
 
-        public static Block CreateDrawing(Shape  shape)
+        public static Block CreateDrawing(Shape shape)
         {
             Block block = Block.CreateDrawing(new List<Shape> { shape });
 
@@ -244,7 +252,7 @@ namespace PdfPlus
         {
             get { return drawing; }
         }
-        
+
         public virtual double Width
         {
             get { return this.width; }
@@ -269,24 +277,19 @@ namespace PdfPlus
             set { this.rowHeight = value; }
         }
 
-        public virtual bool IsChartHorizontal
-        {
-            get { return ((this.chartType == ChartTypes.Bar) | (this.chartType == ChartTypes.BarStacked)); }
-        }
-
         #endregion
 
         #region methods
 
         public Md.Document Render(Md.Document document)
         {
-            
+
             Md.Paragraph txt;
             switch (this.blockType)
             {
                 case BlockTypes.LineBreak:
                     txt = document.LastSection.AddParagraph();
-                    for (int i =0;i<this.breakCount;i++) txt.AddLineBreak();
+                    for (int i = 0; i < this.breakCount; i++) txt.AddLineBreak();
                     break;
                 case BlockTypes.PageBreak:
                     for (int i = 0; i < this.breakCount; i++) document.LastSection.AddPageBreak();
@@ -310,10 +313,20 @@ namespace PdfPlus
                 case BlockTypes.Table:
                     #region table
                     Md.Tables.Table table = document.LastSection.AddTable();
-                    int colCount = tableContents.Count;
+                    int colCount = data.Count;
                     int rowCount = 0;
                     double columnWidth = this.columnWidth;
-                    if(columnWidth<0) columnWidth = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin)/colCount;
+                    if (columnWidth < 0)
+                    {
+                        if(document.Sections[0].PageSetup.Orientation == Md.Orientation.Landscape)
+                        {
+                            columnWidth = (document.Sections[0].PageSetup.PageHeight - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin) / colCount;
+                        }
+                        else
+                        {
+                            columnWidth = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin) / colCount;
+                        }
+                    }
 
                     table.TopPadding = 6;
                     table.BottomPadding = 6;
@@ -323,9 +336,9 @@ namespace PdfPlus
                     table.Format.Shading = shading;
 
                     //Columns
-                    for (int i = 0; i < tableContents.Count; i++)
+                    for (int i = 0; i < colCount; i++)
                     {
-                        rowCount = Math.Max(rowCount, tableContents[i].Count);
+                        rowCount = Math.Max(rowCount, data[i].Contents.Count);
                         Md.Tables.Column column = table.AddColumn();
                         column.Width = columnWidth;
                         column.Borders.Left.Visible = false;
@@ -385,18 +398,19 @@ namespace PdfPlus
                             table.Rows[i].Borders.Bottom.Width = this.graphic.Weight;
                         }
                     }
-
                     //Cells
                     List<List<Md.Paragraph>> contents = new List<List<Md.Paragraph>>();
                     for (int i = 0; i < colCount; i++)
                     {
+                        DataSet d = new DataSet(data[i]);
+                        if (!d.HasColors) d.SetColors(this.FillColor);
                         contents.Add(new List<Md.Paragraph>());
                         for (int j = 0; j < rowCount; j++)
                         {
                             Md.Tables.Cell cell = table.Rows[j].Cells[i];
-                            cell.Shading.Color = this.FillColor.ToMigraDoc();
+                            cell.Shading.Color = d.Colors[j].ToMigraDoc();
 
-                            txt = cell.AddParagraph(tableContents[i][j]);
+                            txt = cell.AddParagraph(d.Contents[j]);
                             txt.Format = this.font.ToMigraDocParagraphFormat(document.Styles["Normal"].ParagraphFormat.Clone());
 
                             contents[i].Add(txt);
@@ -414,9 +428,9 @@ namespace PdfPlus
                             double txtWidth = 0;
                             for (int j = 0; j < rowCount; j++)
                             {
-                                txtWidth = Math.Max(Math.Ceiling(txtWidth), Math.Ceiling(gfx.MeasureString(tableContents[i][j], this.font.ToPdf()).Width));
+                                txtWidth = Math.Max(Math.Ceiling(txtWidth), Math.Ceiling(gfx.MeasureString(data[i].Contents[j], this.font.ToPdf()).Width));
                             }
-                            table.Columns[i].Width = txtWidth+8;
+                            table.Columns[i].Width = txtWidth + 8;
                         }
                     }
 
@@ -453,7 +467,7 @@ namespace PdfPlus
                             contents[i][0].Format.Font.Bold = true;
                             contents[i][0].Format.Font.Size = contents[i][0].Format.Font.Size * 1.25;
                         }
-                        table.Rows[0].Borders.Bottom.Width = table.Rows[0].Borders.Bottom.Width*2;
+                        table.Rows[0].Borders.Bottom.Width = table.Rows[0].Borders.Bottom.Width * 2;
                     }
 
                     if (HasYAxis)
@@ -463,7 +477,7 @@ namespace PdfPlus
                             contents[0][i].Format.Font.Bold = true;
                             contents[0][i].Format.Font.Size = contents[0][i].Format.Font.Size * 1.25;
                         }
-                        table.Columns[0].Borders.Right.Width = table.Columns[0].Borders.Right.Width*2;
+                        table.Columns[0].Borders.Right.Width = table.Columns[0].Borders.Right.Width * 2;
                     }
                     #endregion
                     break;
@@ -482,7 +496,14 @@ namespace PdfPlus
 
                     if (this.Width <= 0)
                     {
-                        chart.Width = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin);
+                        if (document.Sections[0].PageSetup.Orientation == Md.Orientation.Landscape)
+                        {
+                            chart.Width = (document.Sections[0].PageSetup.PageHeight - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin);
+                        }
+                        else
+                        {
+                            chart.Width = (document.Sections[0].PageSetup.PageWidth - document.Sections[0].PageSetup.LeftMargin - document.Sections[0].PageSetup.RightMargin);
+                        }
                         if (this.chartType == ChartTypes.Pie) chart.Width = this.Width / 3.0;
                     }
                     else
@@ -492,7 +513,7 @@ namespace PdfPlus
 
                     if (this.Height <= 0)
                     {
-                        chart.Height = chart.Width/2.0;
+                        chart.Height = chart.Width / 2.0;
                         if (this.chartType == ChartTypes.Pie) chart.Height = chart.Width;
                     }
                     else
@@ -505,121 +526,130 @@ namespace PdfPlus
                     //Series
                     foreach (DataSet d in this.data)
                     {
-                        Md.Shapes.Charts.Series series = chart.SeriesCollection.AddSeries();
-
-                        series.Name = d.Title;
-                        series.MarkerStyle = Md.Shapes.Charts.MarkerStyle.None;
-                        series.Add(d.Values.ToArray());
-                        if(d.Graphic.HasColor)series.FillFormat.Color = d.Graphic.Color.ToMigraDoc();
-                        if (d.Graphic.HasStroke)
+                        if (d.IsNumeric)
                         {
-                            series.LineFormat.Width = d.Graphic.Weight;
-                            series.LineFormat.Color = d.Graphic.Stroke.ToMigraDoc();
-                        }
+                            Md.Shapes.Charts.Series series = chart.SeriesCollection.AddSeries();
 
-                    if ((int)this.chartType < 4)
-                    {
-                        if (d.HasColors)
+                            series.Name = d.Title;
+                            series.MarkerStyle = Md.Shapes.Charts.MarkerStyle.None;
+                            series.Add(d.Values.ToArray());
+                            if (d.Graphic.HasColor) series.FillFormat.Color = d.Graphic.Color.ToMigraDoc();
+                            if (d.Graphic.HasStroke)
                             {
-                                List< Md.Shapes.Charts.Point> elements = series.Elements.Cast<Md.Shapes.Charts.Point>().ToList();
-                                for (int i = 0; i < elements.Count; i++)
+                                series.LineFormat.Width = d.Graphic.Weight;
+                                series.LineFormat.Color = d.Graphic.Stroke.ToMigraDoc();
+                            }
+
+                            if ((int)this.chartType < 4)
                             {
-                                    elements[i].FillFormat.Color = d.Colors[i].ToMigraDoc();
+                                if (d.HasColors)
+                                {
+                                    List<Md.Shapes.Charts.Point> elements = series.Elements.Cast<Md.Shapes.Charts.Point>().ToList();
+                                    for (int i = 0; i < elements.Count; i++)
+                                    {
+                                        elements[i].FillFormat.Color = d.Colors[i].ToMigraDoc();
+                                    }
                                 }
+
+                            }
+
+                            if (d.LabelData)
+                            {
+                                series.HasDataLabel = true;
+
+                                series.DataLabel.Position = d.LabelAlignment.ToMigraDoc();
+
+                                series.DataLabel.Font = d.Font.ToMigraDoc();
+                                if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Md.Underline.Single;
+                            }
+                            else
+                            {
+                                series.HasDataLabel = false;
+                            }
                         }
 
-                    }
-
-                        if (d.LabelData)
-                        {
-                            series.HasDataLabel = true;
-
-                            series.DataLabel.Position = d.LabelAlignment.ToMigraDoc();
-
-                            series.DataLabel.Font = d.Font.ToMigraDoc();
-                            if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Md.Underline.Single;
-                        }
-                        else
-                        {
-                            series.HasDataLabel = false;
-                        }
-                    }
-
-                    //Axis
+                        //Axis
                         chart.XAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
-                    if (this.HasXAxis)
-                    {
                         chart.XAxis.TickLabels.Font = this.font.ToMigraDoc();
-
-                        chart.XAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
-
-                        chart.XAxis.Title.Caption = this.XAxis;
-                        chart.XAxis.Title.Font = this.font.ToMigraDoc();
-                        if(this.IsChartHorizontal) chart.XAxis.Title.Orientation = 90;
-
-                    }
-
-                    chart.XAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
-                    if (chart.XAxis.HasMajorGridlines)
-                    {
-                        if (this.graphic.HasStroke)
+                        if (this.HasXAxis)
                         {
-                            chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
-                            chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                            chart.XAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
+
+                            chart.XAxis.Title.Caption = this.XAxis;
+                            chart.XAxis.Title.Font = this.font.ToMigraDoc();
+                            if (!this.IsChartHorizontal) chart.XAxis.Title.Orientation = 90;
+
+                            if (this.graphic.HasStroke)
+                            {
+                                chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                                chart.XAxis.LineFormat.Width = this.graphic.Weight;
+                            }
                         }
-                    }
 
-                    if (this.HasYAxis)
-                    {
-                        chart.YAxis.TickLabels.Font = this.font.ToMigraDoc();
+                        chart.XAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+                        if ((int)this.chartType < 2) chart.XAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+                        if (chart.XAxis.HasMajorGridlines)
+                        {
+                            if (this.graphic.HasStroke)
+                            {
+                                chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                                chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                            }
+                        }
 
-                        chart.YAxis.Title.VerticalAlignment = Md.Tables.VerticalAlignment.Center;
-                        chart.YAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
-
-                        chart.YAxis.Title.Caption = this.YAxis;
-                        chart.YAxis.Title.Font = this.font.ToMigraDoc();
-                        if (!this.IsChartHorizontal) chart.YAxis.Title.Orientation = 90;
-
+                        //Axis Y
                         chart.YAxis.MajorTickMark = Md.Shapes.Charts.TickMarkType.None;
-                        chart.YAxis.HasMajorGridlines = true;
-                        if (this.graphic.HasStroke)
+                        chart.YAxis.TickLabels.Font = this.font.ToMigraDoc();
+                        chart.YAxis.TickLabels.Format = "#.####";
+                        if (this.HasYAxis)
                         {
-                            chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
-                            chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
-                        }
-                    }
+                            chart.YAxis.Title.VerticalAlignment = Md.Tables.VerticalAlignment.Center;
+                            chart.YAxis.Title.Alignment = Md.Shapes.Charts.HorizontalAlignment.Center;
 
-                    chart.YAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
-                    if (chart.YAxis.HasMajorGridlines)
-                    {
-                        if (this.graphic.HasStroke)
+                            chart.YAxis.Title.Caption = this.YAxis;
+                            chart.YAxis.Title.Font = this.font.ToMigraDoc();
+                            if (this.IsChartHorizontal) chart.YAxis.Title.Orientation = 90;
+
+                            if (this.graphic.HasStroke)
+                            {
+                                chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                                chart.YAxis.LineFormat.Width = this.graphic.Weight;
+                            }
+                        }
+
+                        chart.YAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+                        if ((int)this.chartType < 2) chart.YAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+                        if (chart.YAxis.HasMajorGridlines)
                         {
-                            chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
-                            chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                            if (this.graphic.HasStroke)
+                            {
+                                chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToMigraDoc();
+                                chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                            }
                         }
-                    }
 
-                    //Legend
-                    if (this.alignment != Alignment.None)
-                    {
-                        Md.Shapes.Charts.Legend legend = null;
-
-                        switch (this.alignment)
+                        //Legend
+                        if (this.alignment != Alignment.None)
                         {
-                            default:
-                                legend = chart.LeftArea.AddLegend();
-                                break;
-                            case Alignment.Right:
-                                legend = chart.RightArea.AddLegend();
-                                break;
-                            case Alignment.Bottom:
-                                legend = chart.BottomArea.AddLegend();
-                                break;
-                            case Alignment.Top:
-                                legend = chart.TopArea.AddLegend();
-                                break;
+                            Md.Shapes.Charts.Legend legend = null;
+
+                            switch (this.alignment)
+                            {
+                                default:
+                                    legend = chart.LeftArea.AddLegend();
+                                    break;
+                                case Alignment.Right:
+                                    legend = chart.RightArea.AddLegend();
+                                    break;
+                                case Alignment.Bottom:
+                                    legend = chart.BottomArea.AddLegend();
+                                    break;
+                                case Alignment.Top:
+                                    legend = chart.TopArea.AddLegend();
+                                    break;
+                            }
+                            legend.Format.Font = this.font.ToMigraDoc();
                         }
-                        legend.Format.Font = this.font.ToMigraDoc();
                     }
 
                     break;
@@ -641,7 +671,7 @@ namespace PdfPlus
                             img.LockAspectRatio = true;
                             img.Width = this.width;
                         }
-                        else if (this.height>0)
+                        else if (this.height > 0)
                         {
                             img.LockAspectRatio = true;
                             img.Height = this.height;
@@ -658,7 +688,7 @@ namespace PdfPlus
 
                     frame.Width = box.Diagonal.X;
                     frame.Height = box.Diagonal.Y;
-                    if ((this.width>0) & (this.height > 0))
+                    if ((this.width > 0) & (this.height > 0))
                     {
                         frame.Width = this.width;
                         frame.Height = this.height;
@@ -668,7 +698,7 @@ namespace PdfPlus
                         frame.Width = this.width;
                         frame.Height = box.Diagonal.Y * (this.Width / box.Diagonal.X);
                     }
-                    else if(this.height > 0)
+                    else if (this.height > 0)
                     {
                         frame.Width = box.Diagonal.X * (this.Height / box.Diagonal.Y);
                         frame.Height = this.height;

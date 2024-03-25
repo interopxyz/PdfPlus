@@ -13,10 +13,12 @@ namespace PdfPlus
         #region members
 
         protected List<double> values = new List<double>();
+        protected List<string> contents = new List<string>();
         protected List<Sd.Color> colors = new List<Sd.Color>();
         protected string title = string.Empty;
         protected bool hasTitle = false;
         protected bool hasGraphics = false;
+        protected bool isNumeric = false;
 
         public enum LabelAlignments { None, Above, End, Middle, Start};
         protected LabelAlignments labelAlignment = LabelAlignments.None;
@@ -31,13 +33,33 @@ namespace PdfPlus
             this.values = values;
             this.Graphic.Stroke = Sd.Color.Black;
             this.Graphic.Weight = 1;
+            this.isNumeric = true;
         }
+
+        public DataSet(List<string> contents) : base()
+        {
+            this.elementType = ElementTypes.Data;
+            this.contents = contents;
+
+            List<double> vals = new List<double>();
+            foreach (string text in contents)if (double.TryParse(text, out double val)) vals.Add(val);
+            if (contents.Count == vals.Count)
+            {
+                this.values = vals;
+                this.isNumeric = true;
+            }
+
+            this.Graphic.Stroke = Sd.Color.Black;
+            this.Graphic.Weight = 1;
+        }
+
         public DataSet(List<double> values, List<string> labels) : base()
         {
             this.elementType = ElementTypes.Data;
             this.values = values;
             this.Graphic.Stroke = Sd.Color.Black;
             this.Graphic.Weight = 1;
+            this.isNumeric = true;
         }
 
         public DataSet(DataSet dataSet) : base()
@@ -49,12 +71,24 @@ namespace PdfPlus
             this.Font = new Font(dataSet.Font);
             this.labelAlignment = dataSet.labelAlignment;
             foreach (double v in dataSet.values) this.values.Add(v);
+            foreach (string s in dataSet.contents) this.contents.Add(s);
             foreach (Sd.Color c in dataSet.colors) this.colors.Add(c);
+            this.isNumeric = dataSet.isNumeric;
         }
 
         #endregion
 
         #region properties
+
+        public virtual bool IsNumeric
+        {
+            get { return this.isNumeric; }
+        }
+
+        public virtual List<string> Contents
+        {
+            get { return this.contents; }
+        }
 
         public virtual List<double> Values
         {
@@ -110,7 +144,18 @@ namespace PdfPlus
 
         #region methods
 
+        public void SetColors(Sd.Color color)
+        {
+            this.colors = new List<Sd.Color>();
+            for (int i = 0; i < this.Contents.Count; i++) this.colors.Add(color);
+        }
 
+        public void SetColors(List<Sd.Color> colors)
+        {
+            int c = colors.Count;
+            this.colors = new List<Sd.Color>();
+            for (int i = 0; i < this.Contents.Count; i++) this.colors.Add(colors[i%c]);
+        }
 
         #endregion
 

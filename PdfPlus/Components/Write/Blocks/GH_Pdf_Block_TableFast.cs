@@ -1,21 +1,23 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
 using Sd = System.Drawing;
 
-namespace PdfPlus.Components.Write.Blocks
+namespace PdfPlus.Components
 {
     public class GH_Pdf_Block_Table : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Block_Table class.
+        /// Initializes a new instance of the GH_Pdf_Doc_Blk_Table class.
         /// </summary>
         public GH_Pdf_Block_Table()
-          : base("Table Block", "Tbl Blk",
-              "Create a table block list of DataSet objects",
+          : base("Fast Table Block", "Fast Tbl Blk",
+              "Create a table block from datatree text inputs",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -33,12 +35,12 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("DataSet", "Ds", "A list of DataSet objects", GH_ParamAccess.list);
+            pManager.AddTextParameter("Text Tree", "T", "A datatree of text values", GH_ParamAccess.tree);
             pManager.AddIntegerParameter("Border Style", "B", "Table border style", GH_ParamAccess.item, 0);
             pManager[1].Optional = true;
             pManager.AddIntegerParameter("Heading ", "H", "Table Heading formatting", GH_ParamAccess.item, 0);
             pManager[2].Optional = true;
-            pManager.AddIntegerParameter("Column Fitting", "F", "Table column width " + Environment.NewLine + "(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item, -1);
+            pManager.AddIntegerParameter("Column Fitting", "F", "Table column width "+Environment.NewLine+"(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item,-1);
             pManager[3].Optional = true;
             pManager.AddColourParameter("Alternating Color", "A", "Table alternating row color", GH_ParamAccess.item);
             pManager[4].Optional = true;
@@ -60,6 +62,7 @@ namespace PdfPlus.Components.Write.Blocks
             Param_Integer paramC = (Param_Integer)pManager[3];
             paramC.AddNamedValue("Fit Width", -1);
             paramC.AddNamedValue("Fit Content", 0);
+
         }
 
         /// <summary>
@@ -76,10 +79,38 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<DataSet> data = new List<DataSet>();
-            if (!DA.GetDataList(0, data)) return;
 
-            Block block = Block.CreateTable(data);
+            GH_Structure<GH_String> ghData = new GH_Structure<GH_String>();
+            if (!DA.GetDataTree(0, out ghData)) return;
+
+            Dictionary<int, List<List<string>>> dataSets = new Dictionary<int, List<List<string>>>();
+            List<List<string>> dataSet = new List<List<string>>();
+
+            dataSets.Add(0, new List<List<string>>());
+            int i = 0;
+            foreach (GH_Path path in ghData.Paths)
+            {
+                if (path.Length > 1)
+                {
+                    if (!dataSets.ContainsKey(path[0])) dataSets.Add(path[0], new List<List<string>>());
+                    dataSets[path[0]].Add(ghData.Branches[i].ToStringList());
+                }
+                else
+                {
+                    dataSets[0].Add(ghData.Branches[i].ToStringList());
+                }
+                i++;
+            }
+
+            int rc = this.RunCount - 1;
+            if (rc > (dataSets.Keys.Count - 1)) rc = dataSets.Keys.Count - 1;
+            foreach (List<string> data in dataSets[rc])
+            {
+                dataSet.Add(data);
+            }
+
+
+            Block block = Block.CreateTable(dataSet);
 
             int border = 0;
             DA.GetData(1, ref border);
@@ -150,7 +181,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Table2;
+                return Properties.Resources.Pdf_Block_Table;
             }
         }
 
@@ -159,7 +190,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("4614f54a-9978-4851-b2a1-ba52a911a29a"); }
+            get { return new Guid("621a662a-fefb-45ab-997d-efc8d4259ebc"); }
         }
     }
 }

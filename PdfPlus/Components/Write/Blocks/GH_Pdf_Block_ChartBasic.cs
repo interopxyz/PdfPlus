@@ -23,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.secondary; }
+            get { return GH_Exposure.tertiary; }
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("DataSet", "Ds", "Chart Data to visualize", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Type", "T", "The chart format to be displayed", GH_ParamAccess.item, 4);
+            pManager.AddIntegerParameter("Type", "T", "The chart format to be displayed", GH_ParamAccess.item, 0);
             pManager[1].Optional = true;
             pManager.AddTextParameter("X Axis", "X", "Optional X Axis title for the Graph", GH_ParamAccess.item);
             pManager[2].Optional = true;
@@ -44,10 +44,10 @@ namespace PdfPlus.Components
             pManager[5].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
-            paramA.AddNamedValue("Bar", 0);
-            paramA.AddNamedValue("BarStacked", 1);
-            paramA.AddNamedValue("Column", 2);
-            paramA.AddNamedValue("ColumnStacked", 3);
+            paramA.AddNamedValue("Column", 0);
+            paramA.AddNamedValue("ColumnStacked", 1);
+            paramA.AddNamedValue("Bar", 2);
+            paramA.AddNamedValue("BarStacked", 3);
             paramA.AddNamedValue("Line", 4);
             paramA.AddNamedValue("Area", 5);
 
