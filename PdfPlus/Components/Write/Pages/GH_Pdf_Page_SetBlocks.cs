@@ -44,6 +44,7 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -63,6 +64,8 @@ namespace PdfPlus.Components
 
             //this.PrevPageShapes(page);
             DA.SetData(0, page);
+            DA.SetDataList(1, page.RenderBlocksToShapes());
+
         }
 
         /// <summary>

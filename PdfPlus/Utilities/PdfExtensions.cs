@@ -921,6 +921,12 @@ namespace PdfPlus
             return new Rg.Rectangle3d(new Rg.Plane(new Rg.Point3d(input.X, input.Y, 0), Rg.Vector3d.ZAxis), input.Width, input.Height);
         }
 
+        public static Rg.Rectangle3d ToRectangle3d(this Mr.Area input, Rg.Plane frame)
+        {
+            frame.Origin = frame.PointAt(input.X, input.Y);
+            return new Rg.Rectangle3d(frame, input.Width, input.Height);
+        }
+
         #endregion
 
         #endregion

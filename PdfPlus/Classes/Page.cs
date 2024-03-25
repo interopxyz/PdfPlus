@@ -59,7 +59,7 @@ namespace PdfPlus
             this.graph = reference.graph;
         }
 
-        public Page(Page page)
+        public Page(Page page, bool copyBase = true)
         {
             if (page != null)
             {
@@ -69,7 +69,7 @@ namespace PdfPlus
                 this.Unit = page.Unit;
                 this.Frame = new Rg.Plane(page.Frame);
                 this.graph = page.graph;
-                this.baseObject = (Pf.PdfPage)page.baseObject.Clone();
+                if(copyBase)this.baseObject = (Pf.PdfPage)page.baseObject.Clone();
             }
         }
 
@@ -303,10 +303,66 @@ namespace PdfPlus
             return document;
         }
 
+        public List<Page> RenderBlocksToShapes()
+        {
+                List<Page> pages = new List<Page>();
+            if (this.blocks.Count > 0)
+            {
+
+
+                Md.Document doc = Document.DefaultDocument();
+                doc.Sections.AddSection();
+                doc = this.SetPage(doc);
+
+                List<Block> drawings = new List<Block>();
+                foreach (Block block in blocks)
+                {
+                    block.Render(doc);
+                    if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
+                }
+
+                Pf.PdfDocument document = new Pf.PdfDocument();
+                Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
+                pdfDocumentRenderer.Document = doc;
+                pdfDocumentRenderer.PdfDocument = document;
+
+                pdfDocumentRenderer.PrepareRenderPages();
+                int count = pdfDocumentRenderer.PageCount;
+
+                double spacing = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    pdfDocumentRenderer.RenderPages(i + 1, i + 1);
+                    Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i + 1);
+                    Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
+
+                    double pageWidth = pdfDocumentRenderer.PdfDocument.Pages[i].Width;
+                    double pageHeight = pdfDocumentRenderer.PdfDocument.Pages[i].Height;
+
+                    Page newPage = new Page(this,false);
+                    newPage.Frame.OriginY = spacing;
+                    spacing -= (pageHeight + 10);
+
+                    foreach (Mr.RenderInfo info in infos)
+                    {
+                        Rg.Rectangle3d gpRect = info.LayoutInfo.ContentArea.ToRectangle3d(newPage.Frame);
+                        newPage.AddShape(Shape.CreateGeometry(gpRect, new Graphic()));
+                    }
+
+                    pages.Add(newPage);
+                }
+
+            }
+
+            return pages;
+        }
+
         public Pf.PdfDocument RenderBlocks(Pf.PdfDocument document)
         {
             if (this.blocks.Count > 0)
             {
+                List<Page> pages = new List<Page>();
+
                 var clone = (Pf.PdfPage)this.baseObject.Clone();
 
                 Md.Document doc = Document.DefaultDocument();
@@ -328,11 +384,21 @@ namespace PdfPlus
                 pdfDocumentRenderer.PrepareRenderPages();
                 int count = pdfDocumentRenderer.PageCount;
                 int j = 0;
+
+                double spacing = 0;
                 for (int i = 0; i < count; i++)
                 {
                     pdfDocumentRenderer.RenderPages(i+1, i+1);
                     Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i+1);
                     Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
+
+                    double pageWidth = pdfDocumentRenderer.PdfDocument.Pages[i].Width;
+                    double pageHeight = pdfDocumentRenderer.PdfDocument.Pages[i].Height;
+
+                    spacing += pageHeight + 10;
+
+                    Page newPage = new Page(this);
+                    newPage.Frame.OriginY = spacing;
 
                     foreach (Mr.RenderInfo info in infos)
                     {
@@ -340,15 +406,20 @@ namespace PdfPlus
                         {
                             Rg.Rectangle3d r = info.LayoutInfo.ContentArea.ToRectangle3d();
                             drawings[j].Drawing.Render(graph, r);
-                            //graph.DrawRectangle(new Pd.XPen(Pd.XColor.FromArgb(255, 0, 0),3), new Pd.XRect(r.Plane.OriginX, r.Plane.OriginY, r.Width, r.Height));
                             j++;
                         }
 
+                        Rg.Rectangle3d gpRect = info.LayoutInfo.ContentArea.ToRectangle3d();
+                        newPage.AddShape(Shape.CreateGeometry(gpRect,new Graphic()));
+                        //graph.DrawRectangle(new Pd.XPen(Pd.XColor.FromArgb(255, 0, 0),3), new Pd.XRect(rect.Plane.OriginX, rect.Plane.OriginY, rect.Width, rect.Height));
                     }
+
+                    pages.Add(newPage);
                 }
 
                 return pdfDocumentRenderer.PdfDocument;
             }
+
                 return document;
         }
 
@@ -372,6 +443,15 @@ namespace PdfPlus
             this.shapes.Add(shape);
 
             return isValid;
+        }
+
+        public bool AddShape(Shape shape)
+        {
+            Shape shp = new Shape(shape);
+            shp.AlignContent(this, false);
+            this.shapes.Add(shp);
+
+            return true;
         }
 
         public bool AddBlock(IGH_Goo goo)
