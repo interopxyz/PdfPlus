@@ -13,7 +13,6 @@ using Mr = MigraDoc.Rendering;
 
 using Rg = Rhino.Geometry;
 using Grasshopper.Kernel.Types;
-using System.Drawing;
 
 namespace PdfPlus
 {
@@ -322,7 +321,7 @@ namespace PdfPlus
                 List<Block> drawings = new List<Block>();
                 foreach (Block block in blocks)
                 {
-                    block.Render(doc);
+                    block.RenderToDocument(doc);
                     if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
                 }
 
@@ -374,10 +373,15 @@ namespace PdfPlus
                 doc = this.SetPage(doc);
 
                 List<Block> drawings = new List<Block>();
+                List<Block> subDrawings = new List<Block>();
                 foreach (Block block in blocks)
                 {
-                    block.Render(doc);
+                    block.RenderToDocument(doc);
                     if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
+                    if(block.BlockType == Block.BlockTypes.Dock)
+                    {
+                        foreach (Block blk in block.Blocks) if (blk.BlockType == Block.BlockTypes.Drawing) subDrawings.Add(blk);
+                    }
                 }
 
                 Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
@@ -387,22 +391,61 @@ namespace PdfPlus
                 pdfDocumentRenderer.PrepareRenderPages();
                 int count = pdfDocumentRenderer.PageCount;
                 int j = 0;
-
+                int k = 0;
                 for (int i = 0; i < count; i++)
                 {
                     pdfDocumentRenderer.RenderPages(i + 1, i + 1);
                     Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i + 1);
                     Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
 
+                    int t = 0;
                     foreach (Mr.RenderInfo info in infos)
                     {
+                        Rg.Rectangle3d r = info.LayoutInfo.ContentArea.ToRectangle3d();
                         if (info.DocumentObject.Tag == "Drawing")
                         {
-                            Rg.Rectangle3d r = info.LayoutInfo.ContentArea.ToRectangle3d();
                             drawings[j].Drawing.Render(graph, r);
                             j++;
                         }
+
+                        if (info.DocumentObject.Tag == "Dock")
+                        {
+                            Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
+                            for (int c = 0; c < table.Columns.Count; c++)
+                            {
+                                if (table.Rows[0].Cells[0].Elements[0].Tag == "Drawing")
+                                {
+                                    Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)table.Rows[0].Cells[0].Elements[0];
+                                    Rg.Plane p = Rg.Plane.WorldXY;
+                                    p.OriginX = frame.Left.Position;
+                                    p.OriginY = frame.Top.Position;
+                                    Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, frame.Width, frame.Height);
+                                    subDrawings[k].Drawing.Render(graph, r2);
+                                    k++;
+                                }
+                            }
+                        }
+
+                        t += 1;
                     }
+
+                    //foreach (Mr.TableRenderInfo info in infos)
+                    //{
+                    //    if (info.DocumentObject.Tag == "Dock")
+                    //    {
+                    //        Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
+                    //        for (int c = 0; c < table.Columns.Count; c++)
+                    //        {
+                    //            if (table.Rows[0].Cells[0].Elements[0].Tag == "Drawing")
+                    //            {
+                    //                Rg.Rectangle3d r2 = info.LayoutInfo.ContentArea.ToRectangle3d();
+                    //                //subDrawings[k].Drawing.Render(graph, r2);
+                    //                k++;
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
                     graph.Dispose();
                 }
 

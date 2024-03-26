@@ -91,6 +91,7 @@
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartBasic.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Dock.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Drawing.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_EditSize.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
@@ -250,6 +251,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Document-Create.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Horizontal.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

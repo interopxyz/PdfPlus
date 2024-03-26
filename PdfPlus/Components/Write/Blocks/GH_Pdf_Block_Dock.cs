@@ -1,5 +1,4 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
 using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
@@ -7,14 +6,14 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Block_Drawing : GH_Component
+    public class GH_Pdf_Block_Dock : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_BLock_Drawing class.
+        /// Initializes a new instance of the GH_Pdf_Block_Dock class.
         /// </summary>
-        public GH_Pdf_Block_Drawing()
-          : base("Drawing Block", "Drw Blk",
-              "Create a drawing block",
+        public GH_Pdf_Block_Dock()
+          : base("Dock Block", "Dock Blk",
+              "Place a list of Blocks aligned horizontally on the page."+Environment.NewLine+"Compatible with Text, List, Chart, Drawing, and Image Blocks",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -32,13 +31,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Column Fitting", "F", "Table column width " + Environment.NewLine + "(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item, -1);
-            pManager[1].Optional = true;
-
-            Param_Integer paramC = (Param_Integer)pManager[1];
-            paramC.AddNamedValue("Fit Width", -1);
-            paramC.AddNamedValue("Fit Content", 0);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -55,22 +48,23 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(0, geometry)) return;
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if (!DA.GetDataList(0, goos)) return;
 
-            List<Shape> shapes = new List<Shape>();
-            foreach (IGH_Goo goo in geometry)
+            List<Block> blocks = new List<Block>();
+            foreach (IGH_Goo goo in goos)
             {
-                Shape shape = null;
-                if (goo.TryGetShape(ref shape)) shapes.Add(shape); 
+                Block block = null;
+                if (goo.TryGetBlock(ref block)) blocks.Add(block);
             }
 
-            Block block = Block.CreateDrawing(shapes);
+            if (blocks.Count > 0)
+            {
+                Block output = Block.CreateDock(blocks);
 
-            int width = -1;
-            if (DA.GetData(1, ref width)) block.Width = width;
+                DA.SetData(0, output);
+            }
 
-            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -82,7 +76,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Draw;
+                return Properties.Resources.Pdf_Block_Horizontal;
             }
         }
 
@@ -91,7 +85,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("a41fef5d-8f53-4866-a9ad-5dbf4db5cd64"); }
+            get { return new Guid("1e1aa4a1-326a-4c1f-b524-64930f49a4af"); }
         }
     }
 }
