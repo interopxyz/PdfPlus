@@ -61,10 +61,12 @@ namespace PdfPlus
 
             Rg.BoundingBox box = this.BoundingBox;
 
-            double factor = 1;
-            if (box.Diagonal.X > 0) factor = Math.Min(factor, rectangle.Width / box.Diagonal.X);
-            if (box.Diagonal.Y > 0) factor = Math.Min(factor, rectangle.Height / box.Diagonal.Y );
+            double factor = 0;
 
+            //if (box.Diagonal.X > 0) factor = Math.Min(factor, rectangle.Width / box.Diagonal.X);
+            if ((box.Diagonal.Y > 0)&(box.Diagonal.X > 0)) factor = Math.Min(rectangle.Width / box.Diagonal.X, rectangle.Height / box.Diagonal.Y );
+
+            if (factor == 0) factor = 1;
             Rg.Plane plane = Rg.Plane.WorldZX;
             plane.Origin = box.Center;
             Rg.Transform mirror = Rg.Transform.Mirror(plane);

@@ -10,13 +10,13 @@ using Grasshopper.Kernel.Parameters;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_Add : GH_Pdf__Base
+    public class GH_Pdf_Doc_Create : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the Test class.
         /// </summary>
-        public GH_Pdf_Doc_Add()
-          : base("Add Document", "Doc",
+        public GH_Pdf_Doc_Create()
+          : base("Create Document", "Doc",
               "Create a new PDF Document",
               Constants.ShortName, Constants.Documents)
         {
@@ -81,7 +81,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Add;
+                return Properties.Resources.Pdf_Document_Create;
             }
         }
 

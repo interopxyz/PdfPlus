@@ -274,6 +274,21 @@ namespace PdfPlus
             get { return new Rg.Point3d(this.location); }
         }
 
+        public virtual Rg.Rectangle3d PreviewBoundary
+        {
+            get
+            {
+                return new Rg.Rectangle3d(this.boundary.Plane, this.boundary.X, this.boundary.Y);
+            }
+        }
+
+        public virtual Rg.Polyline PreviewPolyline
+        {
+            get {
+                return this.boundary.ToNurbsCurve().Points.ControlPolygon(); 
+            }
+        }
+
         public virtual Rg.Rectangle3d Boundary
         {
             get { return new Rg.Rectangle3d(this.boundary.Plane,this.boundary.Width,this.boundary.Height) ; }
@@ -342,6 +357,11 @@ namespace PdfPlus
             {
                 this.data.Add(new DataSet(d));
             }
+        }
+
+        public void SetData(DataSet data)
+        {
+                this.data.Add(new DataSet(data));
         }
 
         #endregion

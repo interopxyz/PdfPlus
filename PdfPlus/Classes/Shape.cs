@@ -709,7 +709,6 @@ namespace PdfPlus
 
         protected Pd.XGraphics RenderChartObject(Pd.XGraphics graph)
         {
-
             Pc.Chart chart = CombinationChart();
 
             if (this.alignment != Alignment.None)
@@ -973,14 +972,16 @@ namespace PdfPlus
                     pieseries.MarkerStyle = Pc.MarkerStyle.Circle;
                     pieseries.MarkerSize = dt.Graphic.Weight * 2;
 
-                    pieseries.Add(dt.Values.ToArray());
-                    pieseries.HasDataLabel = true;
+                    pieseries.HasDataLabel = dt.LabelData;
+                    if (pieseries.HasDataLabel) { 
                     pieseries.DataLabel.Font.Color = dt.Font.Color.ToPdf();
                     pieseries.DataLabel.Font.Name = dt.Font.Family;
                     pieseries.DataLabel.Font.Size = dt.Font.Size;
                     pieseries.DataLabel.Font.Bold = dt.Font.IsBold;
                     pieseries.DataLabel.Font.Italic = dt.Font.IsItalic;
-                    if (dt.Font.IsUnderlined) pieseries.DataLabel.Font.Underline = Pc.Underline.Single;
+                        pieseries.DataLabel.Position = dt.LabelAlignment.ToPdf();
+                        if (dt.Font.IsUnderlined) pieseries.DataLabel.Font.Underline = Pc.Underline.Single;
+                    }
 
                     if (dt.Graphic.HasColor)
                     {

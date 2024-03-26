@@ -85,6 +85,7 @@ namespace PdfPlus.Components
         {
             foreach (Page page in doc.Pages)
             {
+                foreach(Page subPage in page.RenderBlocksToPages())this.PrevPageShapes(subPage);
                 prev_pages.Add(new Page(page));
                 prev_shapes.AddRange(page.Shapes);
             }
@@ -147,7 +148,7 @@ namespace PdfPlus.Components
                         if (shape.IsStrikeout) args.Display.DrawLine(new Line((corners[0] + corners[3]) / 2.0, (corners[1] + corners[2]) / 2.0), fontColor);
                         break;
                     case Shape.ShapeType.TextBox:
-                        Point3d[] c = shape.Boundary.ToNurbsCurve().Points.ControlPolygon().ToArray();
+                        Point3d[] c = shape.PreviewPolyline.ToArray();
                         plane.Origin = c[0]+new Vector3d(0,-4,0);
                         args.Display.Draw3dText("Preview Purposes Only", activeColor, plane, messageSize, messageFont);
                         plane.Origin = c[3] - new Vector3d(0, shape.FontSize * factor * 1.5, 0);
@@ -163,13 +164,13 @@ namespace PdfPlus.Components
                             plane.Origin = plane.Origin + new Vector3d(0, -shape.FontSize * factor * 1.8, 0);
                         }
 
-                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), activeColor, false);
+                        args.Display.DrawDottedPolyline(shape.PreviewPolyline, activeColor, false);
                         break;
 
                     case Shape.ShapeType.ChartObj:
 
-                        plane.Origin = shape.Boundary.Corner(0);
-                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), fillColor,false);
+                        plane.Origin = shape.PreviewPolyline.BoundingBox.Min;
+                        args.Display.DrawDottedPolyline(shape.PreviewPolyline, fillColor,false);
                         args.Display.Draw3dText("This preview does not represent actual chart appearance", activeColor, plane, messageSize, messageFont);
                         List<Curve> crvs = shape.RenderChart(out List<Color> clrs);
                         if (Attributes.Selected)
@@ -187,7 +188,7 @@ namespace PdfPlus.Components
 
                         if (Attributes.Selected)
                         {
-                            args.Display.DrawMeshShaded(RectToMesh(shape.Boundary), mat);
+                            args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary), mat);
                         }
                         else
                         {
@@ -201,19 +202,19 @@ namespace PdfPlus.Components
                                 material.EmissionColor = Color.Black;
                                 material.Reflectivity = 0.0;
                                 material.ReflectionGlossiness = 0.0;
-                                args.Display.DrawMeshShaded(RectToMesh(shape.Boundary), new Rhino.Display.DisplayMaterial(material));
+                                args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary), new Rhino.Display.DisplayMaterial(material));
                             }
                             else
                             {
-                                args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.Boundary, shape.Image, 2));
+                                args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.PreviewBoundary, shape.Image, 2));
                             }
                         }
                         break;
                     case Shape.ShapeType.LinkObj:
-                        Curve[] linkCurves = new Curve[] { shape.Boundary.ToNurbsCurve() };
+                        Curve[] linkCurves = new Curve[] { shape.PreviewBoundary.ToNurbsCurve() };
                         Hatch[] linkHatches = Hatch.Create(linkCurves, 0, 0, 1, mTol);
                         foreach (Hatch hatch in linkHatches) args.Display.DrawHatch(hatch, Color.FromArgb(30,activeColor), shape.FillColor);
-                        args.Display.DrawDottedPolyline(shape.Boundary.ToNurbsCurve().Points.ControlPolygon(), strokeColor,false);
+                        args.Display.DrawDottedPolyline(shape.PreviewPolyline, strokeColor,false);
                         break;
                     case Shape.ShapeType.Arc:
                         args.Display.DrawCurve(shape.Bezier, strokeColor, (int)shape.StrokeWeight);

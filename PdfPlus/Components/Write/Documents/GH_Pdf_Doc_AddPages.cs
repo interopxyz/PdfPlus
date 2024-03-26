@@ -1,20 +1,19 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Documents
 {
-    public class GH_Pdf_Block_ChartPie : GH_Component
+    public class GH_Pdf_Doc_AddPages : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_ChartPie class.
+        /// Initializes a new instance of the GH_Pdf_Doc_AddPages class.
         /// </summary>
-        public GH_Pdf_Block_ChartPie()
-          : base("Pie Chart Block", "Pie Blk",
-              "Create a pie chart block",
-              Constants.ShortName, Constants.Blocks)
+        public GH_Pdf_Doc_AddPages()
+          : base("Add Pages", "Add Pgs",
+              "Add Pages to a PDF Document",
+              Constants.ShortName, Constants.Documents)
         {
         }
 
@@ -23,7 +22,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -31,15 +30,9 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("DataSet", "Ds", "A single Chart Data Set to visualize", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
-            pManager[1].Optional = true;
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter("Pages", "Pg", "Pages to add to the document", GH_ParamAccess.list);
 
-            Param_Integer paramC = (Param_Integer)pManager[1];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
-            {
-                paramC.AddNamedValue(value.ToString(), (int)value);
-            }
         }
 
         /// <summary>
@@ -47,7 +40,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -56,15 +49,17 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            DataSet data =null;
-            if (!DA.GetData(0, ref data)) return;
+            Document document = new Document();
+            if (!DA.GetData(0, ref document)) return;
+            document = new Document(document);
 
-            Block block = Block.CreateChart(data, Element.ChartTypes.Pie);
+            List<Page> pages = new List<Page>();
+            if (!DA.GetDataList(1, pages)) return;
 
-            int alignment = 0;
-            if (DA.GetData(1, ref alignment)) block.Alignment = (Alignment)alignment;
+            document.AddPages(pages);
 
-            DA.SetData(0, block);
+            PrevDocumentShapes(document);
+            DA.SetData(0, document);
         }
 
         /// <summary>
@@ -76,7 +71,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Chart_Pie;
+                return Properties.Resources.Pdf_Document_Add;
             }
         }
 
@@ -85,7 +80,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("f959474e-0a17-44d8-9ae3-dd921e5a94db"); }
+            get { return new Guid("c851d2f0-6304-46ea-89d7-b649b7d27594"); }
         }
     }
 }

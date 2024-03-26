@@ -105,7 +105,7 @@ namespace PdfPlus
             get 
             {
                 List<Sd.Color> output = colors;
-                output.AddRange(Enumerable.Repeat(Sd.Color.Black,this.values.Count-colors.Count));
+                output.AddRange(Enumerable.Repeat(Sd.Color.Black,this.contents.Count-colors.Count));
                 return output; 
             }
             set

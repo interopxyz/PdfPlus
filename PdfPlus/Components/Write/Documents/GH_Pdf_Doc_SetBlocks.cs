@@ -8,12 +8,12 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_SetBlocks : GH_Component
+    public class GH_Pdf_Doc_SetBlocks : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddBlocks class.
         /// </summary>
-        public GH_Pdf_Page_SetBlocks()
+        public GH_Pdf_Doc_SetBlocks()
           : base("Set Blocks", "Set Blk",
               "Sequentially place a list of Blocks to PDF Pages.",
               Constants.ShortName, Constants.Blocks)
@@ -43,8 +43,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -62,9 +61,9 @@ namespace PdfPlus.Components
 
             foreach (IGH_Goo goos in geometry) page.AddBlock(goos);
 
-            //this.PrevPageShapes(page);
-            DA.SetData(0, page);
-            DA.SetDataList(1, page.RenderBlocksToShapes());
+            Document document = new Document(page);
+            DA.SetData(0, document);
+            foreach(Page pg in page.RenderBlocksToPages()) this.PrevPageShapes(pg);
 
         }
 

@@ -98,6 +98,7 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_PageBreak.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Table.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_AddPages.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
@@ -111,11 +112,11 @@
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Font.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Graphic.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartPie.cs" />
-    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Add.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Create.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_TableFast.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Add.cs" />
-    <Compile Include="Components\Write\Pages\GH_Pdf_Page_SetBlocks.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_SetBlocks.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_SetShapes.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddImperial.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddMetric.cs" />
@@ -177,9 +178,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Page-Margins.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Set_Blocks.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Page-Set_Shapes.png" />
@@ -246,6 +244,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Block-Table2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Set_Blocks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Create.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
