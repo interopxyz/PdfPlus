@@ -332,7 +332,7 @@ namespace PdfPlus
 
         #region methods
 
-        public List<Rg.Curve> RenderChart(out List<Sd.Color> colors)
+        public List<Rg.Curve> RenderPreviewChart(out List<Sd.Color> colors)
         {
             List<Rg.Curve> output = new List<Rg.Curve>();
             List<Sd.Color> clrs = new List<Sd.Color>();
@@ -356,17 +356,27 @@ namespace PdfPlus
                 {
                     case ChartTypes.Pie:
                         plane.Origin = center;
-
+                        plane.Rotate(Math.PI / 2, Rg.Vector3d.ZAxis);
                         Rg.Circle circle = new Rg.Circle(plane, radius);
-                        output.Add(circle.ToNurbsCurve());
+                        Rg.NurbsCurve circ = circle.ToNurbsCurve();
+                        circ.Reverse();
+                        circ.Domain = new Rg.Interval(0, 1);
+                        output.Add(circ);
                         clrs.Add(Sd.Color.Black);
 
                         List<double> vals = this.data[0].Values.ReMapStack();
 
                         foreach (double t in vals)
                         {
-                            output.Add(new Rg.Line(center, circle.PointAt(t)).ToNurbsCurve());
+                            output.Add(new Rg.Line(center, circ.PointAt(t)).ToNurbsCurve());
+                            if (data[0].HasColors)
+                            {
                             clrs.Add(data[0].Colors[s]);
+                            }
+                            else
+                            {
+                                clrs.Add(data[0].Graphic.Color);
+                            }
                             s++;
                         }
 
@@ -425,7 +435,14 @@ namespace PdfPlus
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(x, t * (radius * 2 - 1) + 1, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(space * 0.9, 0, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
-                                clrs.Add(ds.Colors[(int)i]);
+                                if (ds.HasColors)
+                                {
+                                    clrs.Add(ds.Colors[s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(ds.Graphic.Color);
+                                }
                                 i++;
                             }
                             s++;
@@ -446,7 +463,14 @@ namespace PdfPlus
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(t * (radius * 2 - 1) + 1, y, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(0, space * 0.9, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
-                                clrs.Add(ds.Colors[(int)i]);
+                                if (ds.HasColors)
+                                {
+                                    clrs.Add(ds.Colors[s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(ds.Graphic.Color);
+                                }
                                 i++;
                             }
                             s++;
@@ -466,7 +490,14 @@ namespace PdfPlus
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(barVals[i + 1] * (radius * 2 - 1) + 1, y, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(0, w * 0.9, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
-                                clrs.Add(this.data[i].Colors[(int)s]);
+                                if (this.data[i].HasColors)
+                                {
+                                    clrs.Add(this.data[i].Colors[(int)s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(this.data[i].Graphic.Color);
+                                }
                             }
                             s++;
                         }
@@ -485,7 +516,13 @@ namespace PdfPlus
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(x, barVals[i + 1] * (radius * 2 - 1) + 1, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(w * 0.9, 0, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
+                                if (this.data[i].HasColors) { 
                                 clrs.Add(this.data[i].Colors[(int)s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(this.data[i].Graphic.Color);
+                                }
                             }
                             s++;
                         }
@@ -983,7 +1020,7 @@ namespace PdfPlus
                         if (dt.Font.IsUnderlined) pieseries.DataLabel.Font.Underline = Pc.Underline.Single;
                     }
 
-                    if (dt.Graphic.HasColor)
+                    if (dt.HasColors)
                     {
                         if (dt.Colors.Count > 0)
                         {
@@ -992,14 +1029,13 @@ namespace PdfPlus
                                 pieseries.Elements[p].FillFormat.Color = dt.Colors[p % dt.Colors.Count].ToPdf();
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        for (int p = 0; p < pieseries.Elements.Count; p++)
                         {
-                            for (int p = 0; p < pieseries.Elements.Count; p++)
-                            {
-                                pieseries.Elements[p].FillFormat.Color = dt.Graphic.Color.ToPdf();
-                            }
+                            pieseries.Elements[p].FillFormat.Color = dt.Graphic.Color.ToPdf();
                         }
-
                     }
                     break;
             }

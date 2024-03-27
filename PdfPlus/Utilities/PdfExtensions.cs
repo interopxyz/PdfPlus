@@ -593,6 +593,8 @@ namespace PdfPlus
 
         public static List<double> ReMapStack(this List<double> input)
         {
+            double total = 0;
+            foreach (double val in input) total += val;
             double min = input.Min();
             double max = input.Max();
             List<double> output = new List<double>();
@@ -600,7 +602,7 @@ namespace PdfPlus
             double t = 0;
             foreach (double val in input)
             {
-                t += (val - min) / (max - min);
+                t += val / total;
                 output.Add(t);
             }
             return output;

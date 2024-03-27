@@ -764,12 +764,12 @@ namespace PdfPlus
 
             frame.Width = box.Diagonal.X;
             frame.Height = box.Diagonal.Y;
-            if(this.width == -1)
+            if((this.width < 0)&(this.height <=0))
             {
                 frame.Width = width;
                 frame.Height = (box.Diagonal.Y / box.Diagonal.X) * width;
             }
-            else  if ((this.width > 0) & (this.height > 0))
+            else if ((this.width > 0) & (this.height > 0))
             {
                 frame.Width = this.width;
                 frame.Height = this.height;
@@ -797,7 +797,6 @@ namespace PdfPlus
 
                 int columns = this.blocks.Count;
                 double columnWidth = width / columns;
-
                 //Columns
                 for (int i = 0; i < columns; i++)
                 {
@@ -812,7 +811,6 @@ namespace PdfPlus
                 {
                     Block blk = this.blocks[i];
                     Md.Tables.Cell cell = dock.Rows[0].Cells[i];
-                    cell.Format.Shading.Color = Md.Colors.Red;
                     switch (blk.blockType)
                     {
                         case BlockTypes.Text:

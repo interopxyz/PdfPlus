@@ -172,7 +172,7 @@ namespace PdfPlus.Components
                         plane.Origin = shape.PreviewPolyline.BoundingBox.Min;
                         args.Display.DrawDottedPolyline(shape.PreviewPolyline, fillColor,false);
                         args.Display.Draw3dText("This preview does not represent actual chart appearance", activeColor, plane, messageSize, messageFont);
-                        List<Curve> crvs = shape.RenderChart(out List<Color> clrs);
+                        List<Curve> crvs = shape.RenderPreviewChart(out List<Color> clrs);
                         if (Attributes.Selected)
                         {
                             for (int i = 0; i < crvs.Count; i++) args.Display.DrawCurve(crvs[i], activeColor, 1);

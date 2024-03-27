@@ -402,6 +402,7 @@ namespace PdfPlus
                     foreach (Mr.RenderInfo info in infos)
                     {
                         Rg.Rectangle3d r = info.LayoutInfo.ContentArea.ToRectangle3d();
+                        Rg.Plane p = r.Plane;
                         if (info.DocumentObject.Tag == "Drawing")
                         {
                             drawings[j].Drawing.Render(graph, r);
@@ -411,15 +412,18 @@ namespace PdfPlus
                         if (info.DocumentObject.Tag == "Dock")
                         {
                             Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
+                            
+                            //p.OriginY+=table.Rows[0].Height / 2.0;
                             for (int c = 0; c < table.Columns.Count; c++)
                             {
-                                if (table.Rows[0].Cells[0].Elements[0].Tag == "Drawing")
+                                Mr.TableRenderInfo tinfo = (Mr.TableRenderInfo)info;
+                                Md.Tables.Cell cell = table.Rows[0].Cells[0];
+                                if (cell.Elements[0].Tag == "Drawing")
                                 {
                                     Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)table.Rows[0].Cells[0].Elements[0];
-                                    Rg.Plane p = Rg.Plane.WorldXY;
-                                    p.OriginX = frame.Left.Position;
-                                    p.OriginY = frame.Top.Position;
-                                    Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, frame.Width, frame.Height);
+                                    p.OriginX += table.Columns[c].Width / 2.0-frame.Width/2.0;
+                                    Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, new Rg.Interval(0,frame.Width), new Rg.Interval( 0,frame.Height));
+                                    p.OriginX += table.Columns[c].Width/2.0+frame.Width/2.0;
                                     subDrawings[k].Drawing.Render(graph, r2);
                                     k++;
                                 }
