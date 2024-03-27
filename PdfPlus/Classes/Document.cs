@@ -4,15 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sd = System.Drawing;
 using GH_IO.Serialization;
 using Grasshopper.Kernel.Types;
 
 using pdf = PdfSharp.Pdf;
 
+using Md = MigraDoc.DocumentObjectModel;
+
 namespace PdfPlus
 {
     public class Document : IGH_Goo
     {
+
         #region members
 
         public PageLayouts PageLayout = PageLayouts.Single;
@@ -25,6 +29,7 @@ namespace PdfPlus
 
         public Document()
         {
+
         }
 
         public Document(Document document)
@@ -32,14 +37,14 @@ namespace PdfPlus
             CopyFrom(document);
         }
 
-        public Document(List<Page> pages)
-        {
-            this.AddPages(pages);
-        }
-
         public Document(Page page)
         {
             this.AddPages(page);
+        }
+
+        public Document(List<Page> pages)
+        {
+            this.AddPages(pages);
         }
 
         #endregion
@@ -58,11 +63,191 @@ namespace PdfPlus
 
         #region methods
 
+        public static Md.Document DefaultDocument()
+        {
+            Md.Document doc = new Md.Document();
+            doc = Document.SetDefaultStyles(doc);
+            return doc;
+        }
+
+        public static Md.Document SetDefaultStyles(Md.Document doc)
+        {
+            Font font = Fonts.Normal;
+            Md.Style style = doc.Styles[font.Name];
+
+            #region Normal
+
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+
+            #endregion
+
+            #region Title
+
+            font = Fonts.Title;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceAfter = 3;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Subtitle
+
+            font = Fonts.Subtitle;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceAfter = 16;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Heading1
+
+            font = Fonts.Heading1;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 20;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Heading2
+
+            font = Fonts.Heading2;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 18;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Heading3
+
+            font = Fonts.Heading3;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 16;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Heading4
+
+            font = Fonts.Heading4;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 14;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Heading5
+
+            font = Fonts.Heading5;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 12;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
+
+            #endregion
+
+            #region Heading6
+
+            font = Fonts.Heading6;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 12;
+            style.ParagraphFormat.SpaceAfter = 4;
+            style.ParagraphFormat.KeepWithNext = true;
+            style.ParagraphFormat.Font.Italic = true;
+
+            #endregion
+
+            #region Quote
+
+            font = Fonts.Quote;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 12;
+            style.ParagraphFormat.SpaceAfter = 12;
+            style.ParagraphFormat.LeftIndent = 18;
+            style.ParagraphFormat.Borders.Left.Width = new Md.Unit(1, Md.UnitType.Point);
+            style.ParagraphFormat.Borders.Left.Color = Sd.Color.LightGray.ToMigraDoc();
+            style.ParagraphFormat.Borders.DistanceFromLeft = new Md.Unit(3, Md.UnitType.Point);
+
+            #endregion
+
+            #region Footnote
+
+            font = Fonts.Footnote;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceBefore = 6;
+            style.ParagraphFormat.SpaceAfter = 6;
+            style.ParagraphFormat.LeftIndent = 12;
+            style.ParagraphFormat.RightIndent = 12;
+            style.ParagraphFormat.Font.Italic = true;
+
+            #endregion
+
+            #region Caption
+
+            font = Fonts.Caption;
+            style = doc.Styles.AddStyle(font.Name, "Normal");
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+            style.ParagraphFormat.SpaceAfter = 12;
+            style.ParagraphFormat.LeftIndent = 12;
+            style.ParagraphFormat.RightIndent = 12;
+
+            #endregion
+
+            #region List
+
+            font = Fonts.List;
+            style = doc.Styles[font.Name];
+            style.Font.Name = font.Family;
+            style.Font.Size = font.Size;
+            style.Font.Color = font.Color.ToMigraDoc();
+
+            #endregion
+
+            return doc;
+        }
+
         public void Save(string filepath)
         {
             if (PdfPlusEnvironment.FileIoBlocked)
                 return;
-            var doc = Bake();
+            pdf.PdfDocument doc = Bake();
             doc.Save(filepath);
         }
 
@@ -88,15 +273,15 @@ namespace PdfPlus
 
         protected pdf.PdfDocument Bake()
         {
-            var pdf = new pdf.PdfDocument();
-            pdf.PageLayout = this.PageLayout.ToPdf();
+            pdf.PdfDocument doc = new pdf.PdfDocument();
+            doc.PageLayout = this.PageLayout.ToPdf();
 
-            foreach (Page page in this.pages)
+            foreach (Page pg in this.pages)
             {
-                pdf = page.AddToDocument(pdf);
+                doc = pg.AddToDocument(doc);
             }
 
-            return pdf;
+            return doc;
         }
 
         public MemoryStream GetStream()
@@ -234,5 +419,6 @@ namespace PdfPlus
         }
 
         #endregion
+
     }
 }

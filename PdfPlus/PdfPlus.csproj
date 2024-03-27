@@ -36,19 +36,40 @@
   <ItemGroup>
     <Reference Include="Eto, Version=2.5.0.0, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
       <HintPath>packages\RhinoCommon.6.18.19266.14201\lib\net45\Eto.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="GH_IO, Version=6.18.19266.14200, Culture=neutral, PublicKeyToken=6a29997d2e6b4f97, processorArchitecture=MSIL">
       <HintPath>packages\Grasshopper.6.18.19266.14201\lib\net45\GH_IO.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Grasshopper, Version=6.18.19266.14200, Culture=neutral, PublicKeyToken=dda4f5ec2cd80803, processorArchitecture=MSIL">
       <HintPath>packages\Grasshopper.6.18.19266.14201\lib\net45\Grasshopper.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MigraDoc.DocumentObjectModel, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Rendering, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\PdfSharp.Charting.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="Rhino.UI, Version=6.18.19266.14200, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
       <HintPath>packages\RhinoCommon.6.18.19266.14201\lib\net45\Rhino.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RhinoCommon, Version=6.18.19266.14200, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
       <HintPath>packages\RhinoCommon.6.18.19266.14201\lib\net45\RhinoCommon.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -59,27 +80,45 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Block.cs" />
     <Compile Include="Classes\DataSet.cs" />
     <Compile Include="Classes\Document.cs" />
+    <Compile Include="Classes\Drawing.cs" />
+    <Compile Include="Classes\Element.cs" />
     <Compile Include="Classes\Font.cs" />
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
     <Compile Include="Classes\Shape.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_Link.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf__Base.cs" />
-    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_AddGraph.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImage.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddImagePt.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddTextBox.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_AddTextPt.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_EditFont.cs" />
-    <Compile Include="Components\Write\Contents\GH_Pdf_Shape_EditGraphics.cs" />
-    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphData.cs" />
-    <Compile Include="Components\Write\Contents\Graphs\GH_Pdf_Shape_GraphPie.cs" />
-    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Add.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartBasic.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Dock.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Drawing.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_EditSize.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_PageBreak.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Table.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_AddPages.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Link.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf__Base.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartBasic.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Image.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ImagePt.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_TextBox.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_TextPt.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Font.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Graphic.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartPie.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Create.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_TableFast.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Add.cs" />
-    <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddContents.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_SetBlocks.cs" />
+    <Compile Include="Components\Write\Pages\GH_Pdf_Page_SetShapes.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddImperial.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddMetric.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddRectangle.cs" />
@@ -94,6 +133,7 @@
     </Compile>
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\Enums.cs" />
+    <Compile Include="Utilities\GhExtensions.cs" />
     <Compile Include="Utilities\PdfExtensions.cs" />
     <Compile Include="Utilities\PdfPlusEnvironment.cs" />
   </ItemGroup>
@@ -111,86 +151,109 @@
     <None Include="Resources\PdfPlus-16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pdf-Content-Geometry-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-Text-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-Image-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-AddContent-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-AddContent2-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Imperial-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Metric-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Add-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Document_Add-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Document_Save2-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Document_Save-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Explode-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-AddContent-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-Font-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-AddContent4-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-TextPt-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Content-ImagePt-01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Pdf-Page-Boundary-01.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Components\Read\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PDF_Chart-01.png" />
+    <None Include="Resources\Pdf-Format-Font.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PDF_ChartData-01.png" />
+    <None Include="Resources\Pdf-Block-Text.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PDF_PieGraph-01.png" />
+    <None Include="Resources\Pdf-Block-Table.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PDF_Border-01.png" />
+    <None Include="Resources\Pdf-Block-List.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PDF_Link-01.png" />
+    <None Include="Resources\Pdf-Block-Break.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp.Charting\PdfSharp.Charting.csproj">
-      <Project>{6f98a822-41b0-4c7a-85a6-e95c1d3e88ef}</Project>
-      <Name>PdfSharp.Charting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\other\PDFsharp\src\PdfSharp\PdfSharp.csproj">
-      <Project>{5a6055bc-bf86-4fdd-9f62-0109db7a303b}</Project>
-      <Name>PdfSharp</Name>
-    </ProjectReference>
+    <None Include="Resources\Pdf-Block-Image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Rect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Deconstruct.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Margins.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Set_Shapes.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Chart_Basic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Chart_Pie.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Image_Point.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Image_Rect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Link.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Text_Point.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Text_Rect.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Chart_Basic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Chart_Pie.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Size.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-DataSet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-Graphic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Custom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Imperial.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Add_Metric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-QuickData.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-FontPresets.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Draw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Table2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Set_Blocks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Create.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Horizontal.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -213,13 +276,4 @@ Erase "$(TargetPath)"</PostBuildEvent>
     </StartArguments>
     <StartAction>Program</StartAction>
   </PropertyGroup>
-  <Import Project="packages\RhinoCommon.6.18.19266.14201\build\net45\RhinoCommon.targets" Condition="Exists('packages\RhinoCommon.6.18.19266.14201\build\net45\RhinoCommon.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('packages\RhinoCommon.6.18.19266.14201\build\net45\RhinoCommon.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\RhinoCommon.6.18.19266.14201\build\net45\RhinoCommon.targets'))" />
-    <Error Condition="!Exists('packages\Grasshopper.6.18.19266.14201\build\net45\Grasshopper.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Grasshopper.6.18.19266.14201\build\net45\Grasshopper.targets'))" />
-  </Target>
-  <Import Project="packages\Grasshopper.6.18.19266.14201\build\net45\Grasshopper.targets" Condition="Exists('packages\Grasshopper.6.18.19266.14201\build\net45\Grasshopper.targets')" />
 </Project>

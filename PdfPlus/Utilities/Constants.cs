@@ -44,14 +44,39 @@ namespace PdfPlus
 
         #region 
 
-        public static string WritePage
+        public static string Shapes
         {
-            get { return "PDF"; }
+            get { return "Shape"; }
         }
 
-        public static string ReadPage
+        public static string Blocks
         {
-            get { return "Read PDF"; }
+            get { return "Block"; }
+        }
+
+        public static string Formats
+        {
+            get { return "Format"; }
+        }
+
+        public static string Pages
+        {
+            get { return "Page"; }
+        }
+
+        public static string Documents
+        {
+            get { return "Doc"; }
+        }
+
+        public static Descriptor Element
+        {
+            get { return new Descriptor("Element", "El", "A Pdf Shape, Block, or DataSet Element", "A Pdf Shape, Block, or DataSet Element", "Pdf Shape, Block, or DataSet Elements"); }
+        }
+
+        public static Descriptor Block
+        {
+            get { return new Descriptor("Block", "Bk", "PDF Document Block", "PDF Document Block", "PDF Document Blocks"); }
         }
 
         public static Descriptor Shape

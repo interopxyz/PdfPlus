@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_AddRectangle()
           : base("Add Page Boundary", "Page Rect",
               "Create a new PDF Page from a boundary rectangle in Point units",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.Pages)
         {
         }
 
@@ -71,7 +71,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Boundary_01;
+                return Properties.Resources.Pdf_Page_Add_Rect;
             }
         }
 

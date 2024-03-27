@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_Add()
           : base("Add Page", "Page",
               "Create a new PDF Page from a width and height",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.Pages)
         {
         }
 
@@ -89,7 +89,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Add_01;
+                return Properties.Resources.Pdf_Page_Add_Custom;
             }
         }
 

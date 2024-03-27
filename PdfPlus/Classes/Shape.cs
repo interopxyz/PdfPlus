@@ -14,257 +14,301 @@ using System.IO;
 
 namespace PdfPlus
 {
-    public class Shape
+    public class Shape : Element
     {
+
         #region members
+
         public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
         protected ShapeType shapeType = ShapeType.None;
 
-        public enum LinkTypes { Hyperlink,Filepath,Page};
+        public enum LinkTypes { Hyperlink, Filepath, Page };
         protected LinkTypes linkType = LinkTypes.Hyperlink;
 
-        public enum ChartTypes { Bar, BarStacked, Column, ColumnStacked, Line, Area, Pie };
-        protected ChartTypes chartType = ChartTypes.ColumnStacked;
-        protected List<DataSet> data = new List<DataSet>();
-
-        string xAxis = string.Empty;
-        string yAxis = string.Empty;
-        Justification justification = Justification.None;
-
-        protected Graphic graphic = new Graphic();
-        protected Font font = new Font();
-
-        protected Sd.Bitmap image = new Sd.Bitmap(10, 10);
-        protected string imagePath = "";
-
-        protected string content = string.Empty;
-        protected Alignment alignment = Alignment.Left;
-
-        protected Rg.Point3d location = new Rg.Point3d();
-        protected Rg.Polyline polyline = new Rg.Polyline();
-        protected Rg.Line line = new Rg.Line();
-        protected Rg.Arc arc = new Rg.Arc();
-        protected Rg.Circle circle = new Rg.Circle();
-        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
-        protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
-
-        protected Rg.Brep brep = new Rg.Brep();
-        protected Rg.Mesh mesh = new Rg.Mesh();
+        protected double scale = 1.0;
 
         #endregion
 
         #region constructors
 
-        public Shape(Shape shape)
+        protected Shape() : base()
         {
-            this.graphic = new Graphic(shape.graphic);
-            this.font = new Font(shape.font);
+            this.elementType = ElementTypes.Shape;
+        }
 
+        public Shape(Shape shape) : base(shape)
+        {
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
 
-            this.chartType = shape.chartType;
-            SetData(shape.data);
-            this.xAxis = shape.xAxis;
-            this.yAxis = shape.yAxis;
-            this.justification = shape.justification;
-
-            this.content = shape.content;
-            this.alignment = shape.alignment;
-
-            this.image = new Sd.Bitmap(shape.image);
-            this.imagePath = shape.imagePath;
-
-            this.location = new Rg.Point3d(shape.location);
-            this.polyline = shape.polyline.Duplicate();
-            this.boundary = new Rg.Rectangle3d(shape.boundary.Plane, shape.boundary.Corner(0), shape.boundary.Corner(2));
-            this.line = new Rg.Line(shape.line.From, shape.line.To);
-            this.curve = new Rg.NurbsCurve(shape.curve);
-            this.circle = new Rg.Circle(shape.circle.Plane, shape.circle.Radius);
-
-            this.brep = shape.brep.DuplicateBrep();
-            this.mesh = shape.mesh.DuplicateMesh();
+            this.scale = shape.scale;
         }
 
         #region text
-        public Shape(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
-        {
-            shapeType = ShapeType.TextBox;
 
-            this.content = content;
-            this.alignment = alignment;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
-            this.font = new Font(font);
+        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextBox;
+
+            shape.text = content;
+            shape.alignment = alignment;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+            shape.font = new Font(font);
+
+            return shape;
         }
 
-        public Shape(string content, Rg.Point3d location, Font font)
+        public static Shape CreateText(string content, Rg.Point3d location, Font font)
         {
-            shapeType = ShapeType.TextObj;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextObj;
 
-            this.content = content;
-            this.location = new Rg.Point3d(location);
-            this.font = new Font(font);
+            shape.text = content;
+            shape.location = new Rg.Point3d(location);
+            shape.font = new Font(font);
+
+            return shape;
         }
 
-        public Shape(string link, Rg.Rectangle3d boundary, LinkTypes type)
+        public static Shape CreateLink(string link, Rg.Rectangle3d boundary, LinkTypes type)
         {
-            this.shapeType = ShapeType.LinkObj;
-            this.linkType = type;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.LinkObj;
+            shape.linkType = type;
 
-            this.content = link;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.text = link;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+
+            return shape;
         }
 
         #endregion
 
         #region image
 
-        public Shape(Sd.Bitmap bitmap, Rg.Rectangle3d boundary, string path = "")
+        public static Shape CreateImage(Sd.Bitmap bitmap, Rg.Rectangle3d boundary, string path = "")
         {
-            shapeType = ShapeType.ImageFrame;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ImageFrame;
 
-            this.image = new Sd.Bitmap(bitmap);
-            this.imagePath = path;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+            shape.imageObject = new Sd.Bitmap(bitmap);
+            shape.imageName = path;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+
+            return shape;
         }
 
-        public Shape(Sd.Bitmap bitmap, Rg.Point3d location, double scale = 1.0, string path = "")
+        public static Shape CreateImage(Sd.Bitmap bitmap, Rg.Point3d location, double scale = 1.0, string path = "")
         {
-            shapeType = ShapeType.ImageObj;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ImageObj;
 
-            this.image = new Sd.Bitmap(bitmap);
-            this.imagePath = path;
-            this.location = new Rg.Point3d(location);
+            shape.imageObject = new Sd.Bitmap(bitmap);
+            shape.imageName = path;
+            shape.location = new Rg.Point3d(location);
             Rg.Plane plane = Rg.Plane.WorldXY;
-            double factor = 72.0/96.0;
+            double factor = 72.0 / 96.0;
             plane.Origin = location - new Rg.Vector3d(0, bitmap.Height * factor * scale, 0);
-            this.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X+bitmap.Width * factor * scale, location.Y+bitmap.Height * factor * scale, 0));
+            shape.boundary = new Rg.Rectangle3d(plane, location, new Rg.Point3d(location.X + bitmap.Width * factor * scale, location.Y + bitmap.Height * factor * scale, 0));
+
+            return shape;
         }
 
         #endregion
 
         #region chart
 
-        public Shape(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary)
+        public static Shape CreateChart(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary)
         {
-            shapeType = ShapeType.ChartObj;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
-            this.chartType = chartType;
-            SetData(data);
-        }
-        public Shape(DataSet data, ChartTypes chartType, Rg.Rectangle3d boundary)
-        {
-            shapeType = ShapeType.ChartObj;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
-            this.chartType = chartType;
-            SetData(new List<DataSet> { data });
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ChartObj;
+
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.chartType = chartType;
+            shape.SetData(data);
+
+            return shape;
         }
 
-        public Shape(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary, string title)
+        public static Shape CreateChart(DataSet data, ChartTypes chartType, Rg.Rectangle3d boundary)
         {
-            shapeType = ShapeType.ChartObj;
-            this.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
-            this.chartType = chartType;
-            SetData(data);
-            this.content = title; ;
-            ;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ChartObj;
+
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.chartType = chartType;
+            shape.SetData(new List<DataSet> { data });
+
+            return shape;
         }
+
+        public static Shape CreateChart(List<DataSet> data, ChartTypes chartType, Rg.Rectangle3d boundary, string title)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.ChartObj;
+
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+            shape.chartType = chartType;
+            shape.SetData(data);
+
+            return shape;
+        }
+
         #endregion
 
         #region geometry
 
-        public Shape(Rg.Polyline polyline, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Polyline polyline, Graphic graphic)
         {
-            shapeType = ShapeType.Polyline;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Polyline;
+            shape.boundingBox = polyline.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.polyline = polyline.Duplicate();
+            shape.graphic = new Graphic(graphic);
 
-            this.polyline = polyline.Duplicate();
-
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Line line, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Rectangle3d rectangle, Graphic graphic)
         {
-            shapeType = ShapeType.Line;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Polyline;
 
-            this.line = new Rg.Line(line.From, line.To);
+            shape.boundingBox = rectangle.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.polyline = rectangle.ToPolyline();
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Arc arc, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Line line, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Line;
 
-            this.curve = arc.ToNurbsCurve();
-            this.curve.MakePiecewiseBezier(true);
+            shape.boundingBox = line.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.line = new Rg.Line(line.From, line.To);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.Circle circle, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Arc arc, Graphic graphic)
         {
-            shapeType = ShapeType.Circle;
-            this.circle = new Rg.Circle(circle.Plane, circle.Radius);
-            this.boundary = new Rg.Rectangle3d(circle.Plane, new Rg.Interval(-circle.Radius, circle.Radius), new Rg.Interval(-circle.Radius, circle.Radius));
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.graphic = new Graphic(graphic);
+            shape.boundingBox = arc.BoundingBox();
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.curve = arc.ToNurbsCurve();
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
-        public Shape(Rg.Ellipse ellipse, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Circle circle, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Circle;
 
-            this.curve = ellipse.ToNurbsCurve();
-            this.curve.MakePiecewiseBezier(true);
+            shape.boundingBox = circle.BoundingBox;
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.circle = new Rg.Circle(circle.Plane, circle.Radius);
+            shape.graphic = new Graphic(graphic);
 
-            this.graphic = new Graphic(graphic);
+            return shape;
         }
 
-        public Shape(Rg.BezierCurve bezier, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Ellipse ellipse, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = bezier.ToNurbsCurve();
+            shape.curve = ellipse.ToNurbsCurve();
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
 
-            this.graphic = new Graphic(graphic);
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
-        public Shape(Rg.Curve curve, Graphic graphic)
+        public static Shape CreateGeometry(Rg.BezierCurve bezier, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = new Rg.NurbsCurve(curve.ToNurbsCurve());
-            this.curve.MakePiecewiseBezier(true);
+            shape.curve = bezier.ToNurbsCurve();
 
-            this.graphic = new Graphic(graphic);
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
-        public Shape(Rg.NurbsCurve curve, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Curve curve, Graphic graphic)
         {
-            shapeType = ShapeType.Bezier;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.curve = new Rg.NurbsCurve(curve);
-            this.curve.MakePiecewiseBezier(true);
+            shape.curve = new Rg.NurbsCurve(curve.ToNurbsCurve());
 
-            this.graphic = new Graphic(graphic);
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
-        public Shape(Rg.Brep brep, Graphic graphic)
+        public static Shape CreateGeometry(Rg.NurbsCurve curve, Graphic graphic)
         {
-            shapeType = ShapeType.Brep;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Bezier;
 
-            this.brep = brep.DuplicateBrep();
+            shape.curve = new Rg.NurbsCurve(curve);
 
-            this.graphic = new Graphic(graphic);
+            shape.boundingBox = shape.curve.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.curve.MakePiecewiseBezier(true);
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
-        public Shape(Rg.Mesh mesh, Graphic graphic)
+        public static Shape CreateGeometry(Rg.Brep brep, Graphic graphic)
         {
-            shapeType = ShapeType.Mesh;
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Brep;
 
-            this.mesh = mesh.DuplicateMesh();
+            shape.brep = brep.DuplicateBrep();
 
-            this.graphic = new Graphic(graphic);
+            shape.boundingBox = shape.brep.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
+        }
+
+        public static Shape CreateGeometry(Rg.Mesh mesh, Graphic graphic)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Mesh;
+
+            shape.mesh = mesh.DuplicateMesh();
+
+            shape.boundingBox = shape.mesh.GetBoundingBox(true);
+            shape.boundary = shape.boundingBox.ToRectangle3d();
+            shape.graphic = new Graphic(graphic);
+
+            return shape;
         }
 
         #endregion
@@ -278,185 +322,17 @@ namespace PdfPlus
             get { return this.shapeType; }
         }
 
-        public virtual ChartTypes ChartType
+        public virtual double Scale
         {
-            get { return chartType; }
-        }
-
-        public virtual Sd.Color FontColor
-        {
-            get { return this.font.Color; }
-            set { this.font.Color = value; }
-        }
-
-        public virtual string FontFamily
-        {
-            get { return this.font.Family; }
-            set { this.font.Family = value; }
-        }
-
-        public virtual double FontSize
-        {
-            get { return this.font.Size; }
-            set { this.font.Size = value; }
-        }
-
-        public virtual bool IsBold
-        {
-            get { return this.font.IsBold; }
-        }
-
-        public virtual bool IsItalic
-        {
-            get { return this.font.IsItalic; }
-        }
-
-        public virtual bool IsUnderlined
-        {
-            get { return this.font.IsUnderlined; }
-        }
-
-        public virtual bool IsStrikeout
-        {
-            get { return this.font.IsStrikeout; }
-        }
-
-        public virtual Sd.Color FillColor
-        {
-            get { return this.graphic.Color; }
-            set { this.graphic.Color = value; }
-        }
-
-        public virtual Sd.Color StrokeColor
-        {
-            get { return this.graphic.Stroke; }
-            set { this.graphic.Stroke = value; }
-        }
-
-        public virtual double StrokeWeight
-        {
-            get { return this.graphic.Weight; }
-            set { this.graphic.Weight = value; }
-        }
-
-        public virtual FontStyle Style
-        {
-            get { return this.font.Style; }
-            set { this.font.Style = value; }
-        }
-
-        public virtual Graphic Graphic
-        {
-            get { return new Graphic(graphic); }
-            set { this.graphic = new Graphic(value); }
-        }
-
-        public virtual Font Font
-        {
-            get { return new Font(font); }
-            set { this.font = new Font(value); }
-        }
-
-        public virtual string XAxis
-        {
-            get { return this.xAxis; }
-            set { this.xAxis = value; }
-        }
-
-        public virtual string YAxis
-        {
-            get { return this.yAxis; }
-            set { this.yAxis = value; }
-        }
-
-        public virtual bool HasXAxis
-        {
-            get { return (this.xAxis != string.Empty); }
-        }
-
-        public virtual bool HasYAxis
-        {
-            get { return (this.yAxis != string.Empty); }
-        }
-
-        public virtual Justification Justification
-        {
-            get { return this.justification; }
-            set { this.justification = value; }
-        }
-
-        public virtual string TextContent
-        {
-            get { return this.content; }
-        }
-
-        public virtual Rg.Point3d Location
-        {
-            get { return this.location; }
-        }
-
-        public virtual Rg.Rectangle3d Boundary
-        {
-            get { return this.boundary; }
-        }
-
-        public virtual Rg.Line Line
-        {
-            get { return this.line; }
-        }
-
-        public virtual Rg.Arc Arc
-        {
-            get { return this.arc; }
-        }
-
-        public virtual Rg.Ellipse Ellipse
-        {
-            get { return new Rg.Ellipse(this.boundary.Plane,this.boundary.Width,this.boundary.Height); }
-        }
-
-        public virtual Rg.Polyline Polyline
-        {
-            get { return this.polyline; }
-        }
-        public virtual Rg.Circle Circle
-        {
-            get { return this.circle; }
-        }
-        public virtual Rg.Brep Brep
-        {
-            get { return this.brep; }
-        }
-
-        public virtual Rg.Mesh Mesh
-        {
-            get { return this.mesh; }
-        }
-
-        public virtual Rg.NurbsCurve Bezier
-        {
-            get {
-                Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
-                nurbs.MakePiecewiseBezier(true);
-                return nurbs; 
-            }
-        }
-
-        public virtual Sd.Bitmap Image
-        {
-            get { return new Sd.Bitmap(this.image); }
-        }
-
-        public virtual string ImagePath
-        {
-            get { return imagePath; }
+            get { return this.scale; }
+            set { this.scale = value; }
         }
 
         #endregion
 
         #region methods
 
-        public List<Rg.Curve> RenderChart(out List<Sd.Color> colors)
+        public List<Rg.Curve> RenderPreviewChart(out List<Sd.Color> colors)
         {
             List<Rg.Curve> output = new List<Rg.Curve>();
             List<Sd.Color> clrs = new List<Sd.Color>();
@@ -466,7 +342,7 @@ namespace PdfPlus
                 Rg.Plane plane = Rg.Plane.WorldXY;
                 double radius = Math.Min(this.boundary.Width, this.boundary.Height) * 0.4;
                 Rg.Point3d center = this.boundary.Center;
-                Rg.Point3d corner = new Rg.Point3d(center.X-radius,center.Y-radius,center.Z);
+                Rg.Point3d corner = new Rg.Point3d(center.X - radius, center.Y - radius, center.Z);
                 int count = data.Count;
                 Rg.Interval bounds = data.Bounds();
                 int s = 0;
@@ -474,41 +350,51 @@ namespace PdfPlus
                 double space = (step / count);
                 int total = 0;
                 double w = 0;
-                foreach (DataSet ds in data)total = Math.Max(total, ds.Values.Count);
+                foreach (DataSet ds in data) total = Math.Max(total, ds.Values.Count);
 
                 switch (this.chartType)
                 {
                     case ChartTypes.Pie:
                         plane.Origin = center;
-
+                        plane.Rotate(Math.PI / 2, Rg.Vector3d.ZAxis);
                         Rg.Circle circle = new Rg.Circle(plane, radius);
-                        output.Add(circle.ToNurbsCurve());
+                        Rg.NurbsCurve circ = circle.ToNurbsCurve();
+                        circ.Reverse();
+                        circ.Domain = new Rg.Interval(0, 1);
+                        output.Add(circ);
                         clrs.Add(Sd.Color.Black);
 
                         List<double> vals = this.data[0].Values.ReMapStack();
-                        
+
                         foreach (double t in vals)
                         {
-                            output.Add(new Rg.Line(center, circle.PointAt(t)).ToNurbsCurve());
+                            output.Add(new Rg.Line(center, circ.PointAt(t)).ToNurbsCurve());
+                            if (data[0].HasColors)
+                            {
                             clrs.Add(data[0].Colors[s]);
+                            }
+                            else
+                            {
+                                clrs.Add(data[0].Graphic.Color);
+                            }
                             s++;
                         }
 
                         break;
                     case ChartTypes.Area:
-                        foreach(DataSet ds in data)
+                        foreach (DataSet ds in data)
                         {
                             List<double> areaVals = ds.Values.ReMap(bounds);
                             Rg.Polyline plot = new Rg.Polyline();
-                            int lineCount = areaVals.Count-1;
+                            int lineCount = areaVals.Count - 1;
                             double i = 0;
                             plot.Add(corner);
                             foreach (double t in areaVals)
                             {
-                                plot.Add(corner + new Rg.Vector3d((double)(i/ lineCount) *radius*2, t * radius*2, 0));
+                                plot.Add(corner + new Rg.Vector3d((double)(i / lineCount) * radius * 2, t * radius * 2, 0));
                                 i++;
                             }
-                            plot.Add(corner + new Rg.Vector3d(radius*2, 0, 0));
+                            plot.Add(corner + new Rg.Vector3d(radius * 2, 0, 0));
                             plot.Add(corner);
 
                             output.Add(plot.ToNurbsCurve());
@@ -517,15 +403,15 @@ namespace PdfPlus
 
                         break;
                     case ChartTypes.Line:
-                        foreach(DataSet ds in data)
+                        foreach (DataSet ds in data)
                         {
                             List<double> lineVals = ds.Values.ReMap(bounds);
                             Rg.Polyline plot = new Rg.Polyline();
-                            int lineCount = lineVals.Count-1;
+                            int lineCount = lineVals.Count - 1;
                             double i = 0;
                             foreach (double t in lineVals)
                             {
-                                plot.Add(corner + new Rg.Vector3d((double)(i/ lineCount) *radius*2, t * radius*2, 0));
+                                plot.Add(corner + new Rg.Vector3d((double)(i / lineCount) * radius * 2, t * radius * 2, 0));
                                 i++;
                             }
 
@@ -535,7 +421,7 @@ namespace PdfPlus
 
                         break;
                     case ChartTypes.Column:
-                        step = radius*2 / total;
+                        step = radius * 2 / total;
                         space = (step / count);
                         foreach (DataSet ds in data)
                         {
@@ -544,12 +430,19 @@ namespace PdfPlus
                             double i = 0;
                             foreach (double t in lineVals)
                             {
-                                double x = s* space+ i* step;
+                                double x = s * space + i * step;
                                 Rg.Point3d ptX = corner + new Rg.Vector3d(x, 0, 0);
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(x, t * (radius * 2 - 1) + 1, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(space * 0.9, 0, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
-                                clrs.Add(ds.Colors[(int)i]);
+                                if (ds.HasColors)
+                                {
+                                    clrs.Add(ds.Colors[s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(ds.Graphic.Color);
+                                }
                                 i++;
                             }
                             s++;
@@ -566,11 +459,18 @@ namespace PdfPlus
                             foreach (double t in lineVals)
                             {
                                 double y = s * space + i * step;
-                                Rg.Point3d ptX = corner + new Rg.Vector3d(0,y, 0);
-                                Rg.Point3d ptY = corner + new Rg.Vector3d(t * (radius * 2 - 1) + 1,y, 0);
-                                Rg.Vector3d vcX = new Rg.Vector3d(0, space*0.9, 0);
+                                Rg.Point3d ptX = corner + new Rg.Vector3d(0, y, 0);
+                                Rg.Point3d ptY = corner + new Rg.Vector3d(t * (radius * 2 - 1) + 1, y, 0);
+                                Rg.Vector3d vcX = new Rg.Vector3d(0, space * 0.9, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
-                                clrs.Add(ds.Colors[(int)i]);
+                                if (ds.HasColors)
+                                {
+                                    clrs.Add(ds.Colors[s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(ds.Graphic.Color);
+                                }
                                 i++;
                             }
                             s++;
@@ -578,19 +478,26 @@ namespace PdfPlus
                         break;
                     case ChartTypes.BarStacked:
                         List<List<double>> barValues = data.ReMapSet();
-                        
+
                         total = barValues.Count;
                         w = 1.0 / total * radius * 2.0;
                         foreach (List<double> barVals in barValues)
                         {
-                            for(int i=0;i< barVals.Count-1;i++)
+                            for (int i = 0; i < barVals.Count - 1; i++)
                             {
-                                double y = (double)s / total*radius*2.0;
-                                Rg.Point3d ptX = corner + new Rg.Vector3d(barVals[i] * (radius * 2 - 1) + Convert.ToInt32(i > 0),y, 0);
-                                Rg.Point3d ptY = corner + new Rg.Vector3d(barVals[i + 1] * (radius * 2 - 1) + 1,y, 0);
+                                double y = (double)s / total * radius * 2.0;
+                                Rg.Point3d ptX = corner + new Rg.Vector3d(barVals[i] * (radius * 2 - 1) + Convert.ToInt32(i > 0), y, 0);
+                                Rg.Point3d ptY = corner + new Rg.Vector3d(barVals[i + 1] * (radius * 2 - 1) + 1, y, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(0, w * 0.9, 0);
                                 output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
-                                clrs.Add(this.data[i].Colors[(int)s]);
+                                if (this.data[i].HasColors)
+                                {
+                                    clrs.Add(this.data[i].Colors[(int)s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(this.data[i].Graphic.Color);
+                                }
                             }
                             s++;
                         }
@@ -608,8 +515,14 @@ namespace PdfPlus
                                 Rg.Point3d ptX = corner + new Rg.Vector3d(x, barVals[i] * (radius * 2 - 1) + Convert.ToInt32(i > 0), 0);
                                 Rg.Point3d ptY = corner + new Rg.Vector3d(x, barVals[i + 1] * (radius * 2 - 1) + 1, 0);
                                 Rg.Vector3d vcX = new Rg.Vector3d(w * 0.9, 0, 0);
-                                output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX,ptY,ptY+vcX,ptX+vcX,ptX} ).ToNurbsCurve());
+                                output.Add(new Rg.Polyline(new List<Rg.Point3d> { ptX, ptY, ptY + vcX, ptX + vcX, ptX }).ToNurbsCurve());
+                                if (this.data[i].HasColors) { 
                                 clrs.Add(this.data[i].Colors[(int)s]);
+                                }
+                                else
+                                {
+                                    clrs.Add(this.data[i].Graphic.Color);
+                                }
                             }
                             s++;
                         }
@@ -617,15 +530,7 @@ namespace PdfPlus
                 }
             }
             colors = clrs;
-                return output;
-        }
-
-        public void SetData(List<DataSet> data)
-        {
-            foreach (DataSet d in data)
-            {
-                this.data.Add(new DataSet(d));
-            }
+            return output;
         }
 
         public void AlignContent(Page page, bool translate = true)
@@ -681,198 +586,344 @@ namespace PdfPlus
             }
         }
 
+        #region geometry rendering
+
+        public Shape Transform(Rg.Transform transform)
+        {
+            Shape shape = new Shape(this);
+
+            shape.boundary.Transform(transform);
+            shape.boundingBox.Transform(transform);
+
+            switch (this.shapeType)
+            {
+                case ShapeType.Line:
+                    shape.line.Transform(transform);
+                    break;
+                case ShapeType.Polyline:
+                    shape.polyline.Transform(transform);
+                    break;
+                case ShapeType.Circle:
+                    shape.circle.Transform(transform);
+                    break;
+                case ShapeType.Bezier:
+                    shape.curve.Transform(transform);
+                    break;
+                case ShapeType.Brep:
+                    shape.brep.Transform(transform);
+                    break;
+                case ShapeType.Mesh:
+                    shape.mesh.Transform(transform);
+                    break;
+                case ShapeType.TextObj:
+                    shape.location.Transform(transform);
+                    break;
+            }
+            return shape;
+        }
+
+        public Pd.XGraphics RenderGeometry(Pd.XGraphics graph)
+        {
+            switch (this.shapeType)
+            {
+                case ShapeType.Line:
+                    graph = this.RenderLine(graph);
+                    break;
+                case ShapeType.Polyline:
+                    graph = this.RenderPolyline(graph);
+                    break;
+                case ShapeType.Circle:
+                    graph = this.RenderEllipse(graph);
+                    break;
+                case ShapeType.Ellipse:
+                    graph = this.RenderEllipse(graph);
+                    break;
+                case ShapeType.Bezier:
+                    graph = this.RenderBezier(graph);
+                    break;
+                case ShapeType.Brep:
+                    graph = this.RenderBrep(graph);
+                    break;
+                case ShapeType.Mesh:
+                    graph = this.RenderMesh(graph);
+                    break;
+                case ShapeType.TextObj:
+                    graph = this.RenderTextPoint(graph);
+                    break;
+                case ShapeType.TextBox:
+                    graph = this.RenderTextBoundary(graph);
+                    break;
+                case ShapeType.ChartObj:
+                    graph = this.RenderChartObject(graph);
+                    break;
+            }
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderLine(Pd.XGraphics graph)
+        {
+            graph.DrawLine(graphic.ToPdf(), line.From.ToPdf(), line.To.ToPdf());
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderPolyline(Pd.XGraphics graph)
+        {
+            Pd.XGraphicsPath plinePath = new Pd.XGraphicsPath();
+
+            plinePath.StartFigure();
+            plinePath.AddLines(polyline.ToPdf().ToArray());
+            if (polyline.IsClosed) plinePath.CloseFigure();
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderEllipse(Pd.XGraphics graph)
+        {
+            graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderBezier(Pd.XGraphics graph)
+        {
+            graph.DrawBeziers(graphic.ToPdf(), curve.ToBezierPolyline().ToPdf().ToArray());
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderBrep(Pd.XGraphics graph)
+        {
+            Pd.XGraphicsPath crvPath = new Pd.XGraphicsPath();
+
+            List<Rg.Curve> curves = Rg.NurbsCurve.JoinCurves(brep.DuplicateNakedEdgeCurves(true, true)).ToList();
+            foreach (Rg.Curve curve in curves)
+            {
+                Rg.NurbsCurve nurbs = curve.ToNurbsCurve();
+                crvPath.StartFigure();
+                crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
+                if (nurbs.IsClosed) crvPath.CloseFigure();
+            }
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderMesh(Pd.XGraphics graph)
+        {
+            Pd.XGraphicsPath polyPath = new Pd.XGraphicsPath();
+
+            List<Rg.Polyline> polylines = this.mesh.GetNakedEdges().ToList();
+            foreach (Rg.Polyline pline in polylines)
+            {
+                polyPath.StartFigure();
+                polyPath.AddLines(pline.ToPdf().ToArray());
+                if (pline.IsClosed) polyPath.CloseFigure();
+            }
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath);
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
+        {
+            Pd.XStringFormat format = new Pd.XStringFormat();
+            format.Alignment = font.Justification.ToPdfLine();
+            format.LineAlignment = Pd.XLineAlignment.BaseLine;
+            graph.DrawString(this.text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
+
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderTextBoundary(Pd.XGraphics graph)
+        {
+            Pd.XFont pdfFont = font.ToPdf(this.scale);
+
+            Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
+            textFormatter.Alignment = this.Font.Justification.ToPdf();
+            textFormatter.LayoutRectangle = this.boundary.ToPdf();
+            textFormatter.Text = this.text;
+            textFormatter.Font = pdfFont;
+            textFormatter.DrawString(this.text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+
+            return graph;
+        }
+
+        protected Pd.XGraphics RenderChartObject(Pd.XGraphics graph)
+        {
+            Pc.Chart chart = CombinationChart();
+
+            if (this.alignment != Alignment.None)
+            {
+                chart.Legend.Docking = this.alignment.ToPdf();
+
+                chart.Legend.Font.Color = this.font.Color.ToPdf();
+                chart.Legend.Font.Name = this.font.Family;
+                chart.Legend.Font.Size = this.font.Size;
+                chart.Legend.Font.Bold = this.font.IsBold;
+                chart.Legend.Font.Italic = this.font.IsItalic;
+                if (this.font.IsUnderlined) chart.Legend.Font.Underline = Pc.Underline.Single;
+            }
+
+            chart.Font.Color = this.FontColor.ToPdf();
+            chart.Font.Name = this.FontFamily;
+            chart.Font.Size = this.FontSize * this.scale;
+            chart.Font.Bold = this.font.IsBold;
+            chart.Font.Italic = this.font.IsItalic;
+            if (this.font.IsUnderlined) chart.Font.Underline = Pc.Underline.Single;
+
+            //X Axis
+            chart.XAxis.MajorTickMark = Pc.TickMarkType.None;
+            chart.XAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
+            chart.XAxis.TickLabels.Font.Name = this.FontFamily;
+            chart.XAxis.TickLabels.Font.Size = this.FontSize * this.scale;
+            chart.XAxis.TickLabels.Font.Bold = this.font.IsBold;
+            chart.XAxis.TickLabels.Font.Italic = this.font.IsItalic;
+            if (this.font.IsUnderlined) chart.XAxis.TickLabels.Font.Underline = Pc.Underline.Single;
+            if (this.HasXAxis)
+            {
+                chart.XAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
+
+                chart.XAxis.Title.Caption = this.xAxis;
+                chart.XAxis.Title.Font.Color = this.FontColor.ToPdf();
+                chart.XAxis.Title.Font.Name = this.FontFamily;
+                chart.XAxis.Title.Font.Size = this.FontSize * this.scale;
+                chart.XAxis.Title.Font.Bold = this.font.IsBold;
+                chart.XAxis.Title.Font.Italic = this.font.IsItalic;
+                if (this.font.IsUnderlined) chart.XAxis.Title.Font.Underline = Pc.Underline.Single;
+                if (!this.IsChartHorizontal) chart.XAxis.Title.Orientation = 90;
+
+                if (this.graphic.HasStroke)
+                {
+                    chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.XAxis.LineFormat.Width = this.graphic.Weight;
+                }
+            }
+
+            chart.XAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+            if ((int)this.chartType < 2) chart.XAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+            if (chart.XAxis.HasMajorGridlines)
+            {
+                if (this.graphic.HasStroke)
+                {
+                    chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                }
+            }
+
+            //Y Axis
+            chart.YAxis.MajorTickMark = Pc.TickMarkType.None;
+            chart.YAxis.TickLabels.Format = "#.####";
+            chart.YAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
+            chart.YAxis.TickLabels.Font.Name = this.FontFamily;
+            chart.YAxis.TickLabels.Font.Size = this.FontSize * this.scale;
+            chart.YAxis.TickLabels.Font.Bold = this.font.IsBold;
+            chart.YAxis.TickLabels.Font.Italic = this.font.IsItalic;
+            if (this.font.IsUnderlined) chart.YAxis.TickLabels.Font.Underline = Pc.Underline.Single;
+            if (this.HasYAxis)
+            {
+                chart.YAxis.Title.Alignment = Pc.HorizontalAlignment.Center;
+                chart.YAxis.Title.VerticalAlignment = Pc.VerticalAlignment.Center;
+
+                chart.YAxis.Title.Caption = this.yAxis;
+                chart.YAxis.Title.Font.Color = this.FontColor.ToPdf();
+                chart.YAxis.Title.Font.Name = this.FontFamily;
+                chart.YAxis.Title.Font.Size = this.FontSize * this.scale;
+                chart.YAxis.Title.Font.Bold = this.font.IsBold;
+                chart.YAxis.Title.Font.Italic = this.font.IsItalic;
+                if (this.font.IsUnderlined) chart.YAxis.Title.Font.Underline = Pc.Underline.Single;
+                if (this.IsChartHorizontal) chart.YAxis.Title.Orientation = 90;
+
+                if (this.graphic.HasStroke)
+                {
+                    chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.YAxis.LineFormat.Width = this.graphic.Weight;
+                }
+            }
+
+            chart.YAxis.HasMajorGridlines = (this.verticalBorderStyle != BorderStyles.None);
+            if ((int)this.chartType < 2) chart.YAxis.HasMajorGridlines = (this.horizontalBorderStyle != BorderStyles.None);
+            if (chart.YAxis.HasMajorGridlines)
+            {
+                if (this.graphic.HasStroke)
+                {
+                    chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
+                    chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
+                }
+            }
+
+            Pc.ChartFrame frame = new Pc.ChartFrame();
+            frame.Location = new Pd.XPoint(boundary.Corner(0).X, boundary.Corner(3).Y);
+            frame.Size = new Pd.XSize(boundary.Width, boundary.Height);
+
+            frame.Background = graphic.Color.ToPdfBrush();
+
+            frame.Add(chart);
+            frame.Draw(graph);
+
+            return graph;
+        }
+
+        #endregion
+
         public void Render(Pd.XGraphics graph, Pf.PdfPage page, Rg.Plane coordinateframe)
         {
             switch (this.shapeType)
             {
                 case ShapeType.Line:
-                    graph.DrawLine(graphic.ToPdf(), line.From.ToPdf(), line.To.ToPdf());
+                    graph = this.RenderLine(graph);
                     break;
-
                 case ShapeType.Polyline:
-                    Pd.XGraphicsPath plinePath = new Pd.XGraphicsPath();
-
-                    plinePath.StartFigure();
-                    plinePath.AddLines(polyline.ToPdf().ToArray());
-                        if (polyline.IsClosed) plinePath.CloseFigure();
-                    graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
+                    graph = this.RenderPolyline(graph);
                     break;
-
                 case ShapeType.Circle:
-                    graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+                    graph = this.RenderEllipse(graph);
                     break;
-
                 case ShapeType.Ellipse:
-                    graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+                    graph = this.RenderEllipse(graph);
                     break;
-
                 case ShapeType.Bezier:
-                    graph.DrawBeziers(graphic.ToPdf(), curve.ToBezierPolyline().ToPdf().ToArray());
+                    graph = this.RenderBezier(graph);
                     break;
-
                 case ShapeType.Brep:
-                    Pd.XGraphicsPath crvPath = new Pd.XGraphicsPath();
-
-                    List<Rg.Curve> curves = Rg.NurbsCurve.JoinCurves(brep.DuplicateNakedEdgeCurves(true, true)).ToList();
-                    foreach (Rg.Curve curve in curves)
-                    {
-                        Rg.NurbsCurve nurbs = curve.ToNurbsCurve();
-                        crvPath.StartFigure();
-                        crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
-                        if (nurbs.IsClosed) crvPath.CloseFigure();
-                    }
-                    graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
+                    graph = this.RenderBrep(graph);
                     break;
-
                 case ShapeType.Mesh:
-                    Pd.XGraphicsPath polyPath = new Pd.XGraphicsPath();
-
-                    List<Rg.Polyline> polylines = this.mesh.GetNakedEdges().ToList();
-                    foreach (Rg.Polyline pline in polylines)
-                    {
-                        polyPath.StartFigure();
-                        polyPath.AddLines(pline.ToPdf().ToArray());
-                        if (pline.IsClosed) polyPath.CloseFigure();
-                    }
-                    graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath);
+                    graph = this.RenderMesh(graph);
                     break;
-
-                case ShapeType.ImageFrame:
-                case ShapeType.ImageObj:
-                    Stream stream = image.ToStream();
-                    Pd.XImage xImageA = Pd.XImage.FromStream(stream);
-
-                    graph.DrawImage(xImageA, this.boundary.ToPdf());
-                    stream.Dispose();
-                    break;
-
                 case ShapeType.TextObj:
-                    graph.DrawString(this.content, font.ToPdf(), font.Color.ToPdfBrush(), location.ToPdf());
+                    graph = this.RenderTextPoint(graph);
                     break;
-
                 case ShapeType.TextBox:
-                    Pd.XFont pdfFont = font.ToPdf();
-
-                    Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
-                    textFormatter.Alignment = this.alignment.ToPdf();
-                    textFormatter.LayoutRectangle = this.boundary.ToPdf();
-                    textFormatter.Text = this.content;
-                    textFormatter.Font = pdfFont;
-
-                    textFormatter.DrawString(this.content, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+                    graph = this.RenderTextBoundary(graph);
                     break;
                 case ShapeType.LinkObj:
                     switch (this.linkType)
                     {
                         case LinkTypes.Hyperlink:
-                            page.AddWebLink(boundary.ToPdfRect(coordinateframe), this.content);
+                            page.AddWebLink(boundary.ToPdfRect(coordinateframe), this.text);
                             break;
                         case LinkTypes.Filepath:
-                            page.AddFileLink(boundary.ToPdfRect(coordinateframe), this.content);
+                            page.AddFileLink(boundary.ToPdfRect(coordinateframe), this.text);
                             break;
                         case LinkTypes.Page:
                             int index = 0;
-                            bool isInt = int.TryParse(this.content, out index);
-                            if(isInt) page.AddDocumentLink(boundary.ToPdfRect(coordinateframe), index + 1);
+                            bool isInt = int.TryParse(this.text, out index);
+                            if (isInt) page.AddDocumentLink(boundary.ToPdfRect(coordinateframe), index + 1);
 
                             break;
                     }
                     break;
+                case ShapeType.ImageFrame:
+                case ShapeType.ImageObj:
+                    Stream stream = imageObject.ToStream();
+                    Pd.XImage xImageA = Pd.XImage.FromStream(stream);
+
+                    graph.DrawImage(xImageA, this.boundary.ToPdf());
+                    stream.Dispose();
+                    break;
                 case ShapeType.ChartObj:
-                    Pc.Chart chart = CombinationChart();
-
-                    if (this.justification != Justification.None)
-                    {
-                        chart.Legend.Docking = this.justification.ToPdf();
-                        chart.Legend.Font.Color = this.font.Color.ToPdf();
-                        chart.Legend.Font.Name = this.font.Family;
-                        chart.Legend.Font.Size = this.font.Size;
-                        chart.Legend.Font.Bold = this.font.IsBold;
-                        chart.Legend.Font.Italic = this.font.IsItalic;
-                        if (this.font.IsUnderlined) chart.Legend.Font.Underline = Pc.Underline.Single;
-                    }
-
-                    chart.Font.Color = this.FontColor.ToPdf();
-                    chart.Font.Name = this.FontFamily;
-                    chart.Font.Size = this.FontSize;
-                    chart.Font.Bold = this.font.IsBold;
-                    chart.Font.Italic = this.font.IsItalic;
-                    if (this.font.IsUnderlined) chart.Font.Underline = Pc.Underline.Single;
-
-                    if (this.HasXAxis)
-                    {
-                        chart.XAxis.MajorTickMark = Pc.TickMarkType.Outside;
-                        chart.XAxis.Title.Caption = this.xAxis;
-                        chart.XAxis.HasMajorGridlines = true;
-
-                        chart.XAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                        chart.XAxis.LineFormat.Width = this.graphic.Weight;
-
-                        chart.XAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                        chart.XAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
-
-                        chart.XAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
-                        chart.XAxis.TickLabels.Font.Name = this.FontFamily;
-                        chart.XAxis.TickLabels.Font.Size = this.FontSize;
-                        chart.XAxis.TickLabels.Font.Bold = this.font.IsBold;
-                        chart.XAxis.TickLabels.Font.Italic = this.font.IsItalic;
-                        if (this.font.IsUnderlined) chart.XAxis.TickLabels.Font.Underline = Pc.Underline.Single;
-
-                        chart.XAxis.Title.Font.Color = this.FontColor.ToPdf();
-                        chart.XAxis.Title.Font.Name = this.FontFamily;
-                        chart.XAxis.Title.Font.Size = this.FontSize;
-                        chart.XAxis.Title.Font.Bold = this.font.IsBold;
-                        chart.XAxis.Title.Font.Italic = this.font.IsItalic;
-                        if (this.font.IsUnderlined) chart.XAxis.Title.Font.Underline = Pc.Underline.Single;
-                    }
-                    else
-                    {
-                        chart.XAxis.HasMajorGridlines = false;
-                        chart.XAxis.MajorTickMark = Pc.TickMarkType.None;
-                    }
-
-                    if (this.HasYAxis)
-                    {
-                        chart.YAxis.MajorTickMark = Pc.TickMarkType.Outside;
-                        chart.YAxis.Title.Caption = this.yAxis;
-                        chart.YAxis.HasMajorGridlines = true;
-
-                        chart.YAxis.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                        chart.YAxis.LineFormat.Width = this.graphic.Weight;
-
-                        chart.YAxis.MajorGridlines.LineFormat.Color = this.graphic.Stroke.ToPdf();
-                        chart.YAxis.MajorGridlines.LineFormat.Width = this.graphic.Weight;
-
-                        chart.YAxis.TickLabels.Format = "#.####";
-                        chart.YAxis.TickLabels.Font.Color = this.FontColor.ToPdf();
-                        chart.YAxis.TickLabels.Font.Name = this.FontFamily;
-                        chart.YAxis.TickLabels.Font.Size = this.FontSize;
-                        chart.YAxis.TickLabels.Font.Bold = this.font.IsBold;
-                        chart.YAxis.TickLabels.Font.Italic = this.font.IsItalic;
-                        if (this.font.IsUnderlined) chart.YAxis.TickLabels.Font.Underline = Pc.Underline.Single;
-
-                        chart.YAxis.Title.Font.Color = this.FontColor.ToPdf();
-                        chart.YAxis.Title.Font.Name = this.FontFamily;
-                        chart.YAxis.Title.Font.Size = this.FontSize;
-                        chart.YAxis.Title.Font.Bold = this.font.IsBold;
-                        chart.YAxis.Title.Font.Italic = this.font.IsItalic;
-                        if (this.font.IsUnderlined) chart.YAxis.Title.Font.Underline = Pc.Underline.Single;
-                    }
-
-
-                    Pc.ChartFrame frame = new Pc.ChartFrame();
-                    frame.Location = new Pd.XPoint(boundary.Corner(0).X, boundary.Corner(3).Y);
-                    frame.Size = new Pd.XSize(boundary.Width, boundary.Height);
-
-                    frame.Background = graphic.Color.ToPdfBrush();
-
-                    frame.Add(chart);
-                    frame.Draw(graph);
-
+                    graph = this.RenderChartObject(graph);
                     break;
             }
 
         }
+
         private Pc.Chart CombinationChart()
         {
             Pc.ChartType cType = this.chartType.ToPdf();
@@ -883,53 +934,62 @@ namespace PdfPlus
                 default:
                     foreach (DataSet d in this.data)
                     {
-                        Pc.Series series = chart.SeriesCollection.AddSeries();
-                        series.ChartType = cType;
-                        series.Name = d.Title;
-
-                        if (d.Graphic.HasStroke)
-                        { 
-                        series.LineFormat.Visible = true;
-                        series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
-                        series.LineFormat.Width = d.Graphic.Weight;
-
-                        }
-
-                        if (d.Graphic.HasColor)
+                        if (d.IsNumeric)
                         {
-                            series.FillFormat.Visible = true;
-                            series.FillFormat.Color = d.Graphic.Color.ToPdf();
-                        }
+                            Pc.Series series = chart.SeriesCollection.AddSeries();
+                            series.ChartType = cType;
+                            series.Name = d.Title;
 
-                        series.MarkerStyle = Pc.MarkerStyle.Circle;
-                        series.MarkerSize = d.Graphic.Weight * 2;
+                            if (d.Graphic.HasStroke)
+                            {
+                                series.LineFormat.Visible = true;
+                                series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
+                                series.LineFormat.Width = d.Graphic.Weight;
 
-                        series.Add(d.Values.ToArray());
-                        series.HasDataLabel = d.LabelData;
+                            }
 
-                        series.DataLabel.Font.Color = d.Font.Color.ToPdf();
-                        series.DataLabel.Font.Name = d.Font.Family;
-                        series.DataLabel.Font.Size = d.Font.Size;
-                        series.DataLabel.Font.Bold = d.Font.IsBold;
-                        series.DataLabel.Font.Italic = d.Font.IsItalic;
-                        if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Pc.Underline.Single;
-
-                        if ((int)this.chartType < 4)
-                        {
                             if (d.Graphic.HasColor)
                             {
-                                if (d.Colors.Count > 0)
+                                series.FillFormat.Visible = true;
+                                series.FillFormat.Color = d.Graphic.Color.ToPdf();
+                            }
+
+                            series.MarkerStyle = Pc.MarkerStyle.Circle;
+                            series.MarkerSize = d.Graphic.Weight * 2;
+
+                            series.Add(d.Values.ToArray());
+
+                            if (d.LabelData)
+                            {
+                                series.HasDataLabel = true;
+
+                                series.DataLabel.Position = d.LabelAlignment.ToPdf();
+
+                                series.DataLabel.Font.Color = d.Font.Color.ToPdf();
+                                series.DataLabel.Font.Name = d.Font.Family;
+                                series.DataLabel.Font.Size = d.Font.Size;
+                                series.DataLabel.Font.Bold = d.Font.IsBold;
+                                series.DataLabel.Font.Italic = d.Font.IsItalic;
+                                if (d.Font.IsUnderlined) series.DataLabel.Font.Underline = Pc.Underline.Single;
+                            }
+                            else
+                            {
+                                series.HasDataLabel = false;
+                            }
+
+                            if ((int)this.chartType < 4)
+                            {
+                                if (d.HasColors)
                                 {
                                     for (int p = 0; p < series.Elements.Count; p++)
                                     {
                                         series.Elements[p].FillFormat.Color = d.Colors[p].ToPdf();
                                     }
                                 }
+
                             }
 
                         }
-
-
                     }
                     break;
                 case ChartTypes.Pie:
@@ -949,16 +1009,18 @@ namespace PdfPlus
                     pieseries.MarkerStyle = Pc.MarkerStyle.Circle;
                     pieseries.MarkerSize = dt.Graphic.Weight * 2;
 
-                    pieseries.Add(dt.Values.ToArray());
-                    pieseries.HasDataLabel = true;
+                    pieseries.HasDataLabel = dt.LabelData;
+                    if (pieseries.HasDataLabel) { 
                     pieseries.DataLabel.Font.Color = dt.Font.Color.ToPdf();
                     pieseries.DataLabel.Font.Name = dt.Font.Family;
                     pieseries.DataLabel.Font.Size = dt.Font.Size;
                     pieseries.DataLabel.Font.Bold = dt.Font.IsBold;
                     pieseries.DataLabel.Font.Italic = dt.Font.IsItalic;
-                    if (dt.Font.IsUnderlined) pieseries.DataLabel.Font.Underline = Pc.Underline.Single;
+                        pieseries.DataLabel.Position = dt.LabelAlignment.ToPdf();
+                        if (dt.Font.IsUnderlined) pieseries.DataLabel.Font.Underline = Pc.Underline.Single;
+                    }
 
-                    if (dt.Graphic.HasColor)
+                    if (dt.HasColors)
                     {
                         if (dt.Colors.Count > 0)
                         {
@@ -967,14 +1029,13 @@ namespace PdfPlus
                                 pieseries.Elements[p].FillFormat.Color = dt.Colors[p % dt.Colors.Count].ToPdf();
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        for (int p = 0; p < pieseries.Elements.Count; p++)
                         {
-                            for (int p = 0; p < pieseries.Elements.Count; p++)
-                            {
-                                pieseries.Elements[p].FillFormat.Color = dt.Graphic.Color.ToPdf();
-                            }
+                            pieseries.Elements[p].FillFormat.Color = dt.Graphic.Color.ToPdf();
                         }
-
                     }
                     break;
             }
@@ -984,6 +1045,7 @@ namespace PdfPlus
 
             return chart;
         }
+
         #endregion
 
     }

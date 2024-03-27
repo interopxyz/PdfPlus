@@ -1,6 +1,7 @@
 ﻿using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 
@@ -14,7 +15,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Doc_Save()
           : base("Save Document", "Save Doc",
               "Save the PDF Document to a file",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.Documents)
         {
         }
 
@@ -90,6 +91,18 @@ namespace PdfPlus.Components
 
                 name = name.EndsWith(".pdf") ? name : $"{name}.pdf";
                 string filepath = Path.Combine(path, name);
+                
+
+                //if (File.Exists(filepath)) { 
+                //int count = new DirectoryInfo(path).GetFiles().Count();
+                //    string fileName = Path.GetFileNameWithoutExtension(filepath);
+                //    string fileExt = ".pdf";
+
+                //for (int i = 0; i<count; ++i)
+                //{
+                //        if (!File.Exists(filepath)) filepath = Path.Combine(path, fileName + "(" + i + 1 + ").pdf");
+                //}
+                //}
 
                 document.Save(filepath);
                 DA.SetData(0, filepath);
@@ -105,7 +118,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Save2_01;
+                return Properties.Resources.Pdf_Document_Save;
             }
         }
 

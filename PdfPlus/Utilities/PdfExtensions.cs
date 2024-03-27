@@ -14,9 +14,13 @@ using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
 using Pc = PdfSharp.Charting;
 
+using Md = MigraDoc.DocumentObjectModel;
+using Mr = MigraDoc.Rendering;
+
 using System.IO;
 using System.Windows.Media.Imaging;
 using Grasshopper.Kernel.Types;
+using System.Reflection;
 
 namespace PdfPlus
 {
@@ -24,6 +28,103 @@ namespace PdfPlus
     {
         #region Grasshopper 
 
+        public static bool TryGetGeometricShape(this IGH_Goo goo, ref Shape shape)
+        {
+            bool isValid = false;
+            switch (goo.TypeName)
+            {
+                case "Curve":
+                    Rg.Curve curve;
+                    isValid = true;
+
+                    if (goo.CastTo<Rg.Curve>(out curve))
+                    {
+                        string type = goo.ToString();
+
+                        switch (type)
+                        {
+                            default:
+                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), new Graphic());
+                                break;
+                            case "Polyline Curve":
+                                Rg.Polyline pline;
+                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, new Graphic());
+                                break;
+                            case "Line-like Curve":
+                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
+                                break;
+                            case "Elliptical Curve":
+                                Rg.Ellipse ellipse;
+                                curve.TryGetEllipse(out ellipse);
+                                shape = Shape.CreateGeometry(ellipse, new Graphic());
+                                break;
+                        }
+                        isValid = true;
+                    }
+                    break;
+                case "Arc":
+                    Rg.Arc arc;
+
+                    if (goo.CastTo<Rg.Arc>(out arc))
+                    {
+                        shape = Shape.CreateGeometry(arc, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Circle":
+                    Rg.Circle circle;
+
+                    if (goo.CastTo<Rg.Circle>(out circle))
+                    {
+                        shape = Shape.CreateGeometry(circle, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Line":
+                    Rg.Line line;
+
+                    if (goo.CastTo<Rg.Line>(out line))
+                    {
+                        shape = Shape.CreateGeometry(line, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Rectangle":
+                    Rg.Rectangle3d rect;
+                    if (goo.CastTo<Rg.Rectangle3d>(out rect))
+                    {
+                        shape = Shape.CreateGeometry(rect, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Surface":
+                    Rg.Surface surface;
+                    if (goo.CastTo<Rg.Surface>(out surface))
+                    {
+                        Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
+                        shape = Shape.CreateGeometry(srfBrep, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Brep":
+                    Rg.Brep brep;
+                    if (goo.CastTo<Rg.Brep>(out brep))
+                    {
+                        shape = Shape.CreateGeometry(brep, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+                case "Mesh":
+                    Rg.Mesh mesh;
+                    if (goo.CastTo<Rg.Mesh>(out mesh))
+                    {
+                        shape = Shape.CreateGeometry(mesh, new Graphic());
+                        isValid = true;
+                    }
+                    break;
+            }
+            return isValid;
+        }
         public static bool TryGetShape(this IGH_Goo goo, ref Shape shape)
         {
             Shape shp;
@@ -36,93 +137,66 @@ namespace PdfPlus
             }
             else
             {
-                switch (goo.TypeName)
-                {
-                    case "Curve":
-                        Rg.Curve curve;
-                        isValid = true;
-
-                        if (goo.CastTo<Rg.Curve>(out curve))
-                        {
-                            string type = goo.ToString();
-
-                            switch (type)
-                            {
-                                default:
-                                    shape = new Shape(curve.ToNurbsCurve(), new Graphic());
-                                    break;
-                                case "Polyline Curve":
-                                    Rg.Polyline pline;
-                                    if (curve.TryGetPolyline(out pline)) shape = new Shape(pline, new Graphic());
-                                    break;
-                                case "Line-like Curve":
-                                    shape = new Shape(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
-                                    break;
-                                case "Elliptical Curve":
-                                    Rg.Ellipse ellipse;
-                                    curve.TryGetEllipse(out ellipse);
-                                    shape = new Shape(ellipse, new Graphic());
-                                    break;
-                            }
-                            isValid = true;
-                        }
-                        break;
-                    case "Arc":
-                        Rg.Arc arc;
-
-                        if (goo.CastTo<Rg.Arc>(out arc))
-                        {
-                            shape = new Shape(arc, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Circle":
-                        Rg.Circle circle;
-
-                        if (goo.CastTo<Rg.Circle>(out circle))
-                        {
-                            shape = new Shape(circle, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Line":
-                        Rg.Line line;
-
-                        if (goo.CastTo<Rg.Line>(out line))
-                        {
-                            shape = new Shape(line, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Surface":
-                        Rg.Surface surface;
-                        if (goo.CastTo<Rg.Surface>(out surface))
-                        {
-                            Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
-                            shape = new Shape(srfBrep, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Brep":
-                        Rg.Brep brep;
-                        if (goo.CastTo<Rg.Brep>(out brep))
-                        {
-                            shape = new Shape(brep, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                    case "Mesh":
-                        Rg.Mesh mesh;
-                        if (goo.CastTo<Rg.Mesh>(out mesh))
-                        {
-                            shape = new Shape(mesh, new Graphic());
-                            isValid = true;
-                        }
-                        break;
-                }
+                isValid = goo.TryGetGeometricShape(ref shp);
+                if (isValid) shape = new Shape(shp);
             }
             return isValid;
         }
+
+        public static bool TryGetBlock(this IGH_Goo goo, ref Block block)
+        {
+            Block blk;
+            bool isValid = false;
+
+            if (goo.CastTo<Block>(out blk))
+            {
+                block = new Block(blk);
+                isValid = true;
+            }
+            else
+            {
+                Shape shp = null;
+                isValid = goo.TryGetGeometricShape(ref shp);
+                if (isValid) block = Block.CreateDrawing(shp);
+            }
+
+            return isValid;
+        }
+
+        public static bool TryGetElement(this IGH_Goo goo, ref Element element)
+        {
+            Element elem;
+            bool isValid = false;
+
+            if (goo.CastTo<Element>(out elem))
+            {
+                element = new Element(elem);
+                isValid = true;
+            }
+            else
+            {
+                Shape shp = null;
+                isValid = goo.TryGetGeometricShape(ref shp);
+                if (isValid) element = shp;
+            }
+
+            return isValid;
+        }
+
+        public static bool TryGetDataSet(this IGH_Goo goo, ref DataSet dataSet)
+        {
+            Element elem;
+            bool isValid = false;
+
+            if (goo.CastTo<DataSet>(out dataSet))
+            {
+                dataSet = new DataSet(dataSet);
+                isValid = true;
+            }
+
+            return isValid;
+        }
+
         public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap, ref string path)
         {
 
@@ -148,6 +222,7 @@ namespace PdfPlus
             }
             return false;
         }
+
         public static bool GetBitmapFromFile(this string FilePath, out Sd.Bitmap bitmap)
         {
             bitmap = null;
@@ -177,6 +252,23 @@ namespace PdfPlus
 
         #endregion
 
+        #region Pdf Sharp
+
+        public static Pc.DataLabelPosition ToPdf(this DataSet.LabelAlignments input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pc.DataLabelPosition.OutsideEnd;
+                case DataSet.LabelAlignments.End:
+                    return Pc.DataLabelPosition.InsideEnd;
+                case DataSet.LabelAlignments.Middle:
+                    return Pc.DataLabelPosition.Center;
+                case DataSet.LabelAlignments.Start:
+                    return Pc.DataLabelPosition.InsideBase;
+            }
+        }
+
         public static double GetValue(this Pd.XUnit input, Units unit)
         {
             switch (unit)
@@ -198,16 +290,33 @@ namespace PdfPlus
             {
                 default:
                     return Pd.XUnit.FromMillimeter(value);
-                    break;
                 case Units.Centimeter:
                     return Pd.XUnit.FromCentimeter(value);
-                    break;
                 case Units.Inch:
                     return Pd.XUnit.FromInch(value);
-                    break;
                 case Units.Point:
                     return Pd.XUnit.FromPoint(value);
-                    break;
+            }
+        }
+
+        public static Md.Shapes.Charts.ChartType ToMigraDoc(this Element.ChartTypes input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Shapes.Charts.ChartType.Line;
+                case Element.ChartTypes.Area:
+                    return Md.Shapes.Charts.ChartType.Area2D;
+                case Element.ChartTypes.Bar:
+                    return Md.Shapes.Charts.ChartType.Bar2D;
+                case Element.ChartTypes.BarStacked:
+                    return Md.Shapes.Charts.ChartType.BarStacked2D;
+                case Element.ChartTypes.Column:
+                    return Md.Shapes.Charts.ChartType.Column2D;
+                case Element.ChartTypes.ColumnStacked:
+                    return Md.Shapes.Charts.ChartType.ColumnStacked2D;
+                case Element.ChartTypes.Pie:
+                    return Md.Shapes.Charts.ChartType.Pie2D;
             }
         }
 
@@ -228,19 +337,23 @@ namespace PdfPlus
             }
         }
 
+        #region render geometry
+
+        #endregion
+
         #region charts
 
-        public static Pc.DockingType ToPdf(this Justification input)
+        public static Pc.DockingType ToPdf(this Alignment input)
         {
             switch (input)
             {
                 default:
                     return Pc.DockingType.Bottom;
-                case Justification.Left:
+                case Alignment.Left:
                     return Pc.DockingType.Left;
-                case Justification.Right:
+                case Alignment.Right:
                     return Pc.DockingType.Right;
-                case Justification.Top:
+                case Alignment.Top:
                     return Pc.DockingType.Top;
             }
         }
@@ -440,16 +553,16 @@ namespace PdfPlus
             List<List<double>> output = new List<List<double>>();
 
             int count = 0;
-            foreach(DataSet ds in input)
+            foreach (DataSet ds in input)
             {
                 count = Math.Max(count, ds.Values.Count);
             }
 
             List<double> peaks = new List<double>();
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 peaks.Add(0);
-                foreach(DataSet ds in input)
+                foreach (DataSet ds in input)
                 {
                     if (i < ds.Values.Count)
                     {
@@ -480,6 +593,8 @@ namespace PdfPlus
 
         public static List<double> ReMapStack(this List<double> input)
         {
+            double total = 0;
+            foreach (double val in input) total += val;
             double min = input.Min();
             double max = input.Max();
             List<double> output = new List<double>();
@@ -487,7 +602,7 @@ namespace PdfPlus
             double t = 0;
             foreach (double val in input)
             {
-                t += (val - min) / (max - min);
+                t += val / total;
                 output.Add(t);
             }
             return output;
@@ -498,7 +613,7 @@ namespace PdfPlus
             double min = input[0].Values.Min();
             double max = input[0].Values.Max();
 
-            foreach(DataSet data in input)
+            foreach (DataSet data in input)
             {
                 min = Math.Min(min, data.Values.Min());
                 max = Math.Max(max, data.Values.Max());
@@ -525,14 +640,14 @@ namespace PdfPlus
 
         public static Pd.XRect ToPdf(this Rg.Rectangle3d input)
         {
-            
+
             Pd.XRect rect = new Pd.XRect(input.Corner(0).X, input.Corner(3).Y, input.Width, input.Height);
             return rect;
         }
 
         public static Pf.PdfRectangle ToPdfRect(this Rg.Rectangle3d input, Rg.Plane plane)
         {
-            Pd.XRect rect = new Pd.XRect(input.Corner(0).X-plane.OriginX, input.Corner(0).Y - plane.OriginY, input.Width, input.Height);
+            Pd.XRect rect = new Pd.XRect(input.Corner(0).X - plane.OriginX, input.Corner(0).Y - plane.OriginY, input.Width, input.Height);
             Pf.PdfRectangle rectangle = new Pf.PdfRectangle(rect);
             return rectangle;
         }
@@ -555,7 +670,7 @@ namespace PdfPlus
             return boundary;
         }
 
-        public static Rg.Rectangle3d ToRhino(this Pf.PdfRectangle input, Rg.Plane frame )
+        public static Rg.Rectangle3d ToRhino(this Pf.PdfRectangle input, Rg.Plane frame)
         {
             Pd.XRect rect = input.ToXRect();
             Rg.Rectangle3d boundary = rect.ToRhino(frame);
@@ -569,6 +684,7 @@ namespace PdfPlus
             return stream;
         }
 
+
         #endregion
 
         #region text
@@ -579,22 +695,35 @@ namespace PdfPlus
 
         #region font
 
-        public static Pd.XFont ToPdf(this Font input)
+        public static Pd.XFont ToPdf(this Font input, double scale = 1.0)
         {
-            return new Pd.XFont(input.Family, input.Size, input.Style.ToPdf());
+            return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf());
         }
 
-        public static Pl.XParagraphAlignment ToPdf(this Alignment input)
+        public static Pd.XStringAlignment ToPdfLine(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pd.XStringAlignment.Near;
+                case Justification.Center:
+                    return Pd.XStringAlignment.Center;
+                case Justification.Right:
+                    return Pd.XStringAlignment.Far;
+            }
+        }
+
+        public static Pl.XParagraphAlignment ToPdf(this Justification input)
         {
             switch (input)
             {
                 default:
                     return Pl.XParagraphAlignment.Left;
-                case Alignment.Center:
+                case Justification.Center:
                     return Pl.XParagraphAlignment.Center;
-                case Alignment.Right:
+                case Justification.Right:
                     return Pl.XParagraphAlignment.Right;
-                case Alignment.Justify:
+                case Justification.Justify:
                     return Pl.XParagraphAlignment.Justify;
             }
         }
@@ -620,5 +749,188 @@ namespace PdfPlus
 
         #endregion
 
+        #endregion
+
+        #region MigraDoc
+
+        #region units
+
+        public static Md.Shapes.Charts.DataLabelPosition ToMigraDoc(this DataSet.LabelAlignments input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Shapes.Charts.DataLabelPosition.OutsideEnd;
+                case DataSet.LabelAlignments.End:
+                    return Md.Shapes.Charts.DataLabelPosition.InsideEnd;
+                case DataSet.LabelAlignments.Middle:
+                    return Md.Shapes.Charts.DataLabelPosition.Center;
+                case DataSet.LabelAlignments.Start:
+                    return Md.Shapes.Charts.DataLabelPosition.InsideBase;
+            }
+        }
+
+        public static Md.Unit ToMigraDoc(this Pd.XUnit input)
+        {
+            switch (input.Type)
+            {
+                default:
+                    return new Md.Unit(input.Point, Md.UnitType.Point);
+                case Pd.XGraphicsUnit.Millimeter:
+                    return new Md.Unit(input.Millimeter, Md.UnitType.Millimeter);
+                case Pd.XGraphicsUnit.Centimeter:
+                    return new Md.Unit(input.Centimeter, Md.UnitType.Centimeter);
+                case Pd.XGraphicsUnit.Inch:
+                    return new Md.Unit(input.Inch, Md.UnitType.Inch);
+                case Pd.XGraphicsUnit.Presentation:
+                    return new Md.Unit(input.Presentation, Md.UnitType.Pica);
+            }
+        }
+
+        #endregion
+
+        #region pages
+
+        public static Md.Orientation ToMigraDoc(this Ps.PageOrientation input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Orientation.Landscape;
+                case Ps.PageOrientation.Portrait:
+                    return Md.Orientation.Portrait;
+            }
+        }
+
+        #endregion
+
+        #region font
+
+        public static Md.Font ToMigraDoc(this Font input)
+        {
+            Md.Font font = new Md.Font();
+            font.Name = input.Family;
+            font.Size = input.Size;
+            font.Color = input.Color.ToMigraDoc();
+            font.Bold = input.IsBold;
+            font.Italic = input.IsItalic;
+            font.Underline = Md.Underline.None;
+            if (input.IsUnderlined) font.Underline = Md.Underline.Single;
+
+            return font;
+        }
+
+            public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
+        {
+            if (input.IsModified)
+            {
+                if (input.HasFamily) format.Font.Name = input.Family;
+                if (input.HasSize)format.Font.Size = input.Size;
+                if (input.HasColor) format.Font.Color = input.Color.ToMigraDoc();
+                if (input.HasJustification) format.Alignment = input.Justification.ToMigraDocParagraphAlignment();
+                if (input.HasStyle)
+                {
+                    format.Font.Bold = input.IsBold;
+                    format.Font.Italic = input.IsItalic;
+                    format.Font.Underline = Md.Underline.None;
+                    if (input.IsUnderlined) format.Font.Underline = Md.Underline.Single;
+                }
+
+            }
+
+            return format;
+        }
+
+        public static Md.ParagraphAlignment ToMigraDocParagraphAlignment(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.ParagraphAlignment.Left;
+                case Justification.Right:
+                    return Md.ParagraphAlignment.Right;
+                case Justification.Center:
+                    return Md.ParagraphAlignment.Center;
+                case Justification.Justify:
+                    return Md.ParagraphAlignment.Justify;
+            }
+        }
+
+        public static Md.Shapes.ShapePosition ToMigraDocShapePosition(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Md.Shapes.ShapePosition.Left;
+                case Justification.Right:
+                    return Md.Shapes.ShapePosition.Right;
+                case Justification.Center:
+                    return Md.Shapes.ShapePosition.Center;
+            }
+        }
+
+        #endregion
+
+        #region graphics
+
+        public static Md.Color ToMigraDoc(this Sd.Color input)
+        {
+            return Md.Color.FromArgb(input.A, input.R, input.G, input.B);
+        }
+
+        public static Md.Color ToMigraDoc(this Sd.Color input, int alpha)
+        {
+            return Md.Color.FromArgb((byte)alpha, input.R, input.G, input.B);
+        }
+
+        #endregion
+
+        #region images
+
+        public static byte[] ToByteArray(this Sd.Bitmap input)
+        {
+            MemoryStream stream = new MemoryStream();
+
+            input.Save(stream, Sd.Imaging.ImageFormat.Png);
+            stream.Position = 0;
+            byte[] buffer = stream.ToArray();
+            stream.Close();
+
+            return buffer;
+        }
+
+        public static string ToBase64String(this Sd.Bitmap input, string prefix = "")
+        {
+            MemoryStream stream = new MemoryStream();
+            
+            input.Save(stream, Sd.Imaging.ImageFormat.Png);
+            stream.Position = 0;
+            byte[] buffer = stream.ToArray();
+            stream.Close();
+
+            string output = Convert.ToBase64String(buffer);
+            buffer = null;
+
+            return prefix+output;
+        }
+
+        #endregion
+
+        #region geometry
+
+        public static Rg.Rectangle3d ToRectangle3d(this Mr.Area input)
+        {
+            return new Rg.Rectangle3d(new Rg.Plane(new Rg.Point3d(input.X, input.Y, 0), Rg.Vector3d.ZAxis), input.Width, input.Height);
+        }
+
+        public static Rg.Rectangle3d ToRectangle3d(this Mr.Area input, Rg.Plane frame)
+        {
+            frame.Origin = frame.PointAt(input.X, input.Y);
+            return new Rg.Rectangle3d(frame, input.Width, input.Height);
+        }
+
+        #endregion
+
+        #endregion
     }
 }

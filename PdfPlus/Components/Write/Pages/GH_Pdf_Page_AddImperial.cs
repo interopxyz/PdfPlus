@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_AddImperial()
           : base("Add Page Imperial", "Page Imperial",
               "Create a new PDF Page from a standard imperial page size",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.Pages)
         {
         }
 
@@ -90,7 +90,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Imperial_01;
+                return Properties.Resources.Pdf_Page_Add_Imperial;
             }
         }
 

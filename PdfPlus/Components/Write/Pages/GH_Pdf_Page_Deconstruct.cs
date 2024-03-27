@@ -13,7 +13,7 @@ namespace PdfPlus.Components
         public GH_Pdf_Page_Deconstruct()
           : base("Deconstruct Page", "DePage",
               "Deconstruct a PDF Page",
-              Constants.ShortName, Constants.WritePage)
+              Constants.ShortName, Constants.Pages)
         {
         }
 
@@ -64,7 +64,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Explode_01;
+                return Properties.Resources.Pdf_Page_Deconstruct;
             }
         }
 
