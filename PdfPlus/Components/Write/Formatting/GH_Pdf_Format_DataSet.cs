@@ -14,8 +14,11 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Shape_GraphData class.
         /// </summary>
         public GH_Pdf_Format_DataSet()
-          : base("Graph Data", "Data",
-              "Compile data points into a Data Set",
+          : base("Data Set", "Data Set",
+              "Compiles a list of text or numbers into a Data Set with optional formatting options."+Environment.NewLine +
+                "For use with PDF+ Chart and Table components." + Environment.NewLine +
+                " - Table: Each DataSet is a column in the Table" + Environment.NewLine +
+                " - Chart: Each DataSet is a series in the Chart",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -25,7 +28,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>

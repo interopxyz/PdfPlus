@@ -71,7 +71,12 @@ namespace PdfPlus
 
         public static Descriptor Element
         {
-            get { return new Descriptor("Element", "El", "A Pdf Shape, Block, or DataSet Element", "A Pdf Shape, Block, or DataSet Element", "Pdf Shape, Block, or DataSet Elements"); }
+            get { return new Descriptor("Element", "El", "A PDF+ Shape, Block, DataSet, or Text Fragment Element", "A PDF+ Shape, Block, DataSet, or Text Fragment Element", "Pdf Shape, Block, or DataSet Elements"); }
+        }
+
+        public static Descriptor Fragment
+        {
+            get { return new Descriptor("Text Fragment", "Tx", "PDF Text Fragment", "PDF Text Fragment", "PDF Text Fragments"); }
         }
 
         public static Descriptor Block

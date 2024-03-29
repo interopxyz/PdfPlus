@@ -161,7 +161,17 @@ namespace PdfPlus
 
         #region overrides
 
-
+        public override string ToString()
+        {
+            if (this.IsNumeric)
+            {
+                return "DataSet | [" + this.contents.Count + "](Numbers)";
+            }
+            else
+            {
+                return "DataSet | [" + this.contents.Count + "](Text)";
+            }
+        }
 
         #endregion
 

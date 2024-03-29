@@ -101,7 +101,7 @@ namespace PdfPlus
                     Rg.Surface surface;
                     if (goo.CastTo<Rg.Surface>(out surface))
                     {
-                        Rg.Brep srfBrep = Rg.Brep.CreateFromSurface(surface);
+                        Rg.Brep srfBrep = surface.ToBrep();
                         shape = Shape.CreateGeometry(srfBrep, new Graphic());
                         isValid = true;
                     }
@@ -166,6 +166,8 @@ namespace PdfPlus
         public static bool TryGetElement(this IGH_Goo goo, ref Element element)
         {
             Element elem;
+            Shape shp = null;
+            Fragment frg = null;
             bool isValid = false;
 
             if (goo.CastTo<Element>(out elem))
@@ -173,11 +175,54 @@ namespace PdfPlus
                 element = new Element(elem);
                 isValid = true;
             }
-            else
+            else if(goo.TryGetGeometricShape(ref shp))
             {
-                Shape shp = null;
-                isValid = goo.TryGetGeometricShape(ref shp);
-                if (isValid) element = shp;
+                element = shp;
+                isValid = true;
+            }
+            else if (goo.TryGetFragment(ref frg))
+            {
+                element = frg;
+                isValid = true;
+            }
+
+            return isValid;
+        }
+
+        public static bool TryGetFragment(this IGH_Goo goo, ref Fragment fragment)
+        {
+            Fragment frag;
+            bool isValid = false;
+
+            if (goo.CastTo<Fragment>(out frag))
+            {
+                fragment = new Fragment(frag);
+                isValid = true;
+            }
+            else if (goo.CastTo<GH_String>(out GH_String ghText))
+            {
+                fragment = new Fragment(ghText.Value);
+                isValid = true;
+            }
+            else if (goo.CastTo<GH_Number>(out GH_Number ghNum))
+            {
+                fragment = new Fragment(ghNum.Value.ToString());
+                isValid = true;
+            }
+            else if (goo.CastTo<double>(out double num))
+            {
+                fragment = new Fragment(num.ToString());
+                isValid = true;
+            }
+            else if (goo.CastTo<int>(out int integer))
+            {
+                fragment = new Fragment(integer.ToString());
+                isValid = true;
+            }
+            else if (goo.CastTo<string>(out string text))
+            {
+                fragment = new Fragment(text);
+                isValid = true;
             }
 
             return isValid;
@@ -185,7 +230,6 @@ namespace PdfPlus
 
         public static bool TryGetDataSet(this IGH_Goo goo, ref DataSet dataSet)
         {
-            Element elem;
             bool isValid = false;
 
             if (goo.CastTo<DataSet>(out dataSet))
@@ -299,23 +343,23 @@ namespace PdfPlus
             }
         }
 
-        public static Md.Shapes.Charts.ChartType ToMigraDoc(this Element.ChartTypes input)
+        public static Md.Shapes.Charts.ChartType ToMigraDoc(this ObjectAssembly.ChartTypes input)
         {
             switch (input)
             {
                 default:
                     return Md.Shapes.Charts.ChartType.Line;
-                case Element.ChartTypes.Area:
+                case ObjectAssembly.ChartTypes.Area:
                     return Md.Shapes.Charts.ChartType.Area2D;
-                case Element.ChartTypes.Bar:
+                case ObjectAssembly.ChartTypes.Bar:
                     return Md.Shapes.Charts.ChartType.Bar2D;
-                case Element.ChartTypes.BarStacked:
+                case ObjectAssembly.ChartTypes.BarStacked:
                     return Md.Shapes.Charts.ChartType.BarStacked2D;
-                case Element.ChartTypes.Column:
+                case ObjectAssembly.ChartTypes.Column:
                     return Md.Shapes.Charts.ChartType.Column2D;
-                case Element.ChartTypes.ColumnStacked:
+                case ObjectAssembly.ChartTypes.ColumnStacked:
                     return Md.Shapes.Charts.ChartType.ColumnStacked2D;
-                case Element.ChartTypes.Pie:
+                case ObjectAssembly.ChartTypes.Pie:
                     return Md.Shapes.Charts.ChartType.Pie2D;
             }
         }
@@ -752,6 +796,20 @@ namespace PdfPlus
         #endregion
 
         #region MigraDoc
+
+        #region text
+
+        public static void RenderFragments(this Md.Paragraph input, Fragment fragment)
+        {
+            foreach (Element element in fragment.Segments) input.AddFormattedText(element.Text, element.Font.ToMigraDoc());
+        }
+
+        public static void RenderFragments(this Md.Paragraph input, List<Fragment> fragments)
+        {
+            foreach (Fragment fragment in fragments) input.RenderFragments(fragment);
+        }
+
+        #endregion
 
         #region units
 

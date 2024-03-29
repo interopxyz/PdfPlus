@@ -84,7 +84,7 @@ namespace PdfPlus.Components
             int type = 4;
             DA.GetData(1, ref type);
 
-            Block block = Block.CreateChart(data, (Element.ChartTypes)type);
+            Block block = Block.CreateChart(data, (ObjectAssembly.ChartTypes)type);
 
             string x = string.Empty;
             if (DA.GetData(2, ref x)) block.XAxis = x;

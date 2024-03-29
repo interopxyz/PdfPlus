@@ -13,8 +13,8 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Format_FontPresets class.
         /// </summary>
         public GH_Pdf_Format_FontPresets()
-          : base("Set Graphics", "Set Graphics",
-              "Edit shape or block graphical attributes",
+          : base("Set Font Preset", "Preset Font",
+              "Assign a preset font",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -57,14 +57,13 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-
             Font font = new Font();
 
             IGH_Goo goo = null;
             if (!DA.GetData(0, ref goo)) return;
             Element elem = null;
             bool isElement = goo.TryGetElement(ref elem);
-            if (isElement) font = elem.Font;
+            if (isElement) font = new Font(elem.Font);
 
             int type = 0;
             if (DA.GetData(1, ref type))
@@ -109,25 +108,30 @@ namespace PdfPlus.Components
                         break;
                 }
 
-
-            Shape shape = null;
-            Block block = null;
-            DataSet dataSet = null;
-            if (goo.TryGetShape(ref shape))
+            switch (elem.ElementType)
             {
-                shape.Font = font;
-                prev_shapes.Add(shape);
-                DA.SetData(0, shape);
-            }
-            else if (goo.TryGetBlock(ref block))
-            {
-                block.Font = font;
-                DA.SetData(0, block);
-            }
-            else if (goo.TryGetDataSet(ref dataSet))
-            {
-                dataSet.Font = font;
-                DA.SetData(0, dataSet);
+                case Element.ElementTypes.Block:
+                    goo.CastTo<Block>(out Block block);
+                    block.Font = font;
+                    DA.SetData(0, block);
+                    break;
+                case Element.ElementTypes.Shape:
+                    goo.CastTo<Shape>(out Shape shape);
+                    shape.Font = font;
+                    prev_shapes.Add(shape);
+                    DA.SetData(0, shape);
+                    break;
+                case Element.ElementTypes.Data:
+                    goo.CastTo<DataSet>(out DataSet dataSet);
+                    dataSet.Font = font;
+                    DA.SetData(0, dataSet);
+                    break;
+                case Element.ElementTypes.Fragment:
+                    Fragment fragment = null;
+                    goo.TryGetFragment(ref fragment);
+                    fragment.SetFonts(font);
+                    DA.SetData(0, fragment);
+                    break;
             }
         }
 

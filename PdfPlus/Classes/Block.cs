@@ -18,7 +18,7 @@ using System.IO;
 
 namespace PdfPlus
 {
-    public class Block : Element
+    public class Block : ObjectAssembly
     {
 
         #region members
@@ -123,7 +123,17 @@ namespace PdfPlus
         {
             Block block = new Block();
             block.blockType = BlockTypes.Text;
-            block.text = content;
+            block.formatType = format;
+            block.formatName = format.ToString();
+            block.fragments.Add(new Fragment(content));
+            return block;
+        }
+
+        public static Block CreateText(Fragment fragment, Font.Presets format = Font.Presets.Normal)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Text;
+            block.fragments.Add(new Fragment(fragment));
             block.formatType = format;
             block.formatName = format.ToString();
 
@@ -139,7 +149,17 @@ namespace PdfPlus
             Block block = new Block();
             block.blockType = BlockTypes.List;
             block.listType = type;
-            foreach (string item in items) block.listItems.Add(item);
+            foreach (string item in items) block.fragments.Add(new Fragment(item));
+
+            return block;
+        }
+
+        public static Block CreateList(List<Fragment> items, ListTypes type = ListTypes.Dot)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.List;
+            block.listType = type;
+            foreach (Fragment fragment in items) block.fragments.Add(new Fragment(fragment));
 
             return block;
         }
@@ -220,6 +240,9 @@ namespace PdfPlus
             block.blockType = BlockTypes.Image;
             block.imageName = fileName;
             block.graphic.Color = Sd.Color.LightGray;
+            block.width = -1;
+            block.height = -1;
+            block.justification = Justification.Center;
 
             return block;
         }
@@ -230,6 +253,9 @@ namespace PdfPlus
             block.blockType = BlockTypes.Image;
             block.imageObject = new Sd.Bitmap(bitmap);
             block.graphic.Color = Sd.Color.LightGray;
+            block.width = -1;
+            block.height = -1;
+            block.justification = Justification.Center;
 
             return block;
         }
@@ -318,24 +344,38 @@ namespace PdfPlus
 
         public void RenderText(Md.Paragraph paragraph, Md.Document document)
         {
-            paragraph.Tag = "Text";
-            paragraph.AddText(this.text);
-
-            paragraph.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
+            paragraph.Tag = "Text~" + this.id;
+            if (this.formatType == Font.Presets.None)
+            {
+                paragraph.RenderFragments(this.fragments);
+            }
+            else
+            {
+                paragraph.AddText(this.Text);
+                paragraph.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
+            }
         }
 
         public void RenderList(Md.Document document)
         {
             Md.ListType listType = (Md.ListType)this.listType;
-            for (int idx = 0; idx < listItems.Count; ++idx)
+            for (int i = 0; i < this.fragments.Count; i++)
             {
                 Md.ListInfo listinfo = new Md.ListInfo();
-                listinfo.ContinuePreviousList = idx > 0;
+                listinfo.ContinuePreviousList = i > 0;
                 listinfo.ListType = listType;
-                Md.Paragraph listItem = document.LastSection.AddParagraph(listItems[idx]);
-                listItem.Tag = "ListItem";
-
-                listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                Md.Paragraph listItem = document.LastSection.AddParagraph();
+                listItem.Tag = "List~" + this.id;
+                listItem.Format.KeepTogether = true;
+                if(this.formatType== Font.Presets.None)
+                {
+                    listItem.RenderFragments(this.fragments[i]);
+                }
+                else
+                {
+                    listItem.AddText(this.Text);
+                    listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                }
                 listItem.Format.ListInfo = listinfo;
             }
         }
@@ -343,22 +383,29 @@ namespace PdfPlus
         public void RenderList(Md.Tables.Cell cell, Md.Document document)
         {
             Md.ListType listType = (Md.ListType)this.listType;
-            for (int idx = 0; idx < listItems.Count; ++idx)
+            for (int i = 0; i < this.fragments.Count; i++)
             {
                 Md.ListInfo listinfo = new Md.ListInfo();
-                listinfo.ContinuePreviousList = idx > 0;
+                listinfo.ContinuePreviousList = i > 0;
                 listinfo.ListType = listType;
-                Md.Paragraph listItem = cell.AddParagraph(listItems[idx]);
-                listItem.Tag = "ListItem";
-
-                listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                listinfo.Tag = "List~" + this.id;
+                Md.Paragraph listItem = cell.AddParagraph();
+                if (this.formatType == Font.Presets.None)
+                {
+                    listItem.RenderFragments(this.fragments[i]);
+                }
+                else
+                {
+                    listItem.AddText(this.Text);
+                    listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                }
                 listItem.Format.ListInfo = listinfo;
             }
         }
 
         public void RenderTable(Md.Tables.Table table, Md.Document document, double containerWidth)
         {
-            table.Tag = "Table";
+            table.Tag = "Table~" + this.id;
 
             int colCount = data.Count;
             int rowCount = 0;
@@ -522,7 +569,7 @@ namespace PdfPlus
 
         public void RenderChart(Md.Shapes.Charts.Chart chart, Md.Document document, double width)
         {
-            chart.Tag = "Chart";
+            chart.Tag = "Chart~" + this.id;
             chart.Type = this.chartType.ToMigraDoc();
 
             chart.TopArea.TopPadding = 15;
@@ -730,15 +777,21 @@ namespace PdfPlus
 
         }
 
-        public void RenderImage(Md.Shapes.Image image, Md.Document document)
+        public void RenderImage(Md.Shapes.Image image, Md.Document document, double width = -1)
         {
-            image.Tag = "Image";
+            image.Tag = "Image~" + this.id;
 
             if ((this.width > 0) & (this.height > 0))
             {
                 image.LockAspectRatio = false;
                 image.Width = this.width;
                 image.Height = this.height;
+            }
+            else if ((this.width < 0) & (this.height < 0))
+            {
+                image.LockAspectRatio = false;
+                image.Width = width;
+                image.LockAspectRatio = true;
             }
             else
             {
@@ -753,12 +806,13 @@ namespace PdfPlus
                     image.Height = this.height;
                 }
             }
+
             image.Left = this.Justification.ToMigraDocShapePosition();
         }
 
         public void RenderDrawing(Md.Shapes.TextFrame frame, Md.Document document, double width)
         {
-            frame.Tag = "Drawing";
+            frame.Tag = "Drawing~" + this.id;
 
             Rg.BoundingBox box = this.drawing.BoundingBox;
 
@@ -791,7 +845,7 @@ namespace PdfPlus
         {
             if (this.blocks.Count > 0)
             {
-                dock.Tag = "Dock";
+                dock.Tag = "Dock~" + this.id;
 
                 dock.Format.Alignment = Md.ParagraphAlignment.Justify;
 
@@ -852,6 +906,7 @@ namespace PdfPlus
                 case BlockTypes.LineBreak:
                     #region linebreak
                     Md.Paragraph brk = document.LastSection.AddParagraph();
+                    brk.Tag = "Linebreak~" + this.id;
                     for (int i = 0; i < this.breakCount; i++) brk.AddLineBreak();
                     #endregion
                     break;
@@ -890,7 +945,7 @@ namespace PdfPlus
                     string filename = this.imageName;
                     if (this.imageObject != null) filename = this.imageObject.ToBase64String("base64:");
 
-                    this.RenderImage(document.LastSection.AddImage(filename), document);
+                    this.RenderImage(document.LastSection.AddImage(filename), document, width);
                     #endregion
                     break;
                 case BlockTypes.Dock:

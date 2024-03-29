@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PdfPlus
 {
-    public class Shape : Element
+    public class Shape : ObjectAssembly
     {
 
         #region members
@@ -44,6 +44,23 @@ namespace PdfPlus
             this.scale = shape.scale;
         }
 
+        public Shape(Block block): base(block)
+        {
+            this.elementType = ElementTypes.Shape;
+            switch (block.BlockType)
+            {
+                case Block.BlockTypes.Chart:
+                    this.shapeType = ShapeType.ChartObj;
+                    break;
+                case Block.BlockTypes.Image:
+                    this.shapeType = ShapeType.ImageFrame;
+                    break;
+                case Block.BlockTypes.Text:
+                    this.shapeType = ShapeType.TextBox;
+                    break;
+            }
+        }
+
         #region text
 
         public static Shape CreateText(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
@@ -51,7 +68,20 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
-            shape.text = content;
+            shape.fragments.Add(new Fragment(content));
+            shape.alignment = alignment;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+            shape.font = new Font(font);
+
+            return shape;
+        }
+
+        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextBox;
+
+            shape.fragments.Add(new Fragment(content));
             shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
@@ -64,7 +94,19 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextObj;
 
-            shape.text = content;
+            shape.fragments.Add(new Fragment(content));
+            shape.location = new Rg.Point3d(location);
+            shape.font = new Font(font);
+
+            return shape;
+        }
+
+        public static Shape CreateText(Fragment content, Rg.Point3d location, Font font)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextObj;
+
+            shape.fragments.Add(new Fragment(content));
             shape.location = new Rg.Point3d(location);
             shape.font = new Font(font);
 
@@ -586,7 +628,7 @@ namespace PdfPlus
             }
         }
 
-        #region geometry rendering
+        #region rendering
 
         public Shape Transform(Rg.Transform transform)
         {
@@ -725,7 +767,7 @@ namespace PdfPlus
             Pd.XStringFormat format = new Pd.XStringFormat();
             format.Alignment = font.Justification.ToPdfLine();
             format.LineAlignment = Pd.XLineAlignment.BaseLine;
-            graph.DrawString(this.text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
+            graph.DrawString(this.Text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
 
             return graph;
         }
@@ -737,9 +779,7 @@ namespace PdfPlus
             Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
             textFormatter.Alignment = this.Font.Justification.ToPdf();
             textFormatter.LayoutRectangle = this.boundary.ToPdf();
-            textFormatter.Text = this.text;
-            textFormatter.Font = pdfFont;
-            textFormatter.DrawString(this.text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
 
             return graph;
         }

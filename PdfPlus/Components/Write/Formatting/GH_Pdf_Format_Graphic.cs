@@ -15,7 +15,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Format_Graphic()
           : base("Set Graphics", "Set Graphics",
-              "Edit shape or block graphical attributes",
+              "Modify Shape, Block, or DataSet graphics",
               Constants.ShortName, Constants.Formats)
         {
         }

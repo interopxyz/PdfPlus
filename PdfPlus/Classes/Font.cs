@@ -14,7 +14,7 @@ namespace PdfPlus
     public class Font
     {
         #region members
-        public enum Presets { Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption };
+        public enum Presets { None,Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption };
 
         protected bool isModified = false;
 

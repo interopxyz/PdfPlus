@@ -34,7 +34,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName,Constants.Fragment.Input, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -54,10 +54,12 @@ namespace PdfPlus.Components
             Point3d location = new Point3d();
             if (!DA.GetData(0, ref location)) return;
 
-            string content = string.Empty;
-            if (!DA.GetData(1, ref content)) return;
+            IGH_Goo goo = null;
+            if (!DA.GetData(1, ref goo)) return;
+                Fragment fragment = null;
+            if (!goo.TryGetFragment(ref fragment)) return;
 
-            Shape shape = Shape.CreateText(content, location, new Font());
+            Shape shape = Shape.CreateText(fragment, location, new Font());
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

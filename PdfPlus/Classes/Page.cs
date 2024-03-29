@@ -318,12 +318,7 @@ namespace PdfPlus
                 doc.Sections.AddSection();
                 doc = this.SetPage(doc);
 
-                List<Block> drawings = new List<Block>();
-                foreach (Block block in blocks)
-                {
-                    block.RenderToDocument(doc);
-                    if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
-                }
+                foreach (Block block in blocks) block.RenderToDocument(doc);
 
                 Pf.PdfDocument document = new Pf.PdfDocument();
                 Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
@@ -350,9 +345,57 @@ namespace PdfPlus
                     foreach (Mr.RenderInfo info in infos)
                     {
                         Rg.Rectangle3d gpRect = info.LayoutInfo.ContentArea.ToRectangle3d(newPage.Frame);
+                        Rg.Plane f = Rg.Plane.WorldXY;
                         Rg.Plane p = Rg.Plane.WorldZX;
                         p.Origin = newPage.Center;
                         gpRect.Transform(Rg.Transform.Mirror(p));
+                        f.Origin = gpRect.BoundingBox.Corner(true, true, true);
+                        double x = f.OriginX;
+                        double y = f.OriginY;
+
+                        if (info.DocumentObject.Tag != null)
+                        {
+                            string[] tag = info.DocumentObject.Tag.ToString().Split('~');
+                            Block block = this.blocks.Find(b => b.id == tag[1]);
+
+                            switch (tag[0])
+                            {
+                                //case "Table":
+                                //    Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
+                                //        double rh = gpRect.Height/table.Rows.Count;
+
+                                //    for (int r = 0; r < table.Rows.Count; r++)
+                                //    {
+                                //        f.OriginX = x;
+                                //        for (int c = 0; c < table.Columns.Count; c++)
+                                //        {
+                                //            double cw = table.Columns[c].Width.Point;
+
+                                //            newPage.AddShape(Shape.CreateGeometry(new Rg.Rectangle3d(f,new Rg.Interval(0,cw), new Rg.Interval(0, rh)), new Graphic()));
+                                //            newPage.AddShape(Shape.CreateText(block.Data[c].Contents[r], f.Origin, block.Font));
+                                //            f.OriginX += cw;
+                                //        }
+                                //        f.OriginY += rh;
+
+                                //    }
+                                //    break;
+                                case "Drawing":
+                                    newPage.AddShapes(block.Drawing.ResizeDrawing(gpRect,false));
+                                    break;
+                                case "Chart":
+                                    Shape shape = new Shape(block);
+                                    shape.SetBoundary(gpRect);
+                                    newPage.AddShape(shape);
+                                    break;
+                                case "Image":
+                                    Rg.Plane plane = Rg.Plane.WorldXY;
+                                    plane.Origin = f.Origin;
+                                    newPage.AddShape(Shape.CreateImage(block.Image, new Rg.Rectangle3d(plane,gpRect.Width,gpRect.Height),block.ImagePath));
+                                    break;
+                            }
+                        newPage.AddShape(Shape.CreateText(block.BlockType.ToString(),f.Origin,new Font()));
+                        }
+
                         newPage.AddShape(Shape.CreateGeometry(gpRect, new Graphic()));
                     }
 
@@ -403,31 +446,35 @@ namespace PdfPlus
                     {
                         Rg.Rectangle3d r = info.LayoutInfo.ContentArea.ToRectangle3d();
                         Rg.Plane p = r.Plane;
-                        if (info.DocumentObject.Tag == "Drawing")
-                        {
-                            drawings[j].Drawing.Render(graph, r);
-                            j++;
-                        }
+                        string[] tag = info.DocumentObject.Tag.ToString().Split('~');
 
-                        if (info.DocumentObject.Tag == "Dock")
+                        switch (tag[0])
                         {
-                            Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
-                            
-                            //p.OriginY+=table.Rows[0].Height / 2.0;
-                            for (int c = 0; c < table.Columns.Count; c++)
-                            {
-                                Mr.TableRenderInfo tinfo = (Mr.TableRenderInfo)info;
-                                Md.Tables.Cell cell = table.Rows[0].Cells[0];
-                                if (cell.Elements[0].Tag == "Drawing")
+                            case "Drawing":
+                                drawings[j].Drawing.Render(graph, r);
+                                j++;
+                                break;
+                            case "Dock":
+                                Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
+
+                                //p.OriginY+=table.Rows[0].Height / 2.0;
+                                for (int c = 0; c < table.Columns.Count; c++)
                                 {
-                                    Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)table.Rows[0].Cells[0].Elements[0];
-                                    p.OriginX += table.Columns[c].Width / 2.0-frame.Width/2.0;
-                                    Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, new Rg.Interval(0,frame.Width), new Rg.Interval( 0,frame.Height));
-                                    p.OriginX += table.Columns[c].Width/2.0+frame.Width/2.0;
-                                    subDrawings[k].Drawing.Render(graph, r2);
-                                    k++;
+                                    Mr.TableRenderInfo tinfo = (Mr.TableRenderInfo)info;
+                                    Md.Tables.Cell cell = table.Rows[0].Cells[0];
+
+                                    string[] subtag = cell.Elements[0].Tag.ToString().Split('~');
+                                    if (subtag[0] == "Drawing")
+                                    {
+                                        Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)table.Rows[0].Cells[0].Elements[0];
+                                        p.OriginX += table.Columns[c].Width / 2.0 - frame.Width / 2.0;
+                                        Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
+                                        p.OriginX += table.Columns[c].Width / 2.0 + frame.Width / 2.0;
+                                        subDrawings[k].Drawing.Render(graph, r2);
+                                        k++;
+                                    }
                                 }
-                            }
+                                break;
                         }
 
                         t += 1;
@@ -486,6 +533,18 @@ namespace PdfPlus
             Shape shp = new Shape(shape);
             if(align)shp.AlignContent(this, false);
             this.shapes.Add(shp);
+
+            return true;
+        }
+
+        public bool AddShapes(List<Shape> shapes, bool align = true)
+        {
+            foreach(Shape shape in shapes)
+            {
+            Shape shp = new Shape(shape);
+            if (align) shp.AlignContent(this, false);
+            this.shapes.Add(shp);
+            }
 
             return true;
         }

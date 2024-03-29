@@ -15,7 +15,8 @@ namespace PdfPlus
 
         #region members
 
-        public enum ElementTypes { Empty, Shape, Block, Data};
+        public string id = Guid.NewGuid().ToString();
+        public enum ElementTypes { Empty, Shape, Block, Data, Fragment};
         protected ElementTypes elementType = ElementTypes.Empty;
 
         public enum BorderStyles { None, Interior, All};
@@ -32,32 +33,9 @@ namespace PdfPlus
         //Text
         protected string text = string.Empty;
 
-        //Chart
-        public enum ChartTypes { Column, ColumnStacked, Bar, BarStacked, Line, Area, Pie };
-        protected ChartTypes chartType = ChartTypes.ColumnStacked;
-        protected List<DataSet> data = new List<DataSet>();
-        protected string xAxis = string.Empty;
-        protected string yAxis = string.Empty;
-
-        //Images
-        protected string imageName = string.Empty;
-        protected Sd.Bitmap imageObject = null;
-
-        //Table
-        protected bool hasAlternatingColor = false;
-        protected Sd.Color alternateColor = Sd.Color.Transparent;
-
         //Geometry
         protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
-        protected Rg.BoundingBox boundingBox = new Rg.BoundingBox();
         protected Rg.Point3d location = new Rg.Point3d();
-        protected Rg.Polyline polyline = new Rg.Polyline();
-        protected Rg.Line line = new Rg.Line();
-        protected Rg.Circle circle = new Rg.Circle();
-        protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
-
-        protected Rg.Brep brep = new Rg.Brep();
-        protected Rg.Mesh mesh = new Rg.Mesh();
 
         #endregion
 
@@ -65,11 +43,12 @@ namespace PdfPlus
 
         public Element()
         {
-
+            this.id = Guid.NewGuid().ToString();
         }
 
         public Element(Element element)
         {
+            this.id = element.id;
             this.elementType = element.elementType;
 
             //Formatting
@@ -85,41 +64,25 @@ namespace PdfPlus
             //Text
             this.text = element.text;
 
-            //Table
-            this.hasAlternatingColor = element.hasAlternatingColor;
-            this.alternateColor = element.alternateColor;
-
-            //Chart
-            this.chartType = element.chartType;
-            SetData(element.data);
-            this.xAxis = element.xAxis;
-            this.yAxis = element.yAxis;
-
-            //Image
-            this.imageName = element.imageName;
-            if (element.imageObject != null) this.imageObject = new Sd.Bitmap(element.imageObject);
-
             //Geoemtry
             this.boundary = new Rg.Rectangle3d(element.boundary.Plane, element.boundary.Corner(0), element.boundary.Corner(2));
-            this.boundingBox = new Rg.BoundingBox(element.boundingBox.GetCorners());
             this.location = new Rg.Point3d(element.location);
-            this.polyline = element.polyline.Duplicate();
-            this.line = new Rg.Line(element.line.From, element.line.To);
-            this.curve = new Rg.NurbsCurve(element.curve);
-            this.circle = new Rg.Circle(element.circle.Plane, element.circle.Radius);
-            this.brep = element.brep.DuplicateBrep();
-            this.mesh = element.mesh.DuplicateMesh();
-
         }
 
         #endregion
 
         #region properties
 
+        public virtual string ID
+        {
+            get { return this.id; }
+        }
+
         //Text
         public virtual string Text
         {
             get { return this.text; }
+            set { this.text = value; }
         }
 
         public virtual ElementTypes ElementType { get { return elementType; } }
@@ -147,7 +110,7 @@ namespace PdfPlus
         public virtual Font Font
         {
             get { return new Font(font); }
-            set { this.font = value; }
+            set { this.font = new Font(value); }
         }
 
         public virtual Sd.Color FontColor
@@ -225,49 +188,6 @@ namespace PdfPlus
             set { this.verticalBorderStyle = value; }
         }
 
-        public virtual Sd.Color AlternateColor
-        {
-            get { return this.alternateColor; }
-            set
-            {
-                this.hasAlternatingColor = true;
-                this.alternateColor = value;
-            }
-        }
-
-        //Chart
-        public virtual ChartTypes ChartType
-        {
-            get { return chartType; }
-        }
-
-        public virtual string XAxis
-        {
-            get { return this.xAxis; }
-            set { this.xAxis = value; }
-        }
-
-        public virtual string YAxis
-        {
-            get { return this.yAxis; }
-            set { this.yAxis = value; }
-        }
-
-        public virtual bool HasXAxis
-        {
-            get { return (this.xAxis != string.Empty); }
-        }
-
-        public virtual bool HasYAxis
-        {
-            get { return (this.yAxis != string.Empty); }
-        }
-
-        public virtual bool IsChartHorizontal
-        {
-            get { return ((int)this.chartType < 2); }
-        }
-
         //Geometry
         public virtual Rg.Point3d Location
         {
@@ -294,74 +214,13 @@ namespace PdfPlus
             get { return new Rg.Rectangle3d(this.boundary.Plane,this.boundary.Width,this.boundary.Height) ; }
         }
 
-        public virtual Rg.BoundingBox BoundingBox
-        {
-            get { return new Rg.BoundingBox(this.boundingBox.GetCorners()); }
-        }
-
-        public virtual Rg.Line Line
-        {
-            get { return new Rg.Line(this.line.From,this.line.To); }
-        }
-
-        public virtual Rg.Ellipse Ellipse
-        {
-            get { return new Rg.Ellipse(this.boundary.Plane, this.boundary.Width, this.boundary.Height); }
-        }
-
-        public virtual Rg.Polyline Polyline
-        {
-            get { return new Rg.Polyline(this.polyline); }
-        }
-        public virtual Rg.Circle Circle
-        {
-            get { return new Rg.Circle(this.circle.Plane,this.circle.Radius); }
-        }
-        public virtual Rg.Brep Brep
-        {
-            get { return this.brep.DuplicateBrep(); }
-        }
-
-        public virtual Rg.Mesh Mesh
-        {
-            get { return this.mesh.DuplicateMesh(); }
-        }
-
-        public virtual Rg.NurbsCurve Bezier
-        {
-            get
-            {
-                Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
-                nurbs.MakePiecewiseBezier(true);
-                return nurbs.DuplicateCurve().ToNurbsCurve();
-            }
-        }
-
-        public virtual Sd.Bitmap Image
-        {
-            get { return new Sd.Bitmap(this.imageObject); }
-        }
-
-        public virtual string ImagePath
-        {
-            get { return imageName; }
-        }
-
         #endregion
 
         #region methods
 
-        public void SetData(List<DataSet> data)
+        public void SetBoundary(Rg.Rectangle3d boundary)
         {
-            foreach (DataSet d in data)
-            {
-                this.data.Add(new DataSet(d));
-            }
-        }
-
-        public void SetData(DataSet data)
-        {
-                this.data.Add(new DataSet(data));
+            this.boundary = new Rg.Rectangle3d(boundary.Plane,boundary.X, boundary.Y);
         }
 
         #endregion
