@@ -93,12 +93,11 @@ namespace PdfPlus
         #region properties
 
         //Text
-
         public override string Text { get => this.FragmentText(); set => this.fragments = new List<Fragment> { new Fragment(value) }; }
 
         public override Font Font
         {
-            get { return new Font(font); }
+            get { return new Font(this.font); }
             set {
                 for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].SetFonts(value);
                 this.font = new Font(value); 
@@ -177,10 +176,12 @@ namespace PdfPlus
         {
             get { return new Rg.Polyline(this.polyline); }
         }
+
         public virtual Rg.Circle Circle
         {
             get { return new Rg.Circle(this.circle.Plane, this.circle.Radius); }
         }
+
         public virtual Rg.Brep Brep
         {
             get { return this.brep.DuplicateBrep(); }
@@ -248,6 +249,99 @@ namespace PdfPlus
         public void AddFragment(List<Fragment> fragments)
         {
             foreach (Fragment fragment in fragments) this.fragments.Add(new Fragment(fragment));
+        }
+
+        public List<string> BreakLines(string txt, double Width)
+        {
+            //Credit: THE FOLLOWING FUNCTION IS MODIFIED FROM ONE WRITTEN BY DAVID RUTTEN https://github.com/DavidRutten
+
+            if (string.IsNullOrWhiteSpace(txt)) return null;
+
+            if (string.IsNullOrWhiteSpace(this.FontFamily))
+                throw new ArgumentException("Font name not specified.");
+
+            if (this.FontSize <= 1.0)
+                throw new ArgumentException("Size needs to be at least 1.0, because the text measuring uses integer arithmetic.");
+
+            if (Width < this.FontSize * 2)
+                throw new ArgumentException("Container width must be at least 10 times the font size.");
+
+
+
+            Sd.Font font = new Sd.Font(this.FontFamily, (float)this.FontSize, Sd.FontStyle.Regular, Sd.GraphicsUnit.World);
+
+            string[] phrases = txt .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            List<string> words = new List<string>();
+            foreach(string phrase in phrases)
+            {
+                if (phrase.Contains(Environment.NewLine))
+                {
+                    string[] subtext = phrase.Trim().Split( new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                    //words.Add(Environment.NewLine);
+                    foreach (string t in subtext)
+                    {
+                        if (t == "")
+                        {
+                            words.Add(Environment.NewLine);
+                        }
+                        else
+                        {
+                            words.Add(t);
+                        }
+                    }
+                }
+                else
+                {
+                    words.Add(phrase.Trim());
+                }
+            }
+
+            Queue<string> queue = new Queue<string>(words);
+
+            List<string> lines = new List<string>();
+            while (queue.Count > 0)
+            {
+                string txtLine = ExtractLine(queue, font, Width);
+                    txtLine += " ";
+                    lines.Add(txtLine);
+            }
+
+            font.Dispose();
+            return lines;
+        }
+
+        private string ExtractLine(Queue<string> words, Sd.Font font, double maxWidth)
+        {
+            //Credit: THE FOLLOWING FUNCTION IS MODIFIED FROM ONE WRITTEN BY DAVID RUTTEN https://github.com/DavidRutten
+
+            // Try the first word. If it is already longer than the maximum width, return immediately.
+            string line = words.Dequeue();
+            double width = Grasshopper.Kernel.GH_FontServer.StringWidth(line, font);
+            if (words.Count < 1) return line;
+            if (width >= maxWidth)
+                return line;
+            if (line == Environment.NewLine) return line;
+
+            // Now add subsequent words one at a time.
+            while (true)
+            {
+                // No words left.
+                if (words.Count == 0)
+                    return line;
+
+                if (words.Peek() == Environment.NewLine) return line;
+
+                string longerLine = line + " " + words.Peek();
+                
+                width = Grasshopper.Kernel.GH_FontServer.StringWidth(longerLine, font);
+                if (width >= maxWidth)
+                    return line;
+
+                // We can fit the longer line.
+                // Remeber the new line and properly dequeue the appended word.
+                line = longerLine;
+                words.Dequeue();
+            }
         }
 
         #endregion

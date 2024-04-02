@@ -61,8 +61,6 @@ namespace PdfPlus
 
         public Block(Block block) : base(block)
         {
-            this.graphic = new Graphic(block.graphic);
-            this.font = new Font(block.font);
 
             this.blockType = block.blockType;
 
@@ -119,23 +117,26 @@ namespace PdfPlus
 
         #region text
 
-        public static Block CreateText(string content, Font.Presets format = Font.Presets.Normal)
+        public static Block CreateText(string content, Font.Presets format = Font.Presets.None)
         {
             Block block = new Block();
             block.blockType = BlockTypes.Text;
             block.formatType = format;
             block.formatName = format.ToString();
-            block.fragments.Add(new Fragment(content));
+            block.fragments.Add(new Fragment(content, Fonts.GetPreset(format)));
+            block.font = Fonts.GetPreset(format);
+
             return block;
         }
 
-        public static Block CreateText(Fragment fragment, Font.Presets format = Font.Presets.Normal)
+        public static Block CreateText(Fragment fragment, Font.Presets format = Font.Presets.None)
         {
             Block block = new Block();
             block.blockType = BlockTypes.Text;
             block.fragments.Add(new Fragment(fragment));
             block.formatType = format;
             block.formatName = format.ToString();
+            block.font = Fonts.GetPreset(format);
 
             return block;
         }
@@ -373,7 +374,7 @@ namespace PdfPlus
                 }
                 else
                 {
-                    listItem.AddText(this.Text);
+                    listItem.AddText(this.fragments[i].FullText);
                     listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
                 }
                 listItem.Format.ListInfo = listinfo;
@@ -396,7 +397,7 @@ namespace PdfPlus
                 }
                 else
                 {
-                    listItem.AddText(this.Text);
+                    listItem.AddText(this.fragments[i].FullText);
                     listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
                 }
                 listItem.Format.ListInfo = listinfo;

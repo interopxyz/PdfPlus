@@ -49,12 +49,35 @@ namespace PdfPlus
             this.Weight = weight;
         }
 
+        public Graphic(Sd.Color stroke, Sd.Color fillColor)
+        {
+            this.Stroke = stroke;
+            this.Weight = weight;
+            this.Pattern = pattern;
+            this.Color = fillColor;
+        }
+
+        public Graphic(Sd.Color stroke, double weight, List<double> pattern)
+        {
+            this.Stroke = stroke;
+            this.Weight = weight;
+            this.Pattern = pattern;
+        }
+
+        public Graphic(Sd.Color stroke, double weight, List<double> pattern, Sd.Color fillColor)
+        {
+            this.Stroke = stroke;
+            this.Weight = weight;
+            this.Pattern = pattern;
+            this.Color = fillColor;
+        }
+
         public Graphic(Sd.Color color)
         {
             this.Color = color;
 
-            this.stroke = Sd.Color.Transparent;
-            this.weight = 0.0;
+            this.Stroke = Sd.Color.Transparent;
+            this.Weight = 0.0;
         }
 
         public void SetPattern(string pattern)
@@ -129,5 +152,13 @@ namespace PdfPlus
         }
 
         #endregion
+    }
+
+    public static class Graphics
+    {
+                public static Graphic Outline { get { return new Graphic(Sd.Color.Black,1); } }
+        public static Graphic Dotted { get { return new Graphic(Sd.Color.Black, 1, new List<double> { 1, 1 }); } }
+        public static Graphic Dashed { get { return new Graphic(Sd.Color.Black, 1, new List<double> { 5, 5 }); } }
+        public static Graphic Solid { get { return new Graphic(Sd.Color.Black); } }
     }
 }

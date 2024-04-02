@@ -30,6 +30,8 @@ namespace PdfPlus
         protected Alignment alignment = Alignment.None;
         protected Justification justification = Justification.Left;
 
+        protected double angle = 0;
+
         //Text
         protected string text = string.Empty;
 
@@ -61,12 +63,14 @@ namespace PdfPlus
             this.horizontalBorderStyle = element.horizontalBorderStyle;
             this.verticalBorderStyle = element.verticalBorderStyle;
 
+            this.angle = element.angle;
             //Text
             this.text = element.text;
 
             //Geoemtry
             this.boundary = new Rg.Rectangle3d(element.boundary.Plane, element.boundary.Corner(0), element.boundary.Corner(2));
             this.location = new Rg.Point3d(element.location);
+
         }
 
         #endregion
@@ -97,6 +101,12 @@ namespace PdfPlus
         {
             get { return this.justification; }
             set { this.justification = value; }
+        }
+
+        public virtual double Angle
+        {
+             get{ return this.angle; }
+            set { this.angle = value; }
         }
 
         //Graphics

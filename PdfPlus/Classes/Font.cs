@@ -22,7 +22,7 @@ namespace PdfPlus
 
         protected string family = "Arial";
         protected bool hasFamily = false;
-        protected double size = 12.0;
+        protected double size = 11.0;
         protected bool hasSize = false;
         protected Sd.Color color = Sd.Color.Black;
         protected bool hasColor = false;
@@ -256,6 +256,37 @@ namespace PdfPlus
 
     public static class Fonts
     {
+        public static Font GetPreset(this Font.Presets input)
+        {
+            switch(input)
+            {
+                default:
+                    return Fonts.Normal;
+                case Font.Presets.Title:
+                    return Fonts.Title;
+                case Font.Presets.Subtitle:
+                    return Fonts.Subtitle;
+                case Font.Presets.Heading1:
+                    return Fonts.Heading1;
+                case Font.Presets.Heading2:
+                    return Fonts.Heading2;
+                case Font.Presets.Heading3:
+                    return Fonts.Heading3;
+                case Font.Presets.Heading4:
+                    return Fonts.Heading4;
+                case Font.Presets.Heading5:
+                    return Fonts.Heading5;
+                case Font.Presets.Heading6:
+                    return Fonts.Heading6;
+                case Font.Presets.Quote:
+                    return Fonts.Quote;
+                case Font.Presets.Footnote:
+                    return Fonts.Footnote;
+                case Font.Presets.Caption:
+                    return Fonts.Caption;
+            }
+        }
+
         public static Font Normal { get { return new Font("Normal", "Arial", 11, Sd.Color.Black); } }
         public static Font Title { get { return new Font("Title", "Arial", 26, Sd.Color.Black); } }
         public static Font Subtitle { get { return new Font("Subtitle", "Arial", 15, Sd.Color.DarkGray); } }

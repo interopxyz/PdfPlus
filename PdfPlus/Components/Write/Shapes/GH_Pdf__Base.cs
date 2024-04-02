@@ -9,6 +9,7 @@ namespace PdfPlus.Components
 {
     public abstract class GH_Pdf__Base : GH_Component
     {
+        private BoundingBox _displayBox = new BoundingBox();
         protected List<Shape> prev_shapes = new List<Shape>();
         protected List<Page> prev_pages = new List<Page>();
 
@@ -28,6 +29,7 @@ namespace PdfPlus.Components
 
         protected override void BeforeSolveInstance()
         {
+            _displayBox = new BoundingBox();
             prev_shapes = new List<Shape>();
             prev_pages = new List<Page>();
         }
@@ -75,10 +77,25 @@ namespace PdfPlus.Components
             get { return new Guid("92db2d26-2a13-4992-a450-f20704b41a73"); }
         }
 
+        protected void AddShapes(List<Shape> shapes)
+        {
+            foreach (Shape shape in shapes) this.AddShapes(shape);
+        }
+        protected void AddShapes(Page page)
+        {
+            prev_pages.Add(new Page(page));
+            this.AddShapes(page.Shapes);
+        }
+
+        protected void AddShapes(Shape shape)
+        {
+            prev_shapes.Add(shape);
+            _displayBox.Union(shape.BoundingBox);
+        }
+
         protected void PrevPageShapes(Page page)
         {
-            prev_shapes.AddRange(page.Shapes);
-            prev_pages.Add(new Page(page));
+            this.AddShapes(page);
         }
 
         protected void PrevDocumentShapes(Document doc)
@@ -86,8 +103,15 @@ namespace PdfPlus.Components
             foreach (Page page in doc.Pages)
             {
                 foreach(Page subPage in page.RenderBlocksToPages())this.PrevPageShapes(subPage);
-                prev_pages.Add(new Page(page));
-                prev_shapes.AddRange(page.Shapes);
+                this.AddShapes(page);
+            }
+        }
+
+        public override BoundingBox ClippingBox
+        {
+            get
+            {
+                return _displayBox;
             }
         }
 
@@ -110,11 +134,13 @@ namespace PdfPlus.Components
             }
 
             Color activeColor = mat.Diffuse;
-            double factor = (72.0 / 96.0);
+            double factor = (72.0 / 96.0*0.85);
 
             foreach (Page page in prev_pages)
             {
                 args.Display.DrawPatternedPolyline(page.Boundary.ToNurbsCurve().Points.ControlPolygon(), activeColor, 12, 1, false);
+                Rhino.Display.Text3d txt = new Rhino.Display.Text3d("All visualizations are for preview purposes only. (Text, Tables, and Lists are estimated, Charts are diagramatic representations, Drawing Graphics are approximated)",page.Boundary.Plane, messageSize);
+                args.Display.Draw3dText(txt, activeColor);
             }
 
             foreach (Shape shape in prev_shapes)
@@ -130,11 +156,19 @@ namespace PdfPlus.Components
                     fillColor = activeColor;
                     fontColor = activeColor;
                 }
+
                 switch (shape.Type)
                 {
+                    case Shape.ShapeType.None:
+                       args.Display.DrawPatternedPolyline(shape.Polyline, activeColor, 8, 1, false);
+
+                        break;
                     case Shape.ShapeType.TextObj:
                         plane.Origin = shape.Location;
+                        plane.Rotate(shape.Angle / 180.0 * Math.PI,plane.ZAxis);
                         Rhino.Display.Text3d text = new Rhino.Display.Text3d(shape.Text, plane, shape.FontSize * factor);
+                        text.HorizontalAlignment = shape.Font.Justification.ToRhHorizontalAlignment();
+                        text.VerticalAlignment = shape.Alignment.ToRhVerticalAlignment();
                         text.FontFace = shape.FontFamily;
                         text.Bold = shape.IsBold;
                         text.Italic = shape.IsItalic;
@@ -150,12 +184,11 @@ namespace PdfPlus.Components
                     case Shape.ShapeType.TextBox:
                         Point3d[] c = shape.PreviewPolyline.ToArray();
                         plane.Origin = c[0]+new Vector3d(0,-4,0);
-                        args.Display.Draw3dText("Preview Purposes Only", activeColor, plane, messageSize, messageFont);
                         plane.Origin = c[3] - new Vector3d(0, shape.FontSize * factor * 1.5, 0);
-                        List<string> lines = BreakLines(shape.Text, shape.FontFamily, shape.FontSize, shape.Boundary.Width);
+                        List<string> lines = shape.BreakLines(shape.Text,shape.Boundary.Width+18);
                         foreach (string line in lines)
                         {
-                            Rhino.Display.Text3d txt = new Rhino.Display.Text3d(line, plane, shape.FontSize * 72.0 / 100.0);
+                            Rhino.Display.Text3d txt = new Rhino.Display.Text3d(line, plane, shape.FontSize * 72.0 / 100.0*0.995);
                             txt.FontFace = shape.FontFamily;
                             txt.Bold = shape.IsBold;
                             txt.Italic = shape.IsItalic;
@@ -171,7 +204,6 @@ namespace PdfPlus.Components
 
                         plane.Origin = shape.PreviewPolyline.BoundingBox.Min;
                         args.Display.DrawDottedPolyline(shape.PreviewPolyline, fillColor,false);
-                        args.Display.Draw3dText("This preview does not represent actual chart appearance", activeColor, plane, messageSize, messageFont);
                         List<Curve> crvs = shape.RenderPreviewChart(out List<Color> clrs);
                         if (Attributes.Selected)
                         {
@@ -253,64 +285,6 @@ namespace PdfPlus.Components
 
             // Set Display Override
             base.DrawViewportWires(args);
-        }
-        //Credit: The following function was written by David Rutten
-        private List<string> BreakLines(string Text, string Font, double Size, double Width)
-        {
-            if (string.IsNullOrWhiteSpace(Text)) return null;
-
-            if (string.IsNullOrWhiteSpace(Font))
-                throw new ArgumentException("Font name not specified.");
-
-            if (Size <= 1.0)
-                throw new ArgumentException("Size needs to be at least 1.0, because the text measuring uses integer arithmetic.");
-
-            if (Width < Size * 10)
-                throw new ArgumentException("Container width must be at least 10 times the font size.");
-
-            System.Drawing.Font font = new System.Drawing.Font(Font, (float)Size, System.Drawing.FontStyle.Regular, GraphicsUnit.World);
-
-            string[] words = Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            Queue<string> queue = new Queue<string>(words);
-
-            List<string> lines = new List<string>();
-            while (queue.Count > 0)
-            {
-                string line = ExtractLine(queue, font, Width);
-                lines.Add(line);
-            }
-
-            font.Dispose();
-            return lines;
-        }
-
-        //Credit: The following function was written by David Rutten
-        private string ExtractLine(Queue<string> words, System.Drawing.Font font, double maxWidth)
-        {
-            // Try the first word. If it is already longer than the maximum width, return immediately.
-            string line = words.Dequeue();
-            double width = Grasshopper.Kernel.GH_FontServer.StringWidth(line, font);
-            if (width >= maxWidth)
-                return line;
-
-            // Now add subsequent words one at a time.
-            while (true)
-            {
-                // No words left.
-                if (words.Count == 0)
-                    return line;
-
-                string longerLine = line + " " + words.Peek();
-
-                width = Grasshopper.Kernel.GH_FontServer.StringWidth(longerLine, font);
-                if (width >= maxWidth)
-                    return line;
-
-                // We can fit the longer line.
-                // Remeber the new line and properly dequeue the appended word.
-                line = longerLine;
-                words.Dequeue();
-            }
         }
 
         private Mesh MeshColorByBitmap(Rectangle3d rectangle, Bitmap bitmap, int count)
