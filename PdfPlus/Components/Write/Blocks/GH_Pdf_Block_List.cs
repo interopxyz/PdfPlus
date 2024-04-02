@@ -1,5 +1,6 @@
 ﻿using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("List Items", "T", "A list of text to display", GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, Constants.Fragment.Input, GH_ParamAccess.list);
             pManager.AddIntegerParameter("Bullet Type", "B", "The list bullet type", GH_ParamAccess.item, 0);
             pManager[1].Optional = true;
 
@@ -57,13 +58,21 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<string> items = new List<string>();
-            DA.GetDataList(0, items);
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if (!DA.GetDataList(0, goos)) return;
+
+            List<Fragment> outputs = new List<Fragment>();
+
+            foreach (IGH_Goo goo in goos)
+            {
+                Fragment fragment = null;
+                if (goo.TryGetFragment(ref fragment)) outputs.Add(fragment);
+            }
 
             int type = 0;
             DA.GetData(1, ref type);
 
-            Block block = Block.CreateList(items,(Block.ListTypes)type);
+            Block block = Block.CreateList(outputs,(Block.ListTypes)type);
 
             DA.SetData(0, block);
         }

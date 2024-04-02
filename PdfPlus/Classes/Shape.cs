@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 using Sd = System.Drawing;
+
+using Rg = Rhino.Geometry;
+
 using Pc = PdfSharp.Charting;
 using Pf = PdfSharp.Pdf;
 using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
-using Rg = Rhino.Geometry;
-using System.IO;
 
 namespace PdfPlus
 {
-    public class Shape : Element
+    public class Shape : ObjectAssembly
     {
 
         #region members
@@ -44,6 +46,37 @@ namespace PdfPlus
             this.scale = shape.scale;
         }
 
+        public Shape(Block block): base(block)
+        {
+            this.elementType = ElementTypes.Shape;
+            switch (block.BlockType)
+            {
+                case Block.BlockTypes.Chart:
+                    this.shapeType = ShapeType.ChartObj;
+                    break;
+                case Block.BlockTypes.Image:
+                    this.shapeType = ShapeType.ImageFrame;
+                    break;
+                case Block.BlockTypes.Text:
+                    this.shapeType = ShapeType.TextBox;
+                    break;
+            }
+        }
+
+        #region preview
+
+        public static Shape CreatePreview(Rg.Rectangle3d boundary)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.None;
+
+            shape.polyline = boundary.ToNurbsCurve().Points.ControlPolygon();
+
+            return shape;
+        }
+
+        #endregion
+
         #region text
 
         public static Shape CreateText(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
@@ -51,7 +84,20 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
-            shape.text = content;
+            shape.fragments.Add(new Fragment(content,font));
+            shape.alignment = alignment;
+            shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
+            shape.font = new Font(font);
+
+            return shape;
+        }
+
+        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextBox;
+
+            shape.fragments.Add(new Fragment(content));
             shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
@@ -64,7 +110,19 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextObj;
 
-            shape.text = content;
+            shape.fragments.Add(new Fragment(content,font));
+            shape.location = new Rg.Point3d(location);
+            shape.font = new Font(font);
+
+            return shape;
+        }
+
+        public static Shape CreateText(Fragment content, Rg.Point3d location, Font font)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.TextObj;
+
+            shape.fragments.Add(new Fragment(content));
             shape.location = new Rg.Point3d(location);
             shape.font = new Font(font);
 
@@ -340,7 +398,9 @@ namespace PdfPlus
             if (this.Type == ShapeType.ChartObj)
             {
                 Rg.Plane plane = Rg.Plane.WorldXY;
-                double radius = Math.Min(this.boundary.Width, this.boundary.Height) * 0.4;
+                double width = this.boundary.Width * 0.8;
+                double height = this.boundary.Height * 0.8;
+                double radius = Math.Min(width, height) /2.0;
                 Rg.Point3d center = this.boundary.Center;
                 Rg.Point3d corner = new Rg.Point3d(center.X - radius, center.Y - radius, center.Z);
                 int count = data.Count;
@@ -375,7 +435,14 @@ namespace PdfPlus
                             }
                             else
                             {
-                                clrs.Add(data[0].Graphic.Color);
+                                if (data[0].Graphic.Color.A == 0)
+                                {
+                                    clrs.Add(Sd.Color.Black);
+                                }
+                                else
+                                {
+                                    clrs.Add(data[0].Graphic.Color);
+                                }
                             }
                             s++;
                         }
@@ -441,7 +508,14 @@ namespace PdfPlus
                                 }
                                 else
                                 {
-                                    clrs.Add(ds.Graphic.Color);
+                                    if (ds.Graphic.Color.A == 0)
+                                    {
+                                        clrs.Add(Sd.Color.Black);
+                                    }
+                                    else
+                                    {
+                                        clrs.Add(ds.Graphic.Color);
+                                    }
                                 }
                                 i++;
                             }
@@ -469,7 +543,14 @@ namespace PdfPlus
                                 }
                                 else
                                 {
-                                    clrs.Add(ds.Graphic.Color);
+                                    if (ds.Graphic.Color.A == 0)
+                                    {
+                                        clrs.Add(Sd.Color.Black);
+                                    }
+                                    else
+                                    {
+                                        clrs.Add(ds.Graphic.Color);
+                                    }
                                 }
                                 i++;
                             }
@@ -496,7 +577,14 @@ namespace PdfPlus
                                 }
                                 else
                                 {
-                                    clrs.Add(this.data[i].Graphic.Color);
+                                    if (this.data[i].Graphic.Color.A == 0)
+                                    {
+                                        clrs.Add(Sd.Color.Black);
+                                    }
+                                    else
+                                    {
+                                        clrs.Add(data[i].Graphic.Color);
+                                    }
                                 }
                             }
                             s++;
@@ -521,7 +609,14 @@ namespace PdfPlus
                                 }
                                 else
                                 {
-                                    clrs.Add(this.data[i].Graphic.Color);
+                                    if (this.data[i].Graphic.Color.A == 0)
+                                    {
+                                        clrs.Add(Sd.Color.Black);
+                                    }
+                                    else
+                                    {
+                                        clrs.Add(data[i].Graphic.Color);
+                                    }
                                 }
                             }
                             s++;
@@ -586,7 +681,7 @@ namespace PdfPlus
             }
         }
 
-        #region geometry rendering
+        #region rendering
 
         public Shape Transform(Rg.Transform transform)
         {
@@ -723,9 +818,10 @@ namespace PdfPlus
         protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
         {
             Pd.XStringFormat format = new Pd.XStringFormat();
+
             format.Alignment = font.Justification.ToPdfLine();
             format.LineAlignment = Pd.XLineAlignment.BaseLine;
-            graph.DrawString(this.text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
+            graph.DrawString(this.Text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
 
             return graph;
         }
@@ -737,9 +833,7 @@ namespace PdfPlus
             Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
             textFormatter.Alignment = this.Font.Justification.ToPdf();
             textFormatter.LayoutRectangle = this.boundary.ToPdf();
-            textFormatter.Text = this.text;
-            textFormatter.Font = pdfFont;
-            textFormatter.DrawString(this.text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
 
             return graph;
         }
@@ -945,7 +1039,6 @@ namespace PdfPlus
                                 series.LineFormat.Visible = true;
                                 series.LineFormat.Color = d.Graphic.Stroke.ToPdf();
                                 series.LineFormat.Width = d.Graphic.Weight;
-
                             }
 
                             if (d.Graphic.HasColor)

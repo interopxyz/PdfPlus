@@ -86,8 +86,10 @@
     <Compile Include="Classes\Drawing.cs" />
     <Compile Include="Classes\Element.cs" />
     <Compile Include="Classes\Font.cs" />
+    <Compile Include="Classes\Fragment.cs" />
     <Compile Include="Classes\Graphic.cs" />
     <Compile Include="Classes\Page.cs" />
+    <Compile Include="Classes\ObjectAssembly.cs" />
     <Compile Include="Classes\Shape.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartBasic.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
+    <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FragmentsJoin.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf__Base.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartBasic.cs" />
@@ -254,6 +257,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Block-Horizontal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Format-JoinFragment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

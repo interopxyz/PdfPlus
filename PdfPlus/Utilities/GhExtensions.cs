@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Sd = System.Drawing;
 
 using Rg = Rhino.Geometry;
+using Rd = Rhino.Display;
+using Ro = Rhino.DocObjects;
 
 using Ps = PdfSharp;
 using Pf = PdfSharp.Pdf;
@@ -22,6 +24,32 @@ namespace PdfPlus
 {
     public static class GhExtensions
     {
+
+        public static Ro.TextHorizontalAlignment ToRhHorizontalAlignment(this Justification input)
+        {
+            switch (input)
+            {
+                default:
+                    return Ro.TextHorizontalAlignment.Left;
+                case Justification.Right:
+                    return Ro.TextHorizontalAlignment.Right;
+                case Justification.Center:
+                    return Ro.TextHorizontalAlignment.Center;
+            }
+        }
+
+        public static Ro.TextVerticalAlignment ToRhVerticalAlignment(this Alignment input)
+        {
+            switch (input)
+            {
+                default:
+                    return Ro.TextVerticalAlignment.Bottom;
+                case Alignment.Top:
+                    return Ro.TextVerticalAlignment.Top;
+                case Alignment.Center:
+                    return Ro.TextVerticalAlignment.Middle;
+            }
+        }
 
         public static Rg.Rectangle3d ToRectangle3d(this Rg.BoundingBox input)
         {

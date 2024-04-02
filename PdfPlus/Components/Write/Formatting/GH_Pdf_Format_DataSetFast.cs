@@ -13,8 +13,13 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Format_DataSetFast class.
         /// </summary>
         public GH_Pdf_Format_DataSetFast()
-          : base("Quick Data", "Data",
-              "Compile text or numbers into a Data Set",
+          : base("Quick Data Set", "Data Set",
+              "Compiles a data tree of text or numbers into a list of Data Sets with optional formatting options." + Environment.NewLine +
+                "Each list will be compiled into a Data Set and the first branch of the data tree will be converted to the list." + Environment.NewLine +
+                "Ex. {A}:i[txt] = A[DataSet(i)] || {A;B}:i[txt] = {A}:B[DataSet(i)] || {A;B;C}:i[txt] = {A;B}:B[DataSet(i)]" + Environment.NewLine +
+                "For use with PDF+ Chart and Table components." + Environment.NewLine +
+                " - Table: Each DataSet is a column in the Table" + Environment.NewLine +
+                " - Chart: Each DataSet is a series in the Chart",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -24,7 +29,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>

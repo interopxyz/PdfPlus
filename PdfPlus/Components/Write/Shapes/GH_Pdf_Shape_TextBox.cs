@@ -35,7 +35,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
-            pManager.AddTextParameter("Content", "T", "The content of the text", GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, Constants.Fragment.Input, GH_ParamAccess.item);
             pManager.AddIntegerParameter("Alignment", "A", "The paragraph alignment", GH_ParamAccess.item,0);
             pManager[2].Optional = true;
 
@@ -63,14 +63,16 @@ namespace PdfPlus.Components
             Rectangle3d boundary = new Rectangle3d();
             if (!DA.GetData(0, ref boundary)) return;
 
-            string content = string.Empty;
-            if (!DA.GetData(1, ref content)) return;
+            IGH_Goo goo = null;
+            if (!DA.GetData(1, ref goo)) return;
+            Fragment fragment = null;
+            if (!goo.TryGetFragment(ref fragment)) return;
 
             int alignment = 0;
             if (!DA.GetData(2, ref alignment)) return;
 
 
-            Shape shape = Shape.CreateText(content, boundary,(Alignment)alignment, new Font());
+            Shape shape = Shape.CreateText(fragment, boundary,(Alignment)alignment, new Font());
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);

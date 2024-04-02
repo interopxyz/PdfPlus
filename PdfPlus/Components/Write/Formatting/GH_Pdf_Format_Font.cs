@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Format_Font()
           : base("Set Font", "Set Font",
-              "Edit basic shape or block Font properties",
+              "Modify Shape, Block, or DataSet fonts",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -98,24 +98,30 @@ namespace PdfPlus.Components
             int justification = 0;
             if (DA.GetData(5, ref justification)) font.Justification = (Justification)justification;
 
-            Shape shape = null;
-            Block block = null;
-            DataSet dataSet = null;
-            if (goo.TryGetShape(ref shape))
+            switch (elem.ElementType)
             {
-                shape.Font = font;
-                prev_shapes.Add(shape);
-                DA.SetData(0, shape);
-            }
-            else if (goo.TryGetBlock(ref block))
-            {
-                block.Font = font;
-                DA.SetData(0, block);
-            }
-            else if (goo.TryGetDataSet(ref dataSet))
-            {
-                dataSet.Font = font;
-                DA.SetData(0, dataSet);
+                case Element.ElementTypes.Block:
+                    goo.CastTo<Block>(out Block block);
+                    block.Font = font;
+                    DA.SetData(0, block);
+                    break;
+                case Element.ElementTypes.Shape:
+                    goo.CastTo<Shape>(out Shape shape);
+                    shape.Font = font;
+                    prev_shapes.Add(shape);
+                    DA.SetData(0, shape);
+                    break;
+                case Element.ElementTypes.Data:
+                    goo.CastTo<DataSet>(out DataSet dataSet);
+                    dataSet.Font = font;
+                    DA.SetData(0, dataSet);
+                    break;
+                case Element.ElementTypes.Fragment:
+                    Fragment fragment = null;
+                    goo.TryGetFragment(ref fragment);
+                    fragment.SetFonts(font);
+                    DA.SetData(0, fragment);
+                    break;
             }
         }
 

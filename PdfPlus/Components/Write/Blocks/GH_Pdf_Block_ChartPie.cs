@@ -59,7 +59,7 @@ namespace PdfPlus.Components
             DataSet data =null;
             if (!DA.GetData(0, ref data)) return;
 
-            Block block = Block.CreateChart(data, Element.ChartTypes.Pie);
+            Block block = Block.CreateChart(data, ObjectAssembly.ChartTypes.Pie);
 
             int alignment = 0;
             if (DA.GetData(1, ref alignment)) block.Alignment = (Alignment)alignment;
