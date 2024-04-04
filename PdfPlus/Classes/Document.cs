@@ -50,6 +50,7 @@ namespace PdfPlus
         #endregion
 
         #region properties
+
         public virtual List<Page> Pages
         {
             get
@@ -310,7 +311,20 @@ namespace PdfPlus
             pdf.PdfDocument doc = new pdf.PdfDocument();
             doc.PageLayout = this.PageLayout.ToPdf();
 
+            Dictionary<string,List<Page>> clusters = new Dictionary<string,  List<Page>>();
             foreach (Page pg in this.pages)
+            {
+                if (!clusters.ContainsKey(pg.id)) clusters.Add(pg.id, new List<Page>());
+                clusters[pg.id].Add(pg);
+            }
+
+            List<Page> queue = new List<Page>();
+            foreach(string key in clusters.Keys)
+            {
+                queue.AddRange(clusters[key].OrderBy(o => o.Index).ToList());
+            }
+
+            foreach (Page pg in queue)
             {
                 doc = pg.AddToDocument(doc);
             }
@@ -384,12 +398,6 @@ namespace PdfPlus
 
         public bool CastFrom(object source)
         {
-            // Note: GH_Param<T>.Cast_Object(object data), which is used when adding data to a floating parameter, or
-            // when collecting data from sources, tries to use
-            //   target = InstantiateT();
-            //   target.CastFrom(data) ...
-            // before trying to use
-            //   data.CastTo<T>(out target)
 
             if (source is Document)
             {

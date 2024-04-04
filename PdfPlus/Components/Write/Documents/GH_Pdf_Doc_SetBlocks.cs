@@ -44,6 +44,7 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -65,8 +66,9 @@ namespace PdfPlus.Components
 
             Document document = new Document(page);
             DA.SetData(0, document);
-            foreach(Page pg in page.RenderBlocksToPages()) this.PrevPageShapes(pg);
-
+            List<Page> pages = page.RenderBlocksToPages();
+            foreach (Page pg in pages) this.PrevPageShapes(pg);
+            DA.SetDataList(1, pages);
         }
 
         /// <summary>
@@ -78,7 +80,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Set_Blocks;
+                return Properties.Resources.Pdf_Block_Add;
             }
         }
 

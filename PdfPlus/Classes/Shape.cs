@@ -29,6 +29,8 @@ namespace PdfPlus
 
         protected double scale = 1.0;
 
+        public bool Renderable = true;
+
         #endregion
 
         #region constructors
@@ -44,6 +46,7 @@ namespace PdfPlus
             this.linkType = shape.linkType;
 
             this.scale = shape.scale;
+            this.Renderable = shape.Renderable;
         }
 
         public Shape(Block block): base(block)
@@ -85,6 +88,7 @@ namespace PdfPlus
             shape.font = Fonts.Preview;
             shape.angle = angle;
 
+            shape.Renderable = false;
             return shape;
         }
 

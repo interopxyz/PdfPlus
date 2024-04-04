@@ -18,10 +18,12 @@ namespace PdfPlus
 {
     public class Page
     {
+
         #region members
 
         public string id = Guid.NewGuid().ToString();
         public int Index = 0;
+        public int Total = 0;
 
         protected Pf.PdfPage baseObject = new Pf.PdfPage();
         protected Pd.XGraphics graph = null;
@@ -59,13 +61,15 @@ namespace PdfPlus
             this.Unit = reference.Unit;
             this.Frame = new Rg.Plane(reference.Frame);
             this.graph = reference.graph;
+            this.id = reference.id;
+            this.Index = reference.Index;
+            this.Total= reference.Total;
         }
 
         public Page(Page page, bool copyBase = true)
         {
             if (page != null)
             {
-                this.id = page.id;
                 foreach (Shape shape in page.shapes) this.shapes.Add(new Shape(shape));
                 foreach (Block block in page.blocks) this.blocks.Add(new Block(block));
 
@@ -73,6 +77,9 @@ namespace PdfPlus
                 this.Frame = new Rg.Plane(page.Frame);
                 if (copyBase) this.graph = page.graph;
                 this.baseObject = (Pf.PdfPage)page.baseObject.Clone();
+                this.id = page.id;
+                this.Index = page.Index;
+                this.Total = page.Total;
             }
         }
 
@@ -243,16 +250,6 @@ namespace PdfPlus
             this.baseObject.ArtBox = this.Boundary.Inflate(-20).ToPdfRect(this.Frame);//-1/4"XX
         }
 
-        public Pf.PdfDocument AddToDocument(Pf.PdfDocument document)
-        {
-            document = this.RenderBlocks(document);
-            if (shapes.Count > 0)
-            {
-                document.AddPage(this.baseObject);
-                this.Render(this.baseObject);
-            }
-            return document;
-        }
 
         public Md.Document SetPage(Md.Document document)
         {
@@ -312,6 +309,23 @@ namespace PdfPlus
             return document;
         }
 
+        public List<string> SubText(Block block, string text, double width, double height, ref int index)
+        {
+            int textLineIndex = index;
+            List<string> textLines = block.BreakLines(text, width + 12);
+            double lineHeight = block.FontSize * 1.5 * (72.0 / 96.0);
+            int lineCount = (int)Math.Floor(height / lineHeight);
+            List<string> textContents = textLines;
+            if ((textLineIndex + lineCount) > textLines.Count) lineCount = textLines.Count - textLineIndex;
+            textContents = textLines.GetRange(textLineIndex, lineCount);
+            textLineIndex += lineCount;
+            index = textLineIndex;
+
+            return textContents;
+        }
+
+        #region Previews
+
         public List<Page> RenderBlocksToPages()
         {
             List<Page> pages = new List<Page>();
@@ -337,6 +351,7 @@ namespace PdfPlus
                 int listIndex = 0;
 
                 double spacing = 0;
+                string newId= Guid.NewGuid().ToString();
                 for (int i = 0; i < count; i++)
                 {
                     pdfDocumentRenderer.RenderPages(i + 1, i + 1);
@@ -348,6 +363,10 @@ namespace PdfPlus
                     Page newPage = new Page(this.baseObject);
                     newPage.Frame = this.Frame;
                     newPage.Frame.OriginY += spacing;
+                    newPage.id = newId;
+                    newPage.Index = i;
+                    newPage.Total = (count - 1);
+
                     spacing -= (pageHeight + 10);
 
                     foreach (Mr.RenderInfo info in infos)
@@ -383,7 +402,6 @@ namespace PdfPlus
                                 textLineIndex = 0;
                                 listIndex = 0;
                                 lastTag = tag[1];
-
                             }
 
                             switch (tag[0])
@@ -450,7 +468,7 @@ namespace PdfPlus
 
                         newPage.AddShape(Shape.CreatePreview(boundary));
                     }
-
+                    newPage.AddBlocks(this.blocks);
                     pages.Add(newPage);
                 }
 
@@ -459,25 +477,10 @@ namespace PdfPlus
             return pages;
         }
 
-        public List<string> SubText(Block block, string text, double width, double height, ref int index)
-        {
-            int textLineIndex = index;
-            List<string> textLines = block.BreakLines(text, width + 12);
-            double lineHeight = block.FontSize * 1.5 * (72.0 / 96.0);
-            int lineCount = (int)Math.Floor(height / lineHeight);
-            List<string> textContents = textLines;
-            if ((textLineIndex + lineCount) > textLines.Count) lineCount = textLines.Count - textLineIndex;
-            textContents = textLines.GetRange(textLineIndex, lineCount);
-            textLineIndex += lineCount;
-            index = textLineIndex;
-
-            return textContents;
-        }
-
         public Shape PreviewText(List<string> lines, Block block, Rg.Rectangle3d boundary)
         {
-
             Shape shape = Shape.CreateText( string.Join("",lines), boundary, block.Alignment, block.Font);
+            shape.Renderable = false;
             return shape;
         }
 
@@ -520,6 +523,9 @@ namespace PdfPlus
                     frame.OriginX += cw;
                 }
             }
+
+            for (int i = 0; i < output.Count; i++) output[i].Renderable = false;
+
             index = tableRowIndex;
             return output;
         }
@@ -528,17 +534,40 @@ namespace PdfPlus
         {
             Shape shape = new Shape(block);
             shape.SetBoundary(boundary);
+            shape.Renderable = false;
             return shape;
         }
 
         public Shape PreviewImage(Block block, Rg.Rectangle3d boundary)
         {
-            return Shape.CreateImage(block.Image, boundary, block.ImagePath);
+            Shape shape = Shape.CreateImage(block.Image, boundary, block.ImagePath);
+            shape.Renderable = false;
+            return shape;
         }
 
         public List<Shape> PreviewDrawing(Block block, Rg.Rectangle3d boundary)
         {
+            List<Shape> output = block.Drawing.ResizeDrawing(boundary, false);
+            for (int i = 0; i < output.Count; i++) output[i].Renderable = false;
             return block.Drawing.ResizeDrawing(boundary, false);
+        }
+
+        #endregion
+
+        public Pf.PdfDocument AddToDocument(Pf.PdfDocument document)
+        {
+            bool newPage = false;
+            if (this.Index == 0)
+            {
+                document = this.RenderBlocks(document);
+                if (this.blocks.Count < 1) newPage = true;
+            }
+            if (shapes.Count > 0)
+            {
+                if(newPage)document.AddPage(this.baseObject);
+                this.Render(document.Pages[document.PageCount-1-(this.Total-this.Index)]);
+            }
+            return document;
         }
 
         public Pf.PdfDocument RenderBlocks(Pf.PdfDocument document)
@@ -630,8 +659,10 @@ namespace PdfPlus
             foreach (Shape shp in shapes)
             {
                 Shape shape = new Shape(shp);
+                if (shape.Renderable) { 
                 shape.AlignContent(this);
                 shape.Render(graph, page, this.Frame);
+                }
             }
             graph.Dispose();
         }
@@ -679,6 +710,13 @@ namespace PdfPlus
         public bool AddBlock(Block block)
         {
             this.blocks.Add(new Block(block));
+
+            return true;
+        }
+
+        public bool AddBlocks(List<Block> blocks)
+        {
+            foreach(Block block in blocks) this.blocks.Add(new Block(block));
 
             return true;
         }

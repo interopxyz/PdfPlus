@@ -63,6 +63,16 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Block_Add {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Block_Add", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Pdf_Block_Break {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Block_Break", resourceCulture);
@@ -346,6 +356,16 @@ namespace PdfPlus.Properties {
         internal static System.Drawing.Bitmap Pdf_Page_Set_Shapes {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Page_Set_Shapes", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Add {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Add", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
