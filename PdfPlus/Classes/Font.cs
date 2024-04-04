@@ -301,6 +301,7 @@ namespace PdfPlus
         public static Font Caption { get { return new Font("Caption", "Arial", 8, Sd.Color.Black); } }
         public static Font List { get { return new Font("List", "Arial", 11, Sd.Color.Black); } }
         public static Font Table { get { return new Font("Table", "Arial", 9, Sd.Color.Black, FontStyle.Regular, Justification.Center); } }
+        public static Font Preview { get { return new Font("Preview", "Arial", 4, Sd.Color.Black, FontStyle.Italic); } }
 
     }
 }

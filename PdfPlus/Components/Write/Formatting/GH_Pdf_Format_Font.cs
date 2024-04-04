@@ -35,13 +35,13 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Input, GH_ParamAccess.item);
-            pManager.AddTextParameter("Family Name", "F", "Optional font family name", GH_ParamAccess.item);
+            pManager.AddTextParameter("Family Name", "F", "Optional Font family name", GH_ParamAccess.item);
             pManager[1].Optional = true;
-            pManager.AddNumberParameter("Size", "S", "Optional font size", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Size", "S", "Optional Text size", GH_ParamAccess.item);
             pManager[2].Optional = true;
-            pManager.AddColourParameter("Color", "C", "Optional text color", GH_ParamAccess.item);
+            pManager.AddColourParameter("Color", "C", "Optional Text color", GH_ParamAccess.item);
             pManager[3].Optional = true;
-            pManager.AddIntegerParameter("Style", "T", "The font style type", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Styling", "T", "Options Text styling type", GH_ParamAccess.item);
             pManager[4].Optional = true;
             pManager.AddIntegerParameter("Justification", "J", "Text justification", GH_ParamAccess.item);
             pManager[5].Optional = true;
@@ -66,6 +66,11 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Output, GH_ParamAccess.item);
+            pManager.AddTextParameter("Family Name", "F", "Font family name", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Size", "S", "Text size", GH_ParamAccess.item);
+            pManager.AddColourParameter("Color", "C", "Text color", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Styling", "T", "Text styling type", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Justification", "J", "Text justification", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -85,18 +90,23 @@ namespace PdfPlus.Components
 
             string family = "Arial";
             if (DA.GetData(1, ref family)) font.Family = family;
+            DA.SetData(1, font.Family);
 
             double size = 10.0;
             if (DA.GetData(2, ref size)) font.Size = size;
+            DA.SetData(2, font.Size);
 
             Sd.Color color = Sd.Color.Black;
             if (DA.GetData(3, ref color)) font.Color = color;
+            DA.SetData(3, font.Color);
 
             int style = 0;
             if (DA.GetData(4, ref style)) font.Style = (FontStyle)style;
+            DA.SetData(4, font.Style);
 
             int justification = 0;
             if (DA.GetData(5, ref justification)) font.Justification = (Justification)justification;
+            DA.SetData(5, font.Justification);
 
             switch (elem.ElementType)
             {

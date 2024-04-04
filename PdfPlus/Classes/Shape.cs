@@ -21,7 +21,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj };
+        public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj, PreviewText, PreviewBoundary };
         protected ShapeType shapeType = ShapeType.None;
 
         public enum LinkTypes { Hyperlink, Filepath, Page };
@@ -68,9 +68,22 @@ namespace PdfPlus
         public static Shape CreatePreview(Rg.Rectangle3d boundary)
         {
             Shape shape = new Shape();
-            shape.shapeType = ShapeType.None;
+            shape.shapeType = ShapeType.PreviewBoundary;
 
             shape.polyline = boundary.ToNurbsCurve().Points.ControlPolygon();
+
+            return shape;
+        }
+
+        public static Shape CreatePreview(string text, Rg.Point3d location, double angle)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.PreviewText;
+
+            shape.location = new Rg.Point3d(location);
+            shape.fragments.Add(new Fragment(text));
+            shape.font = Fonts.Preview;
+            shape.angle = angle;
 
             return shape;
         }
@@ -221,9 +234,11 @@ namespace PdfPlus
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.Polyline;
+
             shape.boundingBox = polyline.BoundingBox;
             shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.polyline = polyline.Duplicate();
+            shape.curve = polyline.ToNurbsCurve();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -236,7 +251,8 @@ namespace PdfPlus
 
             shape.boundingBox = rectangle.BoundingBox;
             shape.boundary = shape.boundingBox.ToRectangle3d();
-            shape.polyline = rectangle.ToPolyline();
+            shape.polyline = rectangle.ToPolyline(); 
+            shape.curve = rectangle.ToNurbsCurve();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -250,6 +266,7 @@ namespace PdfPlus
             shape.boundingBox = line.BoundingBox;
             shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.line = new Rg.Line(line.From, line.To);
+            shape.curve = line.ToNurbsCurve();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -277,6 +294,7 @@ namespace PdfPlus
             shape.boundingBox = circle.BoundingBox;
             shape.boundary = shape.boundingBox.ToRectangle3d();
             shape.circle = new Rg.Circle(circle.Plane, circle.Radius);
+            shape.curve = circle.ToNurbsCurve();
             shape.graphic = new Graphic(graphic);
 
             return shape;
@@ -386,9 +404,95 @@ namespace PdfPlus
             set { this.scale = value; }
         }
 
+        public virtual bool IsPreview
+        {
+            get
+            {
+                switch (this.shapeType)
+                {
+                    case ShapeType.PreviewText:
+                    case ShapeType.PreviewBoundary:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        public virtual bool Is3d
+        {
+            get
+            {
+                switch (this.shapeType)
+                {
+                    case ShapeType.Mesh:
+                    case ShapeType.Brep:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        public virtual bool Is2d
+        {
+            get
+            {
+                switch (this.shapeType)
+                {
+                    case ShapeType.Arc:
+                    case ShapeType.Bezier:
+                    case ShapeType.Circle:
+                    case ShapeType.Ellipse:
+                    case ShapeType.Line:
+                    case ShapeType.Polyline:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        public virtual bool IsText
+        {
+            get
+            {
+                switch (this.shapeType)
+                {
+                    case ShapeType.TextBox:
+                    case ShapeType.TextObj:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        public virtual Rg.GeometryBase Geometry
+        {
+            get
+            {
+                switch (this.shapeType)
+                {
+                    case ShapeType.Arc:
+                    case ShapeType.Bezier:
+                    case ShapeType.Circle:
+                    case ShapeType.Ellipse:
+                    case ShapeType.Line:
+                    case ShapeType.Polyline:
+                        return this.Bezier;
+                    case ShapeType.Mesh:
+                        return this.Mesh;
+                    case ShapeType.Brep:
+                        return this.Brep;
+                }
+                return null;
+            }
+            }
+
         #endregion
 
-        #region methods
+            #region methods
 
         public List<Rg.Curve> RenderPreviewChart(out List<Sd.Color> colors)
         {

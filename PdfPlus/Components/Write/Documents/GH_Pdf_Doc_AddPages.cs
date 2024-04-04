@@ -1,4 +1,5 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -49,12 +50,22 @@ namespace PdfPlus.Components.Write.Documents
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Document document = new Document();
-            if (!DA.GetData(0, ref document)) return;
-            document = new Document(document);
 
+            //TRY GET DOCUMENT
+            IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Document document = new Document();
+            goo.TryGetDocument(ref document);
+
+            //TRY GET PAGES
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, goos)) return;
             List<Page> pages = new List<Page>();
-            if (!DA.GetDataList(1, pages)) return;
+            foreach (IGH_Goo g in goos)
+            {
+                Page page = new Page();
+                if (g.TryGetPage(ref page)) pages.Add(page);
+            }
 
             document.AddPages(pages);
 

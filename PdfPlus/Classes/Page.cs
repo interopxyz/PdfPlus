@@ -20,6 +20,9 @@ namespace PdfPlus
     {
         #region members
 
+        public string id = Guid.NewGuid().ToString();
+        public int Index = 0;
+
         protected Pf.PdfPage baseObject = new Pf.PdfPage();
         protected Pd.XGraphics graph = null;
 
@@ -62,6 +65,7 @@ namespace PdfPlus
         {
             if (page != null)
             {
+                this.id = page.id;
                 foreach (Shape shape in page.shapes) this.shapes.Add(new Shape(shape));
                 foreach (Block block in page.blocks) this.blocks.Add(new Block(block));
 
@@ -411,7 +415,7 @@ namespace PdfPlus
                                                 break;
                                             case Block.BlockTypes.List:
                                                 textLineIndex = 0;
-                                                newPage.AddShape(this.PreviewText(this.SubText(blk, blk.Fragments[listIndex].FullText, dockwidth, h, ref textLineIndex), blk, bnd));
+                                                newPage.AddShape(this.PreviewText(this.SubText(blk, block.ListType.ToUnicode(listIndex) + blk.Fragments[listIndex].FullText, dockwidth, h, ref textLineIndex), blk, bnd));
                                                 listIndex += 1;
                                                 break;
                                         }
@@ -432,14 +436,14 @@ namespace PdfPlus
                                     break;
                                 case "List":
                                     textLineIndex = 0;
-                                    newPage.AddShape(this.PreviewText(this.SubText(block, block.Fragments[listIndex].FullText, w, h, ref textLineIndex), block, boundary));
+                                    newPage.AddShape(this.PreviewText(this.SubText(block, block.ListType.ToUnicode(listIndex) + block.Fragments[listIndex].FullText, w, h, ref textLineIndex), block, boundary));
                                     listIndex += 1;
                                     break;
                                 case "Text":
                                     newPage.AddShape(this.PreviewText(this.SubText(block,block.Text,w,h,ref textLineIndex), block, boundary));
                                     break;
                             }
-                            Shape prevTxt = Shape.CreateText(block.BlockType.ToString(), new Rg.Point3d(x-1, y, 0), new Font("Arial",6,Sd.Color.Black, FontStyle.Italic));
+                            Shape prevTxt = Shape.CreatePreview(block.BlockType.ToString(), new Rg.Point3d(x-1, y, 0), 90);
                             prevTxt.Angle = 90;
                         newPage.AddShape(prevTxt);
                         }
@@ -670,6 +674,13 @@ namespace PdfPlus
             this.blocks.Add(block);
 
             return isValid;
+        }
+
+        public bool AddBlock(Block block)
+        {
+            this.blocks.Add(new Block(block));
+
+            return true;
         }
 
         #endregion

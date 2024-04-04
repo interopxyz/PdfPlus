@@ -300,6 +300,11 @@ namespace PdfPlus
 
         #region properties
 
+        public virtual ListTypes ListType
+        {
+            get { return this.listType; }
+        }
+
         public virtual BlockTypes BlockType
         {
             get { return this.blockType; }

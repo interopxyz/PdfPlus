@@ -33,14 +33,14 @@ namespace PdfPlus
         protected Sd.Color alternateColor = Sd.Color.Transparent;
 
         //Geometry
-        protected Rg.BoundingBox boundingBox = new Rg.BoundingBox();
-        protected Rg.Polyline polyline = new Rg.Polyline();
-        protected Rg.Line line = new Rg.Line();
-        protected Rg.Circle circle = new Rg.Circle();
-        protected Rg.NurbsCurve curve = new Rg.NurbsCurve(3, 2);
+        protected Rg.BoundingBox boundingBox = Rg.BoundingBox.Unset;
+        protected Rg.Polyline polyline = null;
+        protected Rg.Line line = Rg.Line.Unset;
+        protected Rg.Circle circle = Rg.Circle.Unset;
+        protected Rg.NurbsCurve curve = null;
 
-        protected Rg.Brep brep = new Rg.Brep();
-        protected Rg.Mesh mesh = new Rg.Mesh();
+        protected Rg.Brep brep = null;
+        protected Rg.Mesh mesh = null;
 
         #endregion
 
@@ -78,13 +78,13 @@ namespace PdfPlus
             if (assembly.imageObject != null) this.imageObject = new Sd.Bitmap(assembly.imageObject);
 
             //Geoemtry
-            this.boundingBox = new Rg.BoundingBox(assembly.boundingBox.GetCorners());
-            this.polyline = assembly.polyline.Duplicate();
-            this.line = new Rg.Line(assembly.line.From, assembly.line.To);
-            this.curve = new Rg.NurbsCurve(assembly.curve);
-            this.circle = new Rg.Circle(assembly.circle.Plane, assembly.circle.Radius);
-            this.brep = assembly.brep.DuplicateBrep();
-            this.mesh = assembly.mesh.DuplicateMesh();
+            if(assembly.boundingBox.IsValid)this.boundingBox = new Rg.BoundingBox(assembly.boundingBox.GetCorners());
+            if (assembly.polyline!=null)this.polyline = assembly.polyline.Duplicate();
+            if (assembly.line.IsValid) this.line = new Rg.Line(assembly.line.From, assembly.line.To);
+            if (assembly.curve != null) this.curve = new Rg.NurbsCurve(assembly.curve);
+            if (assembly.circle.IsValid) this.circle = new Rg.Circle(assembly.circle.Plane, assembly.circle.Radius);
+            if (assembly.brep != null) this.brep = assembly.brep.DuplicateBrep();
+            if (assembly.mesh != null) this.mesh = assembly.mesh.DuplicateMesh();
 
         }
 
@@ -159,46 +159,71 @@ namespace PdfPlus
 
         public virtual Rg.BoundingBox BoundingBox
         {
-            get { return new Rg.BoundingBox(this.boundingBox.GetCorners()); }
+            get {
+                if(this.boundingBox.IsValid) return new Rg.BoundingBox(this.boundingBox.GetCorners());
+                return Rg.BoundingBox.Unset;
+            }
         }
 
         public virtual Rg.Line Line
         {
-            get { return new Rg.Line(this.line.From, this.line.To); }
+            get {
+                if(this.line.IsValid)return new Rg.Line(this.line.From, this.line.To);
+                return Rg.Line.Unset;
+            }
         }
 
         public virtual Rg.Ellipse Ellipse
         {
-            get { return new Rg.Ellipse(this.boundary.Plane, this.boundary.Width, this.boundary.Height); }
+            get { 
+                if(this.boundary.IsValid)return new Rg.Ellipse(this.boundary.Plane, this.boundary.Width, this.boundary.Height);
+                return new Rg.Ellipse();
+            }
         }
 
         public virtual Rg.Polyline Polyline
         {
-            get { return new Rg.Polyline(this.polyline); }
+            get { 
+                if(this.polyline !=null) return new Rg.Polyline(this.polyline);
+                return null;
+            }
         }
 
         public virtual Rg.Circle Circle
         {
-            get { return new Rg.Circle(this.circle.Plane, this.circle.Radius); }
+            get { 
+                if(this.circle.IsValid) return new Rg.Circle(this.circle.Plane, this.circle.Radius);
+                return Rg.Circle.Unset;
+            }
         }
 
         public virtual Rg.Brep Brep
         {
-            get { return this.brep.DuplicateBrep(); }
+            get { 
+                if(this.brep!=null) return this.brep.DuplicateBrep();
+                return null;
+            }
         }
 
         public virtual Rg.Mesh Mesh
         {
-            get { return this.mesh.DuplicateMesh(); }
+            get { 
+                if(this.mesh!=null)return this.mesh.DuplicateMesh();
+                return null;
+            }
         }
 
         public virtual Rg.NurbsCurve Bezier
         {
             get
             {
-                Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
-                nurbs.MakePiecewiseBezier(true);
-                return nurbs.DuplicateCurve().ToNurbsCurve();
+                if (this.curve != null)
+                {
+                    Rg.NurbsCurve nurbs = this.curve.ToNurbsCurve();
+                    nurbs.MakePiecewiseBezier(true);
+                    return nurbs.DuplicateCurve().ToNurbsCurve();
+                }
+                return null;
             }
         }
 

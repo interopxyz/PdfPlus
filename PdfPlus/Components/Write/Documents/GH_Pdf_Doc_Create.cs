@@ -7,6 +7,7 @@ using PdfSharp;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 
 namespace PdfPlus.Components
 {
@@ -60,8 +61,15 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            //TRY GET PAGES
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if(!DA.GetDataList(0, goos))return;
             List<Page> pages = new List<Page>();
-            if(!DA.GetDataList(0, pages))return;
+            foreach(IGH_Goo goo in goos)
+            {
+                Page page = new Page();
+                if(goo.TryGetPage(ref page))pages.Add(page);
+            }
 
             Document document = new Document(pages);
 

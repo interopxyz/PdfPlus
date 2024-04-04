@@ -59,6 +59,40 @@ namespace PdfPlus
                 return output;
             }
         }
+
+        public virtual List<Shape> Shapes(bool blocks = false)
+        {
+                List<Shape> outputs = new List<Shape>();
+                
+                foreach (Page page in this.pages)
+                {
+                if (blocks) { 
+                    foreach(Page subPage in page.RenderBlocksToPages())
+                    {
+                        foreach (Shape shape in subPage.Shapes) if(!shape.IsPreview) outputs.Add(new Shape(shape));
+                    }
+                }
+                foreach (Shape shape in page.Shapes) if (!shape.IsPreview) outputs.Add(new Shape(shape));
+                }
+                return outputs;
+        }
+
+        public virtual List<Block> Blocks
+        {
+            get
+            {
+                List<Block> outputs = new List<Block>();
+                foreach (Page page in this.pages)
+                {
+                    foreach (Block block in page.Blocks)
+                    {
+                        outputs.Add(new Block(block));
+                    }
+                }
+                return outputs;
+            }
+        }
+
         #endregion
 
         #region methods
