@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using Grasshopper.Kernel.Types;
 
 namespace PdfPlus.Components
 {
@@ -55,14 +56,13 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-                Document document = null;
-            if (!DA.GetData(0, ref document))
-            {
-                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Please provide a document.");
-                return;
-            }
-            document = new Document(document);
-                PrevDocumentShapes(document);
+            //TRY GET DOCUMENT
+            IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Document document = new Document();
+            if(!goo.TryGetDocument(ref document))return;
+
+            PrevDocumentShapes(document);
 
             bool save = false;
             DA.GetData(3, ref save);

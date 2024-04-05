@@ -50,6 +50,10 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Output, GH_ParamAccess.item);
+            pManager.AddColourParameter("Fill Color", "F", "The fill color of the shape", GH_ParamAccess.item);
+            pManager.AddColourParameter("Stroke Color", "S", "The stroke color of the shape", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Stroke Weight", "W", "The stroke weight of the shape", GH_ParamAccess.item);
+            pManager.AddTextParameter("Pattern", "P", "Dash Pattern as string", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -61,23 +65,27 @@ namespace PdfPlus.Components
 
             Graphic graphic = new Graphic();
 
-        IGH_Goo goo = null;
+            IGH_Goo goo = null;
             if (!DA.GetData(0, ref goo)) return;
             Element elem = null;
-        bool isElement = goo.TryGetElement(ref elem);
+            bool isElement = goo.TryGetElement(ref elem);
             if (isElement) graphic = new Graphic(elem.Graphic);
 
             Sd.Color fill = Sd.Color.Black;
             if (DA.GetData(1, ref fill)) graphic.Color = fill;
+            DA.SetData(1, graphic.Color);
 
             Sd.Color stroke = Sd.Color.Black;
             if (DA.GetData(2, ref stroke)) graphic.Stroke = stroke;
+            DA.SetData(2, graphic.Stroke);
 
             double weight = 1.0;
             if (DA.GetData(3, ref weight)) graphic.Weight = weight;
+            DA.SetData(3, graphic.Weight);
 
             string pattern = "1.0,2.0";
             if (DA.GetData(4, ref pattern)) graphic.SetPattern(pattern);
+            DA.SetData(4, graphic.Pattern);
 
             Shape shape = null;
             Block block = null;

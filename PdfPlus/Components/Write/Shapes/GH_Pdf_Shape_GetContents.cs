@@ -4,18 +4,16 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Shapes
 {
-    public class GH_Pdf_Page_AddContents : GH_Pdf__Base
+    public class GH_Pdf_Shape_GetContents : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
+        /// Initializes a new instance of the GH_Pdf_Shape_GetContents class.
         /// </summary>
-        public GH_Pdf_Page_AddContents()
-          : base("Set Shapes", "Set Shp",
-              "Place Text, Image, or Geometric based Shapes to a PDF Page.",
+        public GH_Pdf_Shape_GetContents()
+          : base("Get Shape Contents", "Contents",
+              "Gets geometric, text, and other contents",
               Constants.ShortName, Constants.Shapes)
         {
         }
@@ -25,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -33,9 +31,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
-            pManager[1].Optional = true;
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -43,7 +39,10 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "Shape Boundary", GH_ParamAccess.item);
+            pManager.AddPointParameter("Location", "L", "Shape Location Point", GH_ParamAccess.item);
+            pManager.AddTextParameter("Text", "T", "Text contents when applicable", GH_ParamAccess.item);
+            pManager.AddGeometryParameter("Geometry", "G", "Geometry contents when applicable", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -52,20 +51,16 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Page page = null;
-            if (!DA.GetData(0, ref page))return;
-            page = new Page(page);
+            IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Shape shape = null;
+            if(!goo.TryGetShape(ref shape))return;
 
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, geometry)) return;
+            if(shape.Boundary.IsValid) DA.SetData(0, shape.Boundary);
+            if (shape.Location.IsValid) DA.SetData(1, shape.Location);
+            if(shape.Text!="") DA.SetData(2, shape.Text);
+            if (shape.Geometry!=null) DA.SetData(3, shape.Geometry);
 
-            foreach(IGH_Goo goos in geometry)
-            {
-                page.AddShape(goos);
-            }
-
-            this.PrevPageShapes(page);
-            DA.SetData(0, page);
         }
 
         /// <summary>
@@ -77,7 +72,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Shape_Add;
+                return Properties.Resources.Pdf_Shape_Contents;
             }
         }
 
@@ -86,7 +81,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("7e649fc6-716b-4079-90eb-9fd203298a38"); }
+            get { return new Guid("8632b176-4bfa-4df5-ac1e-4c6796c2bd17"); }
         }
     }
 }

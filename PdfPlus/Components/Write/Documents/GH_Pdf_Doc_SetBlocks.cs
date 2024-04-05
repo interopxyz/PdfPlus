@@ -44,6 +44,7 @@ namespace PdfPlus.Components
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -52,19 +53,22 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Page page = null;
-            if (!DA.GetData(0, ref page)) return;
-            page = new Page(page);
+            //TRY GET PAGES
+            IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Page page = new Page();
+            if (!goo.TryGetPage(ref page)) return;
 
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, geometry)) return;
-
-            foreach (IGH_Goo goos in geometry) page.AddBlock(goos);
+            //TRY GET BLOCKS
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, goos)) return;
+            foreach (IGH_Goo g in goos) page.AddBlock(g);
 
             Document document = new Document(page);
             DA.SetData(0, document);
-            foreach(Page pg in page.RenderBlocksToPages()) this.PrevPageShapes(pg);
-
+            List<Page> pages = page.RenderBlocksToPages();
+            foreach (Page pg in pages) this.PrevPageShapes(pg);
+            DA.SetDataList(1, pages);
         }
 
         /// <summary>
@@ -76,7 +80,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Set_Blocks;
+                return Properties.Resources.Pdf_Block_Add;
             }
         }
 

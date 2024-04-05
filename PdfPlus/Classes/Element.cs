@@ -36,8 +36,8 @@ namespace PdfPlus
         protected string text = string.Empty;
 
         //Geometry
-        protected Rg.Rectangle3d boundary = new Rg.Rectangle3d();
-        protected Rg.Point3d location = new Rg.Point3d();
+        protected Rg.Rectangle3d boundary = Rg.Rectangle3d.Unset;
+        protected Rg.Point3d location = Rg.Point3d.Unset;
 
         #endregion
 
@@ -201,27 +201,35 @@ namespace PdfPlus
         //Geometry
         public virtual Rg.Point3d Location
         {
-            get { return new Rg.Point3d(this.location); }
+            get { 
+                if(this.location.IsValid)return new Rg.Point3d(this.location);
+                return Rg.Point3d.Unset;
+            }
         }
 
         public virtual Rg.Rectangle3d PreviewBoundary
         {
             get
             {
-                return new Rg.Rectangle3d(this.boundary.Plane, this.boundary.X, this.boundary.Y);
+                if(this.boundary.IsValid)return new Rg.Rectangle3d(this.boundary.Plane, this.boundary.X, this.boundary.Y);
+                return Rg.Rectangle3d.Unset;
             }
         }
 
         public virtual Rg.Polyline PreviewPolyline
         {
             get {
-                return this.boundary.ToNurbsCurve().Points.ControlPolygon(); 
+                if(this.boundary.IsValid)return this.boundary.ToNurbsCurve().Points.ControlPolygon();
+                return null;
             }
         }
 
         public virtual Rg.Rectangle3d Boundary
         {
-            get { return new Rg.Rectangle3d(this.boundary.Plane,this.boundary.Width,this.boundary.Height) ; }
+            get { 
+                if(this.boundary.IsValid)return new Rg.Rectangle3d(this.boundary.Plane,this.boundary.Width,this.boundary.Height) ;
+                return Rg.Rectangle3d.Unset;
+            }
         }
 
         #endregion

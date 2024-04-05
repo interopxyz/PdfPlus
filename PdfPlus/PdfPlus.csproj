@@ -102,10 +102,13 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Table.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_AddPages.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_GetBlocks.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_GetShapes.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FragmentsJoin.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_GetContents.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf__Base.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartBasic.cs" />
@@ -260,6 +263,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Format-JoinFragment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Deconstruct.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Deconstruct.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Contents.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Shape-Add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Add.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

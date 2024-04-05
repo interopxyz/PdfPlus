@@ -1,4 +1,7 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Components;
+using Grasshopper.Kernel.Types;
+using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
@@ -9,9 +12,12 @@ namespace PdfPlus.Components
 {
     public abstract class GH_Pdf__Base : GH_Component
     {
+        private double factor =(72.0 / 96.0) * 0.85;
+        private double bump = (72.0 / 100.0) * 0.995;
         private BoundingBox _displayBox = new BoundingBox();
         protected List<Shape> prev_shapes = new List<Shape>();
         protected List<Page> prev_pages = new List<Page>();
+        public override bool IsBakeCapable => (prev_shapes.Count + prev_pages.Count) > 0;
 
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Base_ShapePreview class.
@@ -134,7 +140,6 @@ namespace PdfPlus.Components
             }
 
             Color activeColor = mat.Diffuse;
-            double factor = (72.0 / 96.0*0.85);
 
             foreach (Page page in prev_pages)
             {
@@ -159,44 +164,27 @@ namespace PdfPlus.Components
 
                 switch (shape.Type)
                 {
-                    case Shape.ShapeType.None:
+                    case Shape.ShapeType.PreviewBoundary:
                        args.Display.DrawPatternedPolyline(shape.Polyline, activeColor, 8, 1, false);
 
                         break;
+                    case Shape.ShapeType.PreviewText:
+                        args.Display.Draw3dText(shape.ToSingleLineText(),fontColor);
+
+                        break;
                     case Shape.ShapeType.TextObj:
-                        plane.Origin = shape.Location;
-                        plane.Rotate(shape.Angle / 180.0 * Math.PI,plane.ZAxis);
-                        Rhino.Display.Text3d text = new Rhino.Display.Text3d(shape.Text, plane, shape.FontSize * factor);
-                        text.HorizontalAlignment = shape.Font.Justification.ToRhHorizontalAlignment();
-                        text.VerticalAlignment = shape.Alignment.ToRhVerticalAlignment();
-                        text.FontFace = shape.FontFamily;
-                        text.Bold = shape.IsBold;
-                        text.Italic = shape.IsItalic;
+
+                        Rhino.Display.Text3d text = shape.ToSingleLineText(factor);
 
                         args.Display.Draw3dText(text, fontColor);
                         args.Display.DrawPoint(shape.Location, Rhino.Display.PointStyle.Circle, 2, activeColor);
 
                         Point3d[] corners = text.BoundingBox.GetCorners();
                         if (shape.IsUnderlined) args.Display.DrawLine(new Line(corners[0], corners[1]), fontColor);
-
                         if (shape.IsStrikeout) args.Display.DrawLine(new Line((corners[0] + corners[3]) / 2.0, (corners[1] + corners[2]) / 2.0), fontColor);
                         break;
                     case Shape.ShapeType.TextBox:
-                        Point3d[] c = shape.PreviewPolyline.ToArray();
-                        plane.Origin = c[0]+new Vector3d(0,-4,0);
-                        plane.Origin = c[3] - new Vector3d(0, shape.FontSize * factor * 1.5, 0);
-                        List<string> lines = shape.BreakLines(shape.Text,shape.Boundary.Width+18);
-                        foreach (string line in lines)
-                        {
-                            Rhino.Display.Text3d txt = new Rhino.Display.Text3d(line, plane, shape.FontSize * 72.0 / 100.0*0.995);
-                            txt.FontFace = shape.FontFamily;
-                            txt.Bold = shape.IsBold;
-                            txt.Italic = shape.IsItalic;
-
-                            args.Display.Draw3dText(txt, fontColor);
-                            plane.Origin = plane.Origin + new Vector3d(0, -shape.FontSize * factor * 1.8, 0);
-                        }
-
+                        args.Display.Draw3dText(shape.ToMultiLineTextBlock(bump), fontColor);
                         args.Display.DrawDottedPolyline(shape.PreviewPolyline, activeColor, false);
                         break;
 
@@ -340,6 +328,86 @@ namespace PdfPlus.Components
         {
             Mesh mesh = Mesh.CreateFromPlane(rectangle.Plane, rectangle.X, rectangle.Y, 1, 1);
             return mesh;
+        }
+
+        public override void BakeGeometry(RhinoDoc doc, ObjectAttributes att, List<Guid> obj_ids)
+        {
+            if (this.prev_pages.Count > 0 && this.IsBakeCapable)
+            {
+                foreach(Page page in this.prev_pages)
+                {
+                    GH_CustomPreviewItem item = new GH_CustomPreviewItem();
+                    item.Geometry = (IGH_PreviewData)GH_Convert.ToGeometricGoo(page.Boundary);
+                    GH_Material shader = new GH_Material(Color.Black);
+                    item.Material = shader;
+                    item.Shader = shader.Value;
+                    item.Colour = shader.Value.Diffuse;
+                    Guid guid = item.PushToRhinoDocument(doc, att);
+                    if (guid != Guid.Empty)
+                    {
+                        obj_ids.Add(guid);
+                    }
+                }
+            }
+                if (this.prev_shapes.Count > 0 && this.IsBakeCapable)
+            {
+                if (att == null) att = doc.CreateDefaultAttributes();
+
+                foreach (Shape shp in this.prev_shapes)
+                {
+                    Guid guid = Guid.Empty;
+                    if (shp.Geometry != null)
+                    {
+                        GH_CustomPreviewItem item = new GH_CustomPreviewItem();
+                        item.Geometry = (IGH_PreviewData)GH_Convert.ToGeometricGoo(shp.Geometry);
+                        GH_Material shader = new GH_Material(shp.Graphic.Stroke);
+                        item.Material = shader;
+                        item.Shader = shader.Value;
+                        item.Colour = shader.Value.Diffuse;
+                        if(shp.Is2d)att.ObjectColor = shp.Graphic.Stroke;
+                        if (shp.Is2d) att.PlotColor = shp.Graphic.Stroke;
+                        if (shp.Is3d) att.ObjectColor = shp.Graphic.Color;
+                        if (shp.Is3d) att.PlotColor = shp.Graphic.Color;
+                        guid = item.PushToRhinoDocument(doc, att);
+                        if (guid != Guid.Empty)
+                        {
+                            obj_ids.Add(guid);
+                        }
+                    }
+                    switch (shp.Type)
+                    {
+                        case Shape.ShapeType.TextBox:
+                        case Shape.ShapeType.TextObj:
+                            if (shp.Type == Shape.ShapeType.TextObj) guid = doc.Objects.AddText(shp.ToSingleLineText(RhinoMath.UnitScale(UnitSystem.PrinterPoints, doc.ModelUnitSystem) * 96 * factor * 0.9));
+                            if (shp.Type == Shape.ShapeType.TextBox) guid = doc.Objects.AddText(shp.ToMultiLineTextBlock(RhinoMath.UnitScale(UnitSystem.PrinterPoints, doc.ModelUnitSystem) * 96 * factor * 1.011));
+
+                            if (guid != Guid.Empty)
+                            {
+                                obj_ids.Add(guid);
+                            }
+                            break;
+                        case Shape.ShapeType.ChartObj:
+                            List<Curve> chartCurves = shp.RenderPreviewChart(out List<Color> chartColors);
+                            for (int i = 0; i < chartCurves.Count; i++)
+                            {
+
+                                att.ObjectColor = chartColors[i];
+                                att.PlotColor = chartColors[i];
+                                guid = doc.Objects.AddCurve(chartCurves[i], att);
+
+                                if (guid != Guid.Empty)
+                                {
+                                    obj_ids.Add(guid);
+                                }
+                            }
+                            break;
+                        case Shape.ShapeType.ImageFrame:
+                        case Shape.ShapeType.ImageObj:
+                            guid = doc.Objects.AddCurve(shp.PreviewBoundary.ToNurbsCurve(), att);
+                            break;
+                    }
+                }
+            }
         }
 
     }

@@ -300,6 +300,11 @@ namespace PdfPlus
 
         #region properties
 
+        public virtual ListTypes ListType
+        {
+            get { return this.listType; }
+        }
+
         public virtual BlockTypes BlockType
         {
             get { return this.blockType; }
@@ -944,7 +949,7 @@ namespace PdfPlus
                 case BlockTypes.Image:
                     #region image
                     string filename = this.imageName;
-                    if (this.imageObject != null) filename = this.imageObject.ToBase64String("base64:");
+                    if (this.imageName == string.Empty) filename = this.imageObject.ToBase64String("base64:");
 
                     this.RenderImage(document.LastSection.AddImage(filename), document, width);
                     #endregion

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Sd = System.Drawing;
 
 using Rg = Rhino.Geometry;
+using Rd = Rhino.Display;
 
 using Ps = PdfSharp;
 using Pf = PdfSharp.Pdf;
@@ -27,6 +28,171 @@ namespace PdfPlus
     public static class PdfExtensions
     {
         #region Grasshopper 
+
+        public static string ToAlpha(this int index)
+        {
+            string alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+            string output = "";
+
+            if (index >= alphabet.Length)
+                output += alphabet[index / alphabet.Length - 1];
+            output += alphabet[index % alphabet.Length];
+
+            return output;
+        }
+
+        public static string ToUnicode(this Block.ListTypes input, int index =0)
+        {
+            string s = "\u00A0";
+            switch (input)
+            {
+                default:
+                    return "\u2022" + s + s + s + s + s + s + s + s + s + s;
+                case Block.ListTypes.Circle:
+                    return "\u25E6" + s + s + s + s + s + s + s + s + s + s;
+                case Block.ListTypes.Square:
+                    return "\u25A0" + s + s + s + s + s + s + s + s + s + s;
+                case Block.ListTypes.Number:
+                    return index.ToString()+ "." + s + s + s + s + s + s + s + s + s;
+                case Block.ListTypes.NumberAlt:
+                    return index.ToString() + ")" + s + s + s + s + s + s + s + s + s;
+                case Block.ListTypes.Letter:
+                    return index.ToAlpha() + ")"+ s + s + s + s + s + s + s + s + s;
+            }
+        }
+
+        public static Rd.Text3d ToSingleLineText(this Shape input, Rg.Plane plane, double factor = 1.0)
+        {
+            Rd.Text3d text = new Rd.Text3d(input.Text, plane, input.FontSize * factor);
+
+            text.HorizontalAlignment = input.Font.Justification.ToRhHorizontalAlignment();
+            text.VerticalAlignment = input.Alignment.ToRhVerticalAlignment();
+            text.FontFace = input.FontFamily;
+            text.Bold = input.IsBold;
+            text.Italic = input.IsItalic;
+
+            return text;
+        }
+
+        public static Rd.Text3d ToSingleLineText(this Shape input, double factor = 1.0)
+        {
+            Rg.Plane plane = Rg.Plane.WorldXY;
+                plane.Origin = input.Location;
+            plane.Rotate(input.Angle / 180.0 * Math.PI, plane.ZAxis);
+            
+
+            return input.ToSingleLineText(plane,factor);
+        }
+
+        public static List<Rd.Text3d> ToMultiLineText(this Shape input, double factor = 1.0, double bump = 1.0)
+        {
+            List<Rd.Text3d> output = new List<Rd.Text3d>();
+            Rg.Point3d[] c = input.PreviewPolyline.ToArray();
+            Rg.Plane plane = Rg.Plane.WorldXY;
+            plane.Origin = c[0] + new Rg.Vector3d(0, -4, 0);
+            plane.Origin = c[3] - new Rg.Vector3d(0, input.FontSize * factor * 1.5, 0);
+            List<string> lines = input.BreakLines(input.Text, input.Boundary.Width + 18);
+            foreach (string line in lines)
+            {
+                Rd.Text3d text = new Rd.Text3d(line, plane, input.FontSize * bump);
+                text.HorizontalAlignment = input.Font.Justification.ToRhHorizontalAlignment();
+                text.VerticalAlignment = input.Alignment.ToRhVerticalAlignment();
+                text.FontFace = input.FontFamily;
+                text.Bold = input.IsBold;
+                text.Italic = input.IsItalic;
+                output.Add(text);
+                plane.Origin = plane.Origin + new Rg.Vector3d(0, -input.FontSize * factor * 1.8, 0);
+
+            }
+
+            return output;
+        }
+
+        public static Rd.Text3d ToMultiLineTextBlock(this Shape input, double factor = 1.0)
+        {
+            Rg.Point3d[] c = input.PreviewPolyline.ToArray();
+            Rg.Plane plane = Rg.Plane.WorldXY;
+            plane.Origin = c[3] + new Rg.Vector3d(0, -input.Font.Size/5, 0) ;
+            List<string> lines = input.BreakLines(input.Text, input.Boundary.Width + 18);
+            List<string> subLines = new List<string>();
+            foreach (string line in lines)
+            {
+                string ln = line;
+                if (line == "\r\n ") ln = "";
+                    subLines.Add(ln);
+            }
+
+            Rd.Text3d text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize* factor);
+            text.HorizontalAlignment = input.Font.Justification.ToRhHorizontalAlignment();
+            text.VerticalAlignment = Rhino.DocObjects.TextVerticalAlignment.Top;
+            text.FontFace = input.FontFamily;
+            text.Bold = input.IsBold;
+            text.Italic = input.IsItalic;
+
+            return text;
+        }
+
+        public static bool TryGetDocument(this IGH_Goo goo, ref Document document)
+        {
+            Document doc = new Document();
+            Page page = new Page();
+            bool isValid = false;
+
+            if (goo.TypeName == "PdfPlus")
+            {
+                doc = (Document)goo;
+                document = new Document(doc);
+                isValid = true;
+            }
+            else if (goo.TryGetPage(ref page))
+            {
+                doc.AddPages(page);
+                document = doc;
+                isValid = true;
+            }
+            return isValid;
+        }
+
+
+        public static bool TryGetPage(this IGH_Goo goo, ref Page page)
+        {
+                Page pg = new Page();
+            Shape shape = null;
+            Fragment fragment = new Fragment();
+            Block block = new Block();
+            bool isValid = false;
+
+            if (goo.CastTo<Page>(out pg))
+            {
+                page = new Page(pg);
+                isValid = true;
+            }
+            else if (goo.TryGetShape(ref shape))
+            {
+                pg.AddShape(shape);
+                page = pg;
+                isValid = true;
+            }
+            else if(goo.TryGetBlock(ref block))
+            {
+                pg.AddBlock(block);
+                page = pg;
+                isValid = true;
+            }
+            else if( goo.TryGetGeometricShape(ref shape)) { 
+                pg.AddShape(shape);
+                page = pg;
+                isValid = true;
+            }
+            else if(goo.TryGetFragment(ref fragment))
+            {
+                pg.AddBlock(Block.CreateText(fragment));
+                page = pg;
+                isValid = true;
+            }
+            return isValid;
+        }
 
         public static bool TryGetGeometricShape(this IGH_Goo goo, ref Shape shape)
         {
@@ -125,6 +291,7 @@ namespace PdfPlus
             }
             return isValid;
         }
+
         public static bool TryGetShape(this IGH_Goo goo, ref Shape shape)
         {
             Shape shp;
@@ -146,6 +313,8 @@ namespace PdfPlus
         public static bool TryGetBlock(this IGH_Goo goo, ref Block block)
         {
             Block blk;
+                Shape shp = null;
+            Fragment fragment = null;
             bool isValid = false;
 
             if (goo.CastTo<Block>(out blk))
@@ -153,11 +322,15 @@ namespace PdfPlus
                 block = new Block(blk);
                 isValid = true;
             }
-            else
+            else if(goo.TryGetGeometricShape(ref shp))
             {
-                Shape shp = null;
-                isValid = goo.TryGetGeometricShape(ref shp);
-                if (isValid) block = Block.CreateDrawing(shp);
+                block = Block.CreateDrawing(shp);
+                isValid = true;
+            }
+            else if(goo.TryGetFragment(ref fragment))
+            {
+                block = Block.CreateText(fragment);
+                isValid = true;
             }
 
             return isValid;
