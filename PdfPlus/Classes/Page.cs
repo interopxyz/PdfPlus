@@ -516,13 +516,13 @@ namespace PdfPlus
                 {
                     cw = table.Columns[c].Width.Point;
 
-                    //newPage.AddShape(Shape.CreateGeometry(new Rg.Rectangle3d(f,new Rg.Interval(0,cw), new Rg.Interval(0, rh)), new Graphic(Sd.Color.Gray,1)));
                     Shape tableContent = Shape.CreateText(block.Data[c].Contents[r], frame.Origin + new Rg.Point3d(cw / 2.0, rh / 2.0, 0), block.Font);
                     tableContent.Alignment = Alignment.Center;
                     output.Add(tableContent);
                     frame.OriginX += cw;
                 }
             }
+            output.Add(Shape.CreateGeometry(boundary, new Graphic(Sd.Color.Gray, 1)));
 
             for (int i = 0; i < output.Count; i++) output[i].Renderable = false;
 
@@ -549,7 +549,7 @@ namespace PdfPlus
         {
             List<Shape> output = block.Drawing.ResizeDrawing(boundary, false);
             for (int i = 0; i < output.Count; i++) output[i].Renderable = false;
-            return block.Drawing.ResizeDrawing(boundary, false);
+            return output;
         }
 
         #endregion

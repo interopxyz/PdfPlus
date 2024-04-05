@@ -58,8 +58,10 @@ namespace PdfPlus.Components
 
             bool blocks = false;
             DA.GetData(1, ref blocks);
+            List<Shape> shapes = document.Shapes(blocks);
 
-            DA.SetDataList(0, document.Shapes(blocks));
+            PrevDocumentShapes(document);
+            DA.SetDataList(0, shapes);
         }
 
         /// <summary>

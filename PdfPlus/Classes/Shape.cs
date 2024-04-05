@@ -797,17 +797,21 @@ namespace PdfPlus
 
             shape.boundary.Transform(transform);
             shape.boundingBox.Transform(transform);
+            shape.location.Transform(transform);
 
             switch (this.shapeType)
             {
                 case ShapeType.Line:
                     shape.line.Transform(transform);
+                    shape.curve.Transform(transform);
                     break;
                 case ShapeType.Polyline:
                     shape.polyline.Transform(transform);
+                    shape.curve.Transform(transform);
                     break;
                 case ShapeType.Circle:
                     shape.circle.Transform(transform);
+                    shape.curve.Transform(transform);
                     break;
                 case ShapeType.Bezier:
                     shape.curve.Transform(transform);
@@ -817,9 +821,6 @@ namespace PdfPlus
                     break;
                 case ShapeType.Mesh:
                     shape.mesh.Transform(transform);
-                    break;
-                case ShapeType.TextObj:
-                    shape.location.Transform(transform);
                     break;
             }
             return shape;
@@ -1233,9 +1234,11 @@ namespace PdfPlus
                     }
                     else
                     {
+                        if (dt.Graphic.HasColor) { 
                         for (int p = 0; p < pieseries.Elements.Count; p++)
                         {
                             pieseries.Elements[p].FillFormat.Color = dt.Graphic.Color.ToPdf();
+                        }
                         }
                     }
                     break;

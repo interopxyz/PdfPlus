@@ -44,20 +44,21 @@ namespace PdfPlus
 
         public static string ToUnicode(this Block.ListTypes input, int index =0)
         {
+            string s = "\u00A0";
             switch (input)
             {
                 default:
-                    return "\u2022";
+                    return "\u2022" + s + s + s + s + s + s + s + s + s + s;
                 case Block.ListTypes.Circle:
-                    return "\u25E6";
+                    return "\u25E6" + s + s + s + s + s + s + s + s + s + s;
                 case Block.ListTypes.Square:
-                    return "\u25A0";
+                    return "\u25A0" + s + s + s + s + s + s + s + s + s + s;
                 case Block.ListTypes.Number:
-                    return index.ToString()+".";
+                    return index.ToString()+ "." + s + s + s + s + s + s + s + s + s;
                 case Block.ListTypes.NumberAlt:
-                    return index.ToString() + ")";
+                    return index.ToString() + ")" + s + s + s + s + s + s + s + s + s;
                 case Block.ListTypes.Letter:
-                    return index.ToAlpha() + ")";
+                    return index.ToAlpha() + ")"+ s + s + s + s + s + s + s + s + s;
             }
         }
 
@@ -112,16 +113,17 @@ namespace PdfPlus
         {
             Rg.Point3d[] c = input.PreviewPolyline.ToArray();
             Rg.Plane plane = Rg.Plane.WorldXY;
-            plane.Origin = c[0] + new Rg.Vector3d(0, -4, 0);
-            plane.Origin = c[3] ;
+            plane.Origin = c[3] + new Rg.Vector3d(0, -input.Font.Size/5, 0) ;
             List<string> lines = input.BreakLines(input.Text, input.Boundary.Width + 18);
             List<string> subLines = new List<string>();
             foreach (string line in lines)
             {
-                subLines.Add(line);
+                string ln = line;
+                if (line == "\r\n ") ln = "";
+                    subLines.Add(ln);
             }
 
-            Rd.Text3d text = new Rhino.Display.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize* factor);
+            Rd.Text3d text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize* factor);
             text.HorizontalAlignment = input.Font.Justification.ToRhHorizontalAlignment();
             text.VerticalAlignment = Rhino.DocObjects.TextVerticalAlignment.Top;
             text.FontFace = input.FontFamily;

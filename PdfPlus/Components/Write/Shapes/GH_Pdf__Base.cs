@@ -355,6 +355,7 @@ namespace PdfPlus.Components
 
                 foreach (Shape shp in this.prev_shapes)
                 {
+                    Guid guid = Guid.Empty;
                     if (shp.Geometry != null)
                     {
                         GH_CustomPreviewItem item = new GH_CustomPreviewItem();
@@ -367,22 +368,43 @@ namespace PdfPlus.Components
                         if (shp.Is2d) att.PlotColor = shp.Graphic.Stroke;
                         if (shp.Is3d) att.ObjectColor = shp.Graphic.Color;
                         if (shp.Is3d) att.PlotColor = shp.Graphic.Color;
-                        Guid guid = item.PushToRhinoDocument(doc, att);
+                        guid = item.PushToRhinoDocument(doc, att);
                         if (guid != Guid.Empty)
                         {
                             obj_ids.Add(guid);
                         }
                     }
-                    if (shp.IsText)
+                    switch (shp.Type)
                     {
-                        Guid guid = new Guid();
-                        if (shp.Type == Shape.ShapeType.TextObj) guid = doc.Objects.AddText(shp.ToSingleLineText(RhinoMath.UnitScale(UnitSystem.PrinterPoints, doc.ModelUnitSystem)*96*factor*0.9));
-                        if (shp.Type == Shape.ShapeType.TextBox) guid = doc.Objects.AddText(shp.ToMultiLineTextBlock(RhinoMath.UnitScale(UnitSystem.PrinterPoints, doc.ModelUnitSystem) *96* factor*1.011));
+                        case Shape.ShapeType.TextBox:
+                        case Shape.ShapeType.TextObj:
+                            if (shp.Type == Shape.ShapeType.TextObj) guid = doc.Objects.AddText(shp.ToSingleLineText(RhinoMath.UnitScale(UnitSystem.PrinterPoints, doc.ModelUnitSystem) * 96 * factor * 0.9));
+                            if (shp.Type == Shape.ShapeType.TextBox) guid = doc.Objects.AddText(shp.ToMultiLineTextBlock(RhinoMath.UnitScale(UnitSystem.PrinterPoints, doc.ModelUnitSystem) * 96 * factor * 1.011));
 
-                        if (guid != Guid.Empty)
-                        {
-                            obj_ids.Add(guid);
-                        }
+                            if (guid != Guid.Empty)
+                            {
+                                obj_ids.Add(guid);
+                            }
+                            break;
+                        case Shape.ShapeType.ChartObj:
+                            List<Curve> chartCurves = shp.RenderPreviewChart(out List<Color> chartColors);
+                            for (int i = 0; i < chartCurves.Count; i++)
+                            {
+
+                                att.ObjectColor = chartColors[i];
+                                att.PlotColor = chartColors[i];
+                                guid = doc.Objects.AddCurve(chartCurves[i], att);
+
+                                if (guid != Guid.Empty)
+                                {
+                                    obj_ids.Add(guid);
+                                }
+                            }
+                            break;
+                        case Shape.ShapeType.ImageFrame:
+                        case Shape.ShapeType.ImageObj:
+                            guid = doc.Objects.AddCurve(shp.PreviewBoundary.ToNurbsCurve(), att);
+                            break;
                     }
                 }
             }
