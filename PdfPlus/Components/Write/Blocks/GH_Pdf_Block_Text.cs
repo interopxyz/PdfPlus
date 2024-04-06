@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Block_Text()
           : base("Text Block", "Txt Blk",
-              "Create a text block",
+              "Create a text Block",
               Constants.ShortName, Constants.Blocks)
         {
         }

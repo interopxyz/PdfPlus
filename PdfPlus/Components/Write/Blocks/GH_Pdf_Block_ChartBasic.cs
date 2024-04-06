@@ -13,7 +13,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Block_ChartBasic()
           : base("Basic Chart Block", "Cht Blk",
-              "Create a basic chart block",
+              "Create a Bar, Column, Line, or Area Chart Block.",
               Constants.ShortName, Constants.Blocks)
         {
         }

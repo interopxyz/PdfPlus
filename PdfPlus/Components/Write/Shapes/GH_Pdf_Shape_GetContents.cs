@@ -13,7 +13,7 @@ namespace PdfPlus.Components.Write.Shapes
         /// </summary>
         public GH_Pdf_Shape_GetContents()
           : base("Get Shape Contents", "Contents",
-              "Gets geometric, text, and other contents",
+              "Get geometric, text, and other Shape contents",
               Constants.ShortName, Constants.Shapes)
         {
         }
@@ -23,7 +23,7 @@ namespace PdfPlus.Components.Write.Shapes
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.secondary; }
+            get { return GH_Exposure.tertiary; }
         }
 
         /// <summary>

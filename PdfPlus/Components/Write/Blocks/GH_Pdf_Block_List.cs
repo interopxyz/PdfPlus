@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Block_List()
           : base("List Block", "Lst Blk",
-              "Create a bulleted or numbered list block",
+              "Create an unordered (bulleted) list or numbered list Block",
               Constants.ShortName, Constants.Blocks)
         {
         }

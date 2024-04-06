@@ -12,8 +12,8 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Shape_AddGraph class.
         /// </summary>
         public GH_Pdf_Shape_ChartBasic()
-          : base("Add Chart", "Chart",
-              "Create a Chart Shape within a rectangular boundary",
+          : base("Basic Chart Shape", "Cht Shp",
+              "Create a Bar, Column, Line, or Area Chart Shape within a rectangular boundary.",
               Constants.ShortName, Constants.Shapes)
         {
         }
@@ -31,7 +31,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("DataSet", "Ds", "Chart Data to visualize", GH_ParamAccess.list);
+            pManager.AddGenericParameter("DataSet", "Ds", "Chart Data Set to visualize", GH_ParamAccess.list);
             pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
             pManager[1].Optional = true;
             pManager.AddIntegerParameter("Type", "T", "The chart format to be displayed", GH_ParamAccess.item, 0);

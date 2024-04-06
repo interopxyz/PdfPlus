@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Block_Image()
           : base("Image Block", "Img Blk",
-              "Create an image block",
+              "Create an image Block",
               Constants.ShortName, Constants.Blocks)
         {
         }

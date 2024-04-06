@@ -12,7 +12,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Page_AddRectangle class.
         /// </summary>
         public GH_Pdf_Page_AddRectangle()
-          : base("Add Page Boundary", "Page Rect",
+          : base("Create Page Boundary", "Page Rect",
               "Create a new PDF Page from a boundary rectangle in Point units",
               Constants.ShortName, Constants.Pages)
         {

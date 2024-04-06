@@ -12,7 +12,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_AddPageTemplate class.
         /// </summary>
         public GH_Pdf_Page_AddMetric()
-          : base("Add Page Metric", "Page Metric",
+          : base("Create Page Metric", "Page Metric",
               "Create a new PDF Page from a standard metric page size",
               Constants.ShortName, Constants.Pages)
         {

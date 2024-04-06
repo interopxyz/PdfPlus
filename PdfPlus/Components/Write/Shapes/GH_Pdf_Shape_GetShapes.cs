@@ -4,17 +4,17 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Formatting
+namespace PdfPlus.Components
 {
-    public class GH_Pdf_Format_FragmentsJoin : GH_Component
+    public class GH_Pdf_Shape_GetShapes : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Format_JoinFragments class.
+        /// Initializes a new instance of the GH_Pdf_Doc_GetPages class.
         /// </summary>
-        public GH_Pdf_Format_FragmentsJoin()
-          : base("Join Text Fragments", "Join Frag",
-              "Join Text or PDF+ Text Fragments into a larger fragment while main ",
-              Constants.ShortName, Constants.Blocks)
+        public GH_Pdf_Shape_GetShapes()
+          : base("Get Shapes", "Get Shp",
+              "Get the Shapes from Pages or Documents.",
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -31,7 +31,9 @@ namespace PdfPlus.Components.Write.Formatting
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, "PDF Text Fragments or Text", GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Preview Blocks", "B", "If true, preview Shapes of Block elements will be rendered", GH_ParamAccess.item, false);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace PdfPlus.Components.Write.Formatting
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, Constants.Fragment.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -48,20 +50,18 @@ namespace PdfPlus.Components.Write.Formatting
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<IGH_Goo> goos = new List<IGH_Goo>();
-            if (!DA.GetDataList(0, goos)) return;
+            //TRY GET DOCUMENT
+            IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Document document = new Document();
+            if (!goo.TryGetDocument(ref document)) return;
 
-            Fragment output = new Fragment();
+            bool blocks = false;
+            DA.GetData(1, ref blocks);
+            List<Shape> shapes = document.Shapes(blocks);
 
-            foreach (IGH_Goo goo in goos)
-            {
-                Fragment fragment = null;
-                if (goo.TryGetFragment(ref fragment)) output.AddFragments(fragment);
-            }
-
-            if (output.Texts.Count < 1) return;
-
-            DA.SetData(0, output);
+            PrevDocumentShapes(document);
+            DA.SetDataList(0, shapes);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace PdfPlus.Components.Write.Formatting
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Format_JoinFragment;
+                return Properties.Resources.Pdf_Shape_Deconstruct;
             }
         }
 
@@ -82,7 +82,7 @@ namespace PdfPlus.Components.Write.Formatting
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("b981432c-3b90-41c3-8895-a994b0c5af63"); }
+            get { return new Guid("c8ef1e93-ef08-47aa-9fcf-3d26b57c716f"); }
         }
     }
 }

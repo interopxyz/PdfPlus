@@ -12,7 +12,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_AddPageImperial class.
         /// </summary>
         public GH_Pdf_Page_AddImperial()
-          : base("Add Page Imperial", "Page Imperial",
+          : base("Create Page Imperial", "Page Imperial",
               "Create a new PDF Page from a standard imperial page size",
               Constants.ShortName, Constants.Pages)
         {

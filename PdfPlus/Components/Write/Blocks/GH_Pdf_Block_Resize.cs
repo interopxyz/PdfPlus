@@ -1,19 +1,22 @@
 ﻿using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+using Sd = System.Drawing;
+
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Block_PageBreak : GH_Component
+    public class GH_Pdf_Block_Resize : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_PageBreak class.
+        /// Initializes a new instance of the GH_Pdf_Block_EditSize class.
         /// </summary>
-        public GH_Pdf_Block_PageBreak()
-          : base("Break Block", "Brk Blk",
-              "Create a break block",
+        public GH_Pdf_Block_Resize()
+          : base("Resize Block", "Size Blk",
+              "Resize Blocks that support fixed boundaries",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -23,7 +26,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>
@@ -31,16 +34,19 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Type", "T", "The break type", GH_ParamAccess.item, 0);
-            pManager[0].Optional = true;
-            pManager.AddIntegerParameter("Count", "C", "The number of repetitions of the break", GH_ParamAccess.item, 1);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.item);
+            pManager.AddNumberParameter("Width", "W", "Optional image width override", GH_ParamAccess.item);
             pManager[1].Optional = true;
+            pManager.AddNumberParameter("Height", "H", "Optional image height override", GH_ParamAccess.item);
+            pManager[2].Optional = true;
+            pManager.AddIntegerParameter("Justification", "J", "Optional image justification on page", GH_ParamAccess.item);
+            pManager[3].Optional = true;
 
-
-            Param_Integer paramA = (Param_Integer)pManager[0];
-            paramA.AddNamedValue("Line", 0);
-            paramA.AddNamedValue("Page", 1);
-
+            Param_Integer paramA = (Param_Integer)pManager[3];
+            foreach (Justification value in Enum.GetValues(typeof(Justification)))
+            {
+                paramA.AddNamedValue(value.ToString(), (int)value);
+            }
         }
 
         /// <summary>
@@ -57,20 +63,20 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int type = 0;
-            DA.GetData(0, ref type);
+            IGH_Goo goo = null;
+            Block block = null;
 
-            int count = 1;
-            DA.GetData(1, ref count);
-            if (count < 1) count = 1;
+            if (!DA.GetData(0, ref goo)) return;
+            if (!goo.TryGetBlock(ref block)) return;
 
-            Block block = Block.CreatePageBreak(count);
-            switch (type)
-            {
-                case 0:
-                    block = Block.CreateLineBreak(count);
-                    break;
-            }
+            double width = 0;
+            if (DA.GetData(1, ref width)) block.Width = width;
+
+            double height = 0;
+            if (DA.GetData(2, ref height)) block.Height = height;
+
+            int justification = 0;
+            if (DA.GetData(3, ref justification)) block.Justification = (Justification)justification;
 
             DA.SetData(0, block);
         }
@@ -84,7 +90,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Break;
+                return Properties.Resources.Pdf_Block_Size;
             }
         }
 
@@ -93,7 +99,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("c8f9c9fa-6c24-4934-88af-20b0aeb788f9"); }
+            get { return new Guid("c03a1734-83b7-4ec6-b437-5c37853319ea"); }
         }
     }
 }

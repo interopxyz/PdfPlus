@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Format_FontPresets()
           : base("Set Font Preset", "Preset Font",
-              "Assign a preset font",
+              "Assign a preset Font to a PDF+ Element including geometry, Charts, Data Sets, Blocks, and Shapes.",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -32,7 +32,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, Text Fragment Element, or Text (String)", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Font", "F", "Preset fonts", GH_ParamAccess.item,0);
             pManager[1].Optional = true;
 
@@ -48,7 +48,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, or Text Fragment Element", GH_ParamAccess.item);
         }
 
         /// <summary>

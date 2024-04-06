@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Shape_Link class.
         /// </summary>
         public GH_Pdf_Shape_Link()
-          : base("Link Region", "Link",
+          : base("Link Shape", "Lnk Shp",
               "Create a link to a document, hyperlink, or page within a rectangular boundary",
               Constants.ShortName, Constants.Shapes)
         {

@@ -14,7 +14,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public GH_Pdf_Block_Drawing()
           : base("Drawing Block", "Drw Blk",
-              "Create a drawing block",
+              "Create a drawing Block from a list of geometry and text Shapes",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -33,7 +33,7 @@ namespace PdfPlus.Components.Write.Blocks
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Column Fitting", "F", "Table column width " + Environment.NewLine + "(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item, -1);
+            pManager.AddIntegerParameter("Fitting", "F", "Page Fitting" + Environment.NewLine + "(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item, -1);
             pManager[1].Optional = true;
 
             Param_Integer paramC = (Param_Integer)pManager[1];

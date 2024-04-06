@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
         /// </summary>
         public GH_Pdf_Shape_TextPt()
-          : base("Text Point", "Txt Pt",
+          : base("Text Line Shape", "Txt Shp",
               "Create a Text Shape at a point location",
               Constants.ShortName, Constants.Shapes)
         {

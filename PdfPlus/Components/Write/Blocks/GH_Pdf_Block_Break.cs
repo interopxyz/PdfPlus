@@ -1,19 +1,19 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_GetBlocks : GH_Pdf__Base
+    public class GH_Pdf_Block_Break : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_GetBlocks class.
+        /// Initializes a new instance of the GH_Pdf_Blk_PageBreak class.
         /// </summary>
-        public GH_Pdf_Doc_GetBlocks()
-          : base("Get Blocks", "Get Blk",
-              "Get the Blocks from Pages or Documents.",
+        public GH_Pdf_Block_Break()
+          : base("Break Block", "Brk Blk",
+              "Create a page break or line break Block",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -23,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -31,7 +31,16 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Type", "T", "Switch between Line and Page breaks", GH_ParamAccess.item, 0);
+            pManager[0].Optional = true;
+            pManager.AddIntegerParameter("Count", "C", "The number of repetitions of the break", GH_ParamAccess.item, 1);
+            pManager[1].Optional = true;
+
+
+            Param_Integer paramA = (Param_Integer)pManager[0];
+            paramA.AddNamedValue("Line", 0);
+            paramA.AddNamedValue("Page", 1);
+
         }
 
         /// <summary>
@@ -39,7 +48,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -48,13 +57,22 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            //TRY GET DOCUMENT
-            IGH_Goo goo = null;
-            if (!DA.GetData(0, ref goo)) return;
-            Document document = new Document();
-            if (!goo.TryGetDocument(ref document)) return;
+            int type = 0;
+            DA.GetData(0, ref type);
 
-            DA.SetDataList(0, document.Blocks);
+            int count = 1;
+            DA.GetData(1, ref count);
+            if (count < 1) count = 1;
+
+            Block block = Block.CreatePageBreak(count);
+            switch (type)
+            {
+                case 0:
+                    block = Block.CreateLineBreak(count);
+                    break;
+            }
+
+            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -66,7 +84,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Deconstruct;
+                return Properties.Resources.Pdf_Block_Break;
             }
         }
 
@@ -75,7 +93,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("ef1ea0e4-0378-462d-9ec2-58d579848650"); }
+            get { return new Guid("c8f9c9fa-6c24-4934-88af-20b0aeb788f9"); }
         }
     }
 }
