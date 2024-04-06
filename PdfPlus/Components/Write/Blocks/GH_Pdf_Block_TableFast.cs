@@ -17,7 +17,9 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Block_Table()
           : base("Fast Table Block", "Fast Tbl Blk",
-              "Create a table block from datatree text inputs",
+              "Create a table block from a datatree of text as an input"+Environment.NewLine+
+                "Each list will be compiled into rows in a single column and the first branch of the data tree will set the column." + Environment.NewLine +
+                "Ex. {A}:i[txt] = A[DataSet(i)] || {A;B}:i[txt] = {A}:B[DataSet(i)] || {A;B;C}:i[txt] = {A;B}:B[DataSet(i)]",
               Constants.ShortName, Constants.Blocks)
         {
         }

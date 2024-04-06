@@ -12,7 +12,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_AddPage class.
         /// </summary>
         public GH_Pdf_Page_Add()
-          : base("Add Page", "Page",
+          : base("Create Page", "Page",
               "Create a new PDF Page from a width and height",
               Constants.ShortName, Constants.Pages)
         {

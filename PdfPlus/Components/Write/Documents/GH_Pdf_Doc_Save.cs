@@ -15,7 +15,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Doc_Save()
           : base("Save Document", "Save Doc",
-              "Save the PDF Document to a file",
+              "Save the PDF Document to a local file",
               Constants.ShortName, Constants.Documents)
         {
         }

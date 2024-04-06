@@ -15,7 +15,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public GH_Pdf_Block_Table()
           : base("Table Block", "Tbl Blk",
-              "Create a table block list of DataSet objects",
+              "Create a table Block list of DataSet objects",
               Constants.ShortName, Constants.Blocks)
         {
         }

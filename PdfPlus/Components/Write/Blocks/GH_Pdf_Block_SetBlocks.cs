@@ -4,17 +4,19 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Documents
+using Sd = System.Drawing;
+
+namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_AddPages : GH_Pdf__Base
+    public class GH_Pdf_Block_SetBlocks : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_AddPages class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddBlocks class.
         /// </summary>
-        public GH_Pdf_Doc_AddPages()
-          : base("Add Pages", "Add Pgs",
-              "Add Pages to a PDF Document",
-              Constants.ShortName, Constants.Documents)
+        public GH_Pdf_Block_SetBlocks()
+          : base("Set Blocks", "Set Blk",
+              "Sequentially place a list of Blocks into PDF Pages.",
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -23,7 +25,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.quinary; }
         }
 
         /// <summary>
@@ -31,9 +33,9 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
-            pManager.AddGenericParameter("Pages", "Pg", "Pages to add to the document", GH_ParamAccess.list);
-
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -42,6 +44,7 @@ namespace PdfPlus.Components.Write.Documents
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -50,27 +53,22 @@ namespace PdfPlus.Components.Write.Documents
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-
-            //TRY GET DOCUMENT
+            //TRY GET PAGES
             IGH_Goo goo = null;
             if (!DA.GetData(0, ref goo)) return;
-            Document document = new Document();
-            goo.TryGetDocument(ref document);
+            Page page = new Page();
+            if (!goo.TryGetPage(ref page)) return;
 
-            //TRY GET PAGES
+            //TRY GET BLOCKS
             List<IGH_Goo> goos = new List<IGH_Goo>();
             if (!DA.GetDataList(1, goos)) return;
-            List<Page> pages = new List<Page>();
-            foreach (IGH_Goo g in goos)
-            {
-                Page page = new Page();
-                if (g.TryGetPage(ref page)) pages.Add(page);
-            }
+            foreach (IGH_Goo g in goos) page.AddBlock(g);
 
-            document.AddPages(pages);
-
-            PrevDocumentShapes(document);
+            Document document = new Document(page);
             DA.SetData(0, document);
+            List<Page> pages = page.RenderBlocksToPages();
+            foreach (Page pg in pages) this.PrevPageShapes(pg);
+            DA.SetDataList(1, pages);
         }
 
         /// <summary>
@@ -82,7 +80,7 @@ namespace PdfPlus.Components.Write.Documents
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Add;
+                return Properties.Resources.Pdf_Block_Add;
             }
         }
 
@@ -91,7 +89,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("c851d2f0-6304-46ea-89d7-b649b7d27594"); }
+            get { return new Guid("d9c71778-1a53-443f-a3d3-cdc72ec5c2b1"); }
         }
     }
 }

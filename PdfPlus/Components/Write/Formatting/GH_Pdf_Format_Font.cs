@@ -16,7 +16,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Format_Font()
           : base("Set Font", "Set Font",
-              "Modify Shape, Block, or DataSet fonts",
+              "Get and Set the Font properties of PDF+ Elements including Geometry, Charts, DataSets, Blocks, and Shapes.  ",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -34,7 +34,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, Text Fragment Element, or Text (String)", GH_ParamAccess.item);
             pManager.AddTextParameter("Family Name", "F", "Optional Font family name", GH_ParamAccess.item);
             pManager[1].Optional = true;
             pManager.AddNumberParameter("Size", "S", "Optional Text size", GH_ParamAccess.item);
@@ -65,7 +65,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, or Text Fragment Element", GH_ParamAccess.item);
             pManager.AddTextParameter("Family Name", "F", "Font family name", GH_ParamAccess.item);
             pManager.AddNumberParameter("Size", "S", "Text size", GH_ParamAccess.item);
             pManager.AddColourParameter("Color", "C", "Text color", GH_ParamAccess.item);

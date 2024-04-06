@@ -8,14 +8,14 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_AddContents : GH_Pdf__Base
+    public class GH_Pdf_Shape_SetShapes : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
         /// </summary>
-        public GH_Pdf_Page_AddContents()
+        public GH_Pdf_Shape_SetShapes()
           : base("Set Shapes", "Set Shp",
-              "Place Text, Image, or Geometric based Shapes to a PDF Page.",
+              "Place Text, Image, Geometric, or other Shapes into a PDF Page.",
               Constants.ShortName, Constants.Shapes)
         {
         }
@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>

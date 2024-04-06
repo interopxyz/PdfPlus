@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Page_AddImage class.
         /// </summary>
         public GH_Pdf_Shape_Image()
-          : base("Image Frame", "Img Frame",
+          : base("Image Box Shape", "Img Box Shp",
               "Create an Image Shape within a rectangular boundary",
               Constants.ShortName, Constants.Shapes)
         {

@@ -14,7 +14,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public GH_Pdf_Block_Drawing()
           : base("Drawing Block", "Drw Blk",
-              "Create a drawing block",
+              "Create a drawing Block from a list of geometry and text Shapes",
               Constants.ShortName, Constants.Blocks)
         {
         }

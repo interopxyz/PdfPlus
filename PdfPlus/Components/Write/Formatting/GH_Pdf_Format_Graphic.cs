@@ -15,7 +15,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Format_Graphic()
           : base("Set Graphics", "Set Graphics",
-              "Modify Shape, Block, or DataSet graphics",
+              "Get and Set the Graphic properties of PDF+ Elements including geometry, Charts, DataSets, Blocks, and Shapes.",
               Constants.ShortName, Constants.Formats)
         {
         }
@@ -33,7 +33,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, Text Fragment Element, or Geometry", GH_ParamAccess.item);
             pManager.AddColourParameter("Fill Color", "F", "Optional fill color for the shape", GH_ParamAccess.item);
             pManager[1].Optional = true;
             pManager.AddColourParameter("Stroke Color", "S", "Optional stroke color for the shape", GH_ParamAccess.item);
@@ -49,7 +49,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, Constants.Element.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, or Text Fragment Element", GH_ParamAccess.item);
             pManager.AddColourParameter("Fill Color", "F", "The fill color of the shape", GH_ParamAccess.item);
             pManager.AddColourParameter("Stroke Color", "S", "The stroke color of the shape", GH_ParamAccess.item);
             pManager.AddNumberParameter("Stroke Weight", "W", "The stroke weight of the shape", GH_ParamAccess.item);

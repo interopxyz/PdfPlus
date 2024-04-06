@@ -14,7 +14,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Page_AddImagePt class.
         /// </summary>
         public GH_Pdf_Shape_ImagePt()
-          : base("Image Point", "Img Pt",
+          : base("Image Shape", "Img Shp",
               "Create an Image Shape at a point location",
               Constants.ShortName, Constants.Shapes)
         {

@@ -15,7 +15,7 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Page_AddText class.
         /// </summary>
         public GH_Pdf_Shape_TextBox()
-          : base("Text Box", "Txt Box",
+          : base("Text Box Shape", "Txt Box Shp",
               "Create a Text Shape within a rectangular boundary",
               Constants.ShortName, Constants.Shapes)
         {

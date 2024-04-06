@@ -1,24 +1,19 @@
 ﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using PdfSharp;
-using PdfSharp.Pdf;
-using PdfSharp.Drawing;
-using Grasshopper.Kernel.Parameters;
-using Grasshopper.Kernel.Types;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Documents
 {
     public class GH_Pdf_Doc_Create : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the Test class.
+        /// Initializes a new instance of the GH_Pdf_Doc_AddPages class.
         /// </summary>
         public GH_Pdf_Doc_Create()
-          : base("Create Document", "Doc",
-              "Create a new PDF Document",
+          : base("Create Document", "Create Doc",
+              "Add a list of Pages to an existing PDF Document or create a new Document.",
               Constants.ShortName, Constants.Documents)
         {
         }
@@ -36,15 +31,12 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
+            pManager[0].Optional = true;
             pManager.AddGenericParameter("Pages", "Pg", "Pages to add to the document", GH_ParamAccess.list);
             pManager.AddIntegerParameter("Page Layout", "L", "The page layout", GH_ParamAccess.item, 0);
-            pManager[1].Optional = true;
+            pManager[2].Optional = true;
 
-            Param_Integer paramA = (Param_Integer)pManager[1];
-            foreach (PageLayouts value in Enum.GetValues(typeof(PageLayouts)))
-            {
-                paramA.AddNamedValue(value.ToString(), (int)value);
-            }
         }
 
         /// <summary>
@@ -61,20 +53,27 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+
+            //TRY GET DOCUMENT
+            IGH_Goo goo = null;
+            Document document = new Document();
+            
+            if(DA.GetData(0, ref goo))goo.TryGetDocument(ref document);
+
             //TRY GET PAGES
             List<IGH_Goo> goos = new List<IGH_Goo>();
-            if(!DA.GetDataList(0, goos))return;
+            if (!DA.GetDataList(1, goos)) return;
             List<Page> pages = new List<Page>();
-            foreach(IGH_Goo goo in goos)
+            foreach (IGH_Goo g in goos)
             {
                 Page page = new Page();
-                if(goo.TryGetPage(ref page))pages.Add(page);
+                if (g.TryGetPage(ref page)) pages.Add(page);
             }
 
-            Document document = new Document(pages);
-
             int layout = 0;
-            if (DA.GetData(1, ref layout)) document.PageLayout = (PageLayouts)layout;
+            if (DA.GetData(2, ref layout)) document.PageLayout = (PageLayouts)layout;
+
+            document.AddPages(pages);
 
             PrevDocumentShapes(document);
             DA.SetData(0, document);
@@ -89,7 +88,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Create;
+                return Properties.Resources.Pdf_Document_Add;
             }
         }
 
@@ -98,7 +97,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("251fae32-d546-4777-a9a0-9f48fcb8b90d"); }
+            get { return new Guid("c851d2f0-6304-46ea-89d7-b649b7d27594"); }
         }
     }
 }

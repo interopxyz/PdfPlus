@@ -12,8 +12,8 @@ namespace PdfPlus.Components
         /// Initializes a new instance of the GH_Pdf_Shape_GraphPie class.
         /// </summary>
         public GH_Pdf_Shape_ChartPie()
-          : base("Add Pie Chart", "Pie",
-              "Create a Chart Shape within a rectangular boundary",
+          : base("Pie Chart Shape", "Pie Shp",
+              "Create a Pie Chart Shape within a rectangular boundary",
               Constants.ShortName, Constants.Shapes)
         {
         }

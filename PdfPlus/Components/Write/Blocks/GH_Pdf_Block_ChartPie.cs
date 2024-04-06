@@ -13,7 +13,7 @@ namespace PdfPlus.Components
         /// </summary>
         public GH_Pdf_Block_ChartPie()
           : base("Pie Chart Block", "Pie Blk",
-              "Create a pie chart block",
+              "Create a Pie Chart Block.",
               Constants.ShortName, Constants.Blocks)
         {
         }
