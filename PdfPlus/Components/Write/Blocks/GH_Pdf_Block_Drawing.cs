@@ -33,7 +33,7 @@ namespace PdfPlus.Components.Write.Blocks
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Column Fitting", "F", "Table column width " + Environment.NewLine + "(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item, -1);
+            pManager.AddIntegerParameter("Fitting", "F", "Page Fitting" + Environment.NewLine + "(-1 = Autofit Page" + Environment.NewLine + "0 = Autofit Content" + Environment.NewLine + "0 < Fixed Size", GH_ParamAccess.item, -1);
             pManager[1].Optional = true;
 
             Param_Integer paramC = (Param_Integer)pManager[1];

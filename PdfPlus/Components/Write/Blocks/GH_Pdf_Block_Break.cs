@@ -31,7 +31,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Type", "T", "The break type", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("Type", "T", "Switch between Line and Page breaks", GH_ParamAccess.item, 0);
             pManager[0].Optional = true;
             pManager.AddIntegerParameter("Count", "C", "The number of repetitions of the break", GH_ParamAccess.item, 1);
             pManager[1].Optional = true;
