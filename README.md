@@ -22,6 +22,7 @@ PDF Plus is a simple plugin for Grasshopper 3d that lets you compose geometry, i
 
 PDF+ is built on top of a custom build of [PDF Sharp](http://www.pdfsharp.net/).
  - [PDF Plus Fork of PDF Sharp](https://github.com/interopxyz/PDFsharp/tree/PDFplus)
+ - [Pdf Sharp & Migra Doc custom build ZIP File](https://github.com/interopxyz/PdfPlus/wiki/Dependencies)
 
 ### Contributors & Forks
 Special thanks to the following contributors who have improved PDF Plus and built on top of it!
