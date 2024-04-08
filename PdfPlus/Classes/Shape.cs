@@ -927,11 +927,11 @@ namespace PdfPlus
         protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
         {
             Pd.XStringFormat format = new Pd.XStringFormat();
-
             format.Alignment = font.Justification.ToPdfLine();
             format.LineAlignment = Pd.XLineAlignment.BaseLine;
+            graph.RotateAtTransform(-this.Angle, location.ToPdf());
             graph.DrawString(this.Text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
-
+            graph.RotateAtTransform(this.Angle, location.ToPdf());
             return graph;
         }
 
