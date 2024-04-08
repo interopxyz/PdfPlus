@@ -24,3 +24,4 @@ PDF Plus is a simple plugin for grasshopper 3d that lets you compose geometry, i
 Special thanks to the following contributors who have improved PDF Plus and built on top of it!
 - [Mathias Sønderskov Schaltz](https://github.com/Sonderwoods)
 - [PDF Rex](https://github.com/PdfRex/PdfPlus)
+- [Alexander Schiftner](https://github.com/snabela)
