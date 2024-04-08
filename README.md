@@ -5,7 +5,7 @@ _Like PDF+ [Buy me a coffee :D](http://www.buymeacoffee.com/davidmans)_
 
 ---
 
-PDF Plus is a simple plugin for grasshopper 3d that lets you compose geometry, images, and text into multi-page documents and write them to PDF files.
+PDF Plus is a simple plugin for Grasshopper 3d that lets you compose geometry, images, and text into multi-page documents and write them to PDF files.
 
 [Download Plugin at Food4Rhino](https://www.food4rhino.com/en/app/pdf)
 
@@ -18,7 +18,10 @@ PDF Plus is a simple plugin for grasshopper 3d that lets you compose geometry, i
 ### Dependencies
  - [Rhinoceros 3d](https://www.rhino3d.com/)
  - [Rhinocommon](https://www.nuget.org/packages/RhinoCommon/5.12.50810.13095)
- - [PDF Sharp](http://www.pdfsharp.net/)
+ - [Migra Doc](https://www.nuget.org/packages/PDFsharp-MigraDoc/)
+
+PDF+ is built on top of a custom build of [PDF Sharp](http://www.pdfsharp.net/).
+ - [PDF Plus Fork of PDF Sharp](https://github.com/interopxyz/PDFsharp/tree/PDFplus)
 
 ### Contributors & Forks
 Special thanks to the following contributors who have improved PDF Plus and built on top of it!
