@@ -34,6 +34,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager[0].Optional = true;
             pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
             pManager[1].Optional = true;
         }
@@ -55,9 +56,8 @@ namespace PdfPlus.Components
         {
             //TRY GET PAGES
             IGH_Goo goo = null;
-            if (!DA.GetData(0, ref goo)) return;
             Page page = new Page();
-            if (!goo.TryGetPage(ref page)) return;
+            if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
 
             //TRY GET BLOCKS
             List<IGH_Goo> goos = new List<IGH_Goo>();

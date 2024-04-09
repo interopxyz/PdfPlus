@@ -795,9 +795,8 @@ namespace PdfPlus
             }
             else if ((this.width < 0) & (this.height < 0))
             {
-                image.LockAspectRatio = false;
-                image.Width = width;
                 image.LockAspectRatio = true;
+                image.Width = width;
             }
             else
             {
@@ -886,9 +885,9 @@ namespace PdfPlus
                             blk.RenderDrawing(cell.AddTextFrame(), document,columnWidth);
                             break;
                         case BlockTypes.Image:
-                            string filename = this.imageName;
-                            if (this.imageObject != null) filename = this.imageObject.ToBase64String("base64:");
-                            blk.RenderImage(cell.AddImage(filename), document);
+                            string filename = blk.imageName;
+                            if (blk.imageName == string.Empty) filename = blk.imageObject.ToBase64String("base64:");
+                            blk.RenderImage(cell.AddImage(filename), document,columnWidth);
                             break;
                     }
                 }
@@ -950,7 +949,6 @@ namespace PdfPlus
                     #region image
                     string filename = this.imageName;
                     if (this.imageName == string.Empty) filename = this.imageObject.ToBase64String("base64:");
-
                     this.RenderImage(document.LastSection.AddImage(filename), document, width);
                     #endregion
                     break;

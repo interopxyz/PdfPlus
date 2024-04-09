@@ -208,7 +208,7 @@ namespace PdfPlus.Components
 
                         if (Attributes.Selected)
                         {
-                            args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary), mat);
+                            args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary, shape.Angle), mat);
                         }
                         else
                         {
@@ -222,11 +222,11 @@ namespace PdfPlus.Components
                                 material.EmissionColor = Color.Black;
                                 material.Reflectivity = 0.0;
                                 material.ReflectionGlossiness = 0.0;
-                                args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary), new Rhino.Display.DisplayMaterial(material));
+                                args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary,shape.Angle), new Rhino.Display.DisplayMaterial(material));
                             }
                             else
                             {
-                                args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.PreviewBoundary, shape.Image, 2));
+                                args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.PreviewBoundary, shape.Angle, shape.Image, 2));
                             }
                         }
                         break;
@@ -275,12 +275,12 @@ namespace PdfPlus.Components
             base.DrawViewportWires(args);
         }
 
-        private Mesh MeshColorByBitmap(Rectangle3d rectangle, Bitmap bitmap, int count)
+        private Mesh MeshColorByBitmap(Rectangle3d rectangle,double angle, Bitmap bitmap, int count)
         {
             int xStep = bitmap.Width / count;
             int yStep = bitmap.Height / count;
 
-            Mesh mesh = RectToDenseMesh(rectangle, xStep - 1, yStep - 1);
+            Mesh mesh = RectToDenseMesh(rectangle, angle, xStep - 1, yStep - 1);
             List<Color> colors = new List<Color>();
 
             for (int y = 0; y < bitmap.Height; y += count)
@@ -317,16 +317,20 @@ namespace PdfPlus.Components
             return srf;
         }
 
-        private Mesh RectToDenseMesh(Rectangle3d rectangle, int x, int y)
+        private Mesh RectToDenseMesh(Rectangle3d rectangle, double angle, int x, int y)
         {
             Mesh mesh = Mesh.CreateFromPlane(rectangle.Plane, rectangle.X, rectangle.Y, x, y);
-
+            Plane mirrorPlane = Plane.WorldZX;
+            mirrorPlane.Origin = rectangle.Center;
+            mesh.Transform(Transform.Mirror(mirrorPlane));
+            mesh.Transform(Transform.Rotation(angle / 180.0 * Math.PI, rectangle.Corner(0)));
             return mesh;
         }
 
-        private Mesh RectToMesh(Rectangle3d rectangle)
+        private Mesh RectToMesh(Rectangle3d rectangle, double angle)
         {
             Mesh mesh = Mesh.CreateFromPlane(rectangle.Plane, rectangle.X, rectangle.Y, 1, 1);
+            mesh.Transform(Transform.Rotation(angle / 180.0 * Math.PI, rectangle.Corner(0)));
             return mesh;
         }
 

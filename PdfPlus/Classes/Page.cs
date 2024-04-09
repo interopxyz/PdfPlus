@@ -250,7 +250,6 @@ namespace PdfPlus
             this.baseObject.ArtBox = this.Boundary.Inflate(-20).ToPdfRect(this.Frame);//-1/4"XX
         }
 
-
         public Md.Document SetPage(Md.Document document)
         {
             document.LastSection.PageSetup.Orientation = this.baseObject.Orientation.ToMigraDoc();

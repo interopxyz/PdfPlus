@@ -34,8 +34,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Image", "I", "The System.Drawing.Bitmap or Image Filepath to display", GH_ParamAccess.item);
-            pManager.AddPointParameter("Location", "L", "The location of the Shape", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Scale", "S", "A unitized scale factor (0-1) for the image", GH_ParamAccess.item, 1.0);
+            pManager.AddPlaneParameter("Frame", "F", "The placement plane for the image. The Origin of the plane and XL Plane rotation angle will apply to the image", GH_ParamAccess.item); pManager.AddNumberParameter("Scale", "S", "A unitized scale factor (0-1) for the image", GH_ParamAccess.item, 1.0);
             pManager[2].Optional = true;
         }
 
@@ -61,7 +60,7 @@ namespace PdfPlus.Components
             if (!DA.GetData(0, ref goo)) return;
             if (!goo.TryGetBitmap(ref bitmap,ref path)) return;
 
-            Point3d p = new Point3d();
+            Plane p = Plane.WorldXY;
             if (!DA.GetData(1, ref p)) return;
 
             double scale = 1.0;
@@ -70,13 +69,17 @@ namespace PdfPlus.Components
             double w = bitmap.Width * (72.0 / 96.0) * scale;
             double h = bitmap.Height * (72.0 / 96.0) * scale;
 
-            Rectangle3d rect = new Rectangle3d(Plane.WorldXY, p, new Point3d(p.X + w, p.Y + h, 0));
+            Rectangle3d rect = new Rectangle3d(Plane.WorldXY, p.Origin, new Point3d(p.OriginX + w, p.OriginY + h, 0));
 
             Shape shape = Shape.CreateImage(bitmap, rect, path);
+            shape.Angle = Vector3d.VectorAngle(Vector3d.XAxis, p.XAxis, Plane.WorldXY) / Math.PI * 180.0;
+
+            Rectangle3d bnd = new Rectangle3d(Plane.WorldXY, p.Origin, new Point3d(p.OriginX + w, p.OriginY + h, 0));
+            bnd.Transform(Transform.Rotation(shape.Angle / 180.0 * Math.PI, p.Origin));
 
             prev_shapes.Add(shape);
             DA.SetData(0, shape);
-            DA.SetData(1, shape.Boundary);
+            DA.SetData(1, bnd);
         }
 
         /// <summary>

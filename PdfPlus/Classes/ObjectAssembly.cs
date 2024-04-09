@@ -26,7 +26,7 @@ namespace PdfPlus
 
         //Images
         protected string imageName = string.Empty;
-        protected Sd.Bitmap imageObject = new Sd.Bitmap(10,10);
+        protected Sd.Bitmap imageObject = null;
 
         //Table
         protected bool hasAlternatingColor = false;
@@ -229,7 +229,9 @@ namespace PdfPlus
 
         public virtual Sd.Bitmap Image
         {
-            get { return new Sd.Bitmap(this.imageObject); }
+            get { if(this.imageObject!=null) return new Sd.Bitmap(this.imageObject);
+                return null;
+            }
         }
 
         public virtual string ImagePath
