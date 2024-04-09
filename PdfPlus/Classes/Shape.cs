@@ -167,7 +167,7 @@ namespace PdfPlus
             Shape shape = new Shape();
             shape.shapeType = ShapeType.ImageFrame;
 
-            shape.imageObject = new Sd.Bitmap(bitmap);
+            if(bitmap!=null)shape.imageObject = new Sd.Bitmap(bitmap);
             shape.imageName = path;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
 
@@ -496,7 +496,7 @@ namespace PdfPlus
 
         #endregion
 
-            #region methods
+        #region methods
 
         public List<Rg.Curve> RenderPreviewChart(out List<Sd.Color> colors)
         {
@@ -1117,7 +1117,9 @@ namespace PdfPlus
                     Stream stream = imageObject.ToStream();
                     Pd.XImage xImageA = Pd.XImage.FromStream(stream);
 
+                    graph.RotateAtTransform(-this.Angle, this.boundary.Corner(0).ToPdf());
                     graph.DrawImage(xImageA, this.boundary.ToPdf());
+                    graph.RotateAtTransform(this.Angle, this.boundary.Corner(0).ToPdf());
                     stream.Dispose();
                     break;
                 case ShapeType.ChartObj:

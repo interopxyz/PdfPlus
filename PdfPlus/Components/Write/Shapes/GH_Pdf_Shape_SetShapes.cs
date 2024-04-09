@@ -34,6 +34,7 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager[0].Optional = true;
             pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
             pManager[1].Optional = true;
         }
@@ -52,9 +53,10 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Page page = null;
-            if (!DA.GetData(0, ref page))return;
-            page = new Page(page);
+            //TRY GET PAGES
+            IGH_Goo goo = null;
+            Page page = new Page();
+            if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
 
             List<IGH_Goo> geometry = new List<IGH_Goo>();
             if (!DA.GetDataList(1, geometry)) return;
