@@ -112,7 +112,7 @@ namespace PdfPlus
         public static Rd.Text3d ToMultiLineTextBlock(this Shape input, double factor = 1.0)
         {
             Rg.Point3d[] c = input.PreviewPolyline.ToArray();
-            Rg.Plane plane = Rg.Plane.WorldXY;
+            Rg.Plane plane = input.Boundary.Plane;
             plane.Origin = c[3] + new Rg.Vector3d(0, -input.Font.Size/5, 0) ;
             List<string> lines = input.BreakLines(input.Text, input.Boundary.Width + 18);
             List<string> subLines = new List<string>();

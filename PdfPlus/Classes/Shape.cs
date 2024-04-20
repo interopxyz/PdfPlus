@@ -941,8 +941,19 @@ namespace PdfPlus
 
             Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
             textFormatter.Alignment = this.Font.Justification.ToPdf();
-            textFormatter.LayoutRectangle = this.boundary.ToPdf();
-            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), this.boundary.ToPdf(), Pd.XStringFormats.TopLeft);
+
+            Rg.Point2d center = new Rg.Point2d(this.boundary.Center.X, this.boundary.Center.Y);
+            Rg.Point2d bottomLeft = center - 0.5 * new Rg.Vector2d(this.boundary.Width, this.boundary.Height);
+            Pd.XRect layoutRect = new Pd.XRect(new Pd.XPoint(bottomLeft.X, bottomLeft.Y), new Pd.XSize(this.boundary.Width, this.boundary.Height));
+
+            textFormatter.LayoutRectangle = layoutRect;
+
+            double angleRad = Rg.Vector3d.VectorAngle(Rg.Vector3d.XAxis, this.boundary.Plane.XAxis, Rg.Plane.WorldXY);
+            double angleDeg = Rhino.RhinoMath.ToDegrees(angleRad);
+            Pd.XGraphicsState state = graph.Save();
+            graph.RotateAtTransform(angleDeg, new Pd.XPoint(center.X, center.Y));
+            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, Pd.XStringFormats.TopLeft);
+            graph.Restore(state);
 
             return graph;
         }
