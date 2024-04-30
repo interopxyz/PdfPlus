@@ -8,7 +8,7 @@ using Grasshopper.Kernel.Types;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Doc_Save : GH_Pdf__Base
+    public class GH_Pdf_Doc_Save : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Doc_Save class.
@@ -62,7 +62,7 @@ namespace PdfPlus.Components
             Document document = new Document();
             if(!goo.TryGetDocument(ref document))return;
 
-            PrevDocumentShapes(document);
+            //PrevDocumentShapes(document);
 
             bool save = false;
             DA.GetData(3, ref save);

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Format_FontPresets : GH_Pdf__Base
+    public class GH_Pdf_Format_FontPresets : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Format_FontPresets class.
@@ -118,7 +118,7 @@ namespace PdfPlus.Components
                 case Element.ElementTypes.Shape:
                     goo.CastTo<Shape>(out Shape shape);
                     shape.Font = font;
-                    prev_shapes.Add(shape);
+                    //prev_shapes.Add(shape);
                     DA.SetData(0, shape);
                     break;
                 case Element.ElementTypes.Data:

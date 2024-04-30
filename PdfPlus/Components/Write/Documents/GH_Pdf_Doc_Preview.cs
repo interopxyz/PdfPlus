@@ -4,19 +4,17 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Documents
 {
-    public class GH_Pdf_Shape_TextPt : GH_Component
+    public class GH_Pdf_Doc_Preview : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddTextPt class.
+        /// Initializes a new instance of the GH_Pdf_Doc_Preview class.
         /// </summary>
-        public GH_Pdf_Shape_TextPt()
-          : base("Text Line Shape", "Txt Shp",
-              "Create a Text Shape at a point location",
-              Constants.ShortName, Constants.Shapes)
+        public GH_Pdf_Doc_Preview()
+          : base("Preview PDF", "Prev PDF",
+              "Preview PDF Shapes, Pages, or Documents.",
+              Constants.ShortName, Constants.Documents)
         {
         }
 
@@ -25,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -33,8 +31,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("Frame", "F", "The placement plane for the text. The Origin of the plane and XL Plane rotation angle will apply to the text", GH_ParamAccess.item);
-            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName,Constants.Fragment.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, Text Fragment Element, or Geometry", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -42,7 +39,6 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,20 +47,23 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Plane plane = new Plane();
-            if (!DA.GetData(0, ref plane)) return;
-
+            Document doc = new Document();
             IGH_Goo goo = null;
-            if (!DA.GetData(1, ref goo)) return;
-                Fragment fragment = null;
-            if (!goo.TryGetFragment(ref fragment)) return;
-
-            Shape shape = Shape.CreateText(fragment, plane.Origin, new Font());
-
-            shape.Angle = Vector3d.VectorAngle(Vector3d.XAxis, plane.XAxis,Plane.WorldXY)/Math.PI*180.0;
-
-            //prev_shapes.Add(shape);
-            DA.SetData(0, shape);
+            if (DA.GetData(0, ref goo))
+                {
+                if(goo.TryGetDocument(ref doc))
+                {
+                    this.PrevDocumentShapes(doc);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
         }
 
         /// <summary>
@@ -76,7 +75,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Shape_Text_Point;
+                return Properties.Resources.Pdf_Document_Preview;
             }
         }
 
@@ -85,7 +84,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("81f60353-b223-4c36-b46e-588733aadcac"); }
+            get { return new Guid("d9baa330-a6ee-4e7a-9ddc-a4491d2be7af"); }
         }
     }
 }

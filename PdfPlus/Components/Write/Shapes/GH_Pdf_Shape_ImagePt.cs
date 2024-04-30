@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_ImagePt : GH_Pdf__Base
+    public class GH_Pdf_Shape_ImagePt : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddImagePt class.
@@ -77,7 +77,7 @@ namespace PdfPlus.Components
             Rectangle3d bnd = new Rectangle3d(Plane.WorldXY, p.Origin, new Point3d(p.OriginX + w, p.OriginY + h, 0));
             bnd.Transform(Transform.Rotation(shape.Angle / 180.0 * Math.PI, p.Origin));
 
-            prev_shapes.Add(shape);
+            //prev_shapes.Add(shape);
             DA.SetData(0, shape);
             DA.SetData(1, bnd);
         }

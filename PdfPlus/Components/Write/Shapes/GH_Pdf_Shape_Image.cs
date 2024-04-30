@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_Image : GH_Pdf__Base
+    public class GH_Pdf_Shape_Image : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddImage class.
@@ -63,7 +63,7 @@ namespace PdfPlus.Components
 
             Shape shape = Shape.CreateImage(bitmap, boundary, path);
 
-            prev_shapes.Add(shape);
+            //prev_shapes.Add(shape);
             DA.SetData(0, shape);
         }
 

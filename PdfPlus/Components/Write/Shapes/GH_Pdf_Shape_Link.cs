@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_Link : GH_Pdf__Base
+    public class GH_Pdf_Shape_Link : GH_Component
     {
 
         string[] descriptions = new string[] { "The hyperlink to link to", "The document name to link to", "The page index (integer only) to link to" };
@@ -71,7 +71,7 @@ namespace PdfPlus.Components
 
             Shape shape = Shape.CreateLink(link, boundary, (Shape.LinkTypes)type);
 
-            prev_shapes.Add(shape);
+            //prev_shapes.Add(shape);
             DA.SetData(0, shape);
         }
 

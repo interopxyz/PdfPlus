@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Block_SetBlocks : GH_Pdf__Base
+    public class GH_Pdf_Block_SetBlocks : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddBlocks class.
@@ -67,7 +67,7 @@ namespace PdfPlus.Components
             Document document = new Document(page);
             DA.SetData(0, document);
             List<Page> pages = page.RenderBlocksToPages();
-            foreach (Page pg in pages) this.PrevPageShapes(pg);
+            //foreach (Page pg in pages) this.PrevPageShapes(pg);
             DA.SetDataList(1, pages);
         }
 

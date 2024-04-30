@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_GetShapes : GH_Pdf__Base
+    public class GH_Pdf_Shape_GetShapes : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Doc_GetPages class.
@@ -60,7 +60,7 @@ namespace PdfPlus.Components
             DA.GetData(1, ref blocks);
             List<Shape> shapes = document.Shapes(blocks);
 
-            PrevDocumentShapes(document);
+            //PrevDocumentShapes(document);
             DA.SetDataList(0, shapes);
         }
 

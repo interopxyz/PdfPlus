@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Format_Graphic : GH_Pdf__Base
+    public class GH_Pdf_Format_Graphic : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_EditGraphics class.
@@ -93,7 +93,7 @@ namespace PdfPlus.Components
             if (goo.TryGetShape(ref shape))
             {
                 shape.Graphic = graphic;
-                prev_shapes.Add(shape);
+                //prev_shapes.Add(shape);
                 DA.SetData(0, shape);
             }
             else if (goo.TryGetBlock(ref block))

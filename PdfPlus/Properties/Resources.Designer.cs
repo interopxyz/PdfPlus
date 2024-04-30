@@ -213,6 +213,16 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Document_Preview {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Document_Preview", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Pdf_Document_Save {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Document_Save", resourceCulture);

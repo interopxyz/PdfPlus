@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Block_GetBlocks : GH_Pdf__Base
+    public class GH_Pdf_Block_GetBlocks : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Doc_GetBlocks class.

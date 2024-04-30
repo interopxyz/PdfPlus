@@ -103,6 +103,7 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Create.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_GetBlocks.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Preview.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_GetShapes.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
@@ -277,6 +278,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Block-Add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Preview.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
