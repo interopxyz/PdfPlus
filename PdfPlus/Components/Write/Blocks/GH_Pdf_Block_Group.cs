@@ -11,10 +11,18 @@ namespace PdfPlus.Components.Write.Blocks
         /// Initializes a new instance of the GH_Pdf_Block_Group class.
         /// </summary>
         public GH_Pdf_Block_Group()
-          : base("GH_Pdf_Block_Group", "Nickname",
-              "Description",
-              "Category", "Subcategory")
+          : base("Group Block", "Group Blk",
+              "Group a list of Blocks together vertically." + Environment.NewLine + "Compatible with Text, List, Chart, Drawing, and Image Blocks",
+              Constants.ShortName, Constants.Blocks)
         {
+        }
+
+        /// <summary>
+        /// Set Exposure level for the component.
+        /// </summary>
+        public override GH_Exposure Exposure
+        {
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>

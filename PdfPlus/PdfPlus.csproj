@@ -95,6 +95,7 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_ChartPie.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Dock.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Drawing.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Group.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Resize.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />
