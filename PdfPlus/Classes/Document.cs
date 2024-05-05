@@ -299,6 +299,13 @@ namespace PdfPlus
             this.pages.Add(new Page(page));
         }
 
+        public List<Page> RenderBlocksToPages()
+        {
+            List<Page> pgs = new List<Page>();
+            foreach (Page page in this.Pages) pgs.AddRange(page.RenderBlocksToPages());
+            return pgs;
+        }
+
         public void CopyFrom(Document document)
         {
             this.pages = new List<Page>();

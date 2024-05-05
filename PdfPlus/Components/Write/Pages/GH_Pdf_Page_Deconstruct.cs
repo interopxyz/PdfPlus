@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_Deconstruct : GH_Component
+    public class GH_Pdf_Page_Deconstruct : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_Deconstruct class.
@@ -64,7 +64,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Page_Deconstruct;
+                return Properties.Resources.Pdf_Page_Deconstruct2;
             }
         }
 

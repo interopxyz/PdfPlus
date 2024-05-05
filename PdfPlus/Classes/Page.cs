@@ -338,7 +338,7 @@ namespace PdfPlus
                 foreach (Block block in blocks) block.RenderToDocument(doc);
 
                 Pf.PdfDocument document = new Pf.PdfDocument();
-                Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
+                Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer(true);
                 pdfDocumentRenderer.Document = doc;
                 pdfDocumentRenderer.PdfDocument = document;
 
@@ -405,7 +405,7 @@ namespace PdfPlus
 
                             switch (tag[0])
                             {
-                                case "Dock":
+                                case "DockH":
                                     int j = 0;
                                     foreach(Block blk in block.Blocks)
                                     {
@@ -583,7 +583,7 @@ namespace PdfPlus
                 {
                     block.RenderToDocument(doc);
                     if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
-                    if(block.BlockType == Block.BlockTypes.Dock)
+                    if(block.BlockType == Block.BlockTypes.HorizontalDock)
                     {
                         foreach (Block blk in block.Blocks) if (blk.BlockType == Block.BlockTypes.Drawing) subDrawings.Add(blk);
                     }
@@ -616,7 +616,7 @@ namespace PdfPlus
                                 drawings[j].Drawing.Render(graph, r);
                                 j++;
                                 break;
-                            case "Dock":
+                            case "DockH":
                                 Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
 
                                 //p.OriginY+=table.Rows[0].Height / 2.0;

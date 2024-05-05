@@ -4,17 +4,19 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Shapes
+using Sd = System.Drawing;
+
+namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_GetContents : GH_Component
+    public class GH_Pdf_Block_SetBlocks : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Shape_GetContents class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddBlocks class.
         /// </summary>
-        public GH_Pdf_Shape_GetContents()
-          : base("Get Shape Contents", "Contents",
-              "Get geometric, text, and other Shape contents",
-              Constants.ShortName, Constants.Shapes)
+        public GH_Pdf_Block_SetBlocks()
+          : base("Set Blocks", "Set Blk",
+              "Sequentially place a list of Blocks into PDF Pages.",
+              Constants.ShortName, Constants.Blocks)
         {
         }
 
@@ -23,7 +25,7 @@ namespace PdfPlus.Components.Write.Shapes
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.quinary; }
         }
 
         /// <summary>
@@ -31,7 +33,10 @@ namespace PdfPlus.Components.Write.Shapes
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager[0].Optional = true;
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -39,10 +44,7 @@ namespace PdfPlus.Components.Write.Shapes
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddRectangleParameter("Boundary", "B", "Shape Boundary", GH_ParamAccess.item);
-            pManager.AddPointParameter("Location", "L", "Shape Location Point", GH_ParamAccess.item);
-            pManager.AddTextParameter("Text", "T", "Text contents when applicable", GH_ParamAccess.item);
-            pManager.AddGeometryParameter("Geometry", "G", "Geometry contents when applicable", GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,16 +53,23 @@ namespace PdfPlus.Components.Write.Shapes
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            //TRY GET PAGES
             IGH_Goo goo = null;
-            if (!DA.GetData(0, ref goo)) return;
-            Shape shape = null;
-            if(!goo.TryGetShape(ref shape))return;
+            Page page = new Page();
+            if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
 
-            if(shape.Boundary.IsValid) DA.SetData(0, shape.Boundary);
-            if (shape.Location.IsValid) DA.SetData(1, shape.Location);
-            if(shape.Text!="") DA.SetData(2, shape.Text);
-            if (shape.Geometry!=null) DA.SetData(3, shape.Geometry);
+            //TRY GET BLOCKS
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, goos)) return;
+            foreach (IGH_Goo g in goos) page.AddBlock(g);
 
+            Document document = new Document(page);
+            DA.SetData(0, document);
+
+            if ((!this.Hidden) & (!this.Locked))
+            {
+                this.SetPreview(page.RenderBlocksToPages());
+            }
         }
 
         /// <summary>
@@ -72,7 +81,7 @@ namespace PdfPlus.Components.Write.Shapes
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Shape_Contents;
+                return Properties.Resources.Pdf_Block_Add;
             }
         }
 
@@ -81,7 +90,7 @@ namespace PdfPlus.Components.Write.Shapes
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("8632b176-4bfa-4df5-ac1e-4c6796c2bd17"); }
+            get { return new Guid("d9c71778-1a53-443f-a3d3-cdc72ec5c2b1"); }
         }
     }
 }

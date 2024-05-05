@@ -102,14 +102,15 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Table.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Text.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Create.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_GetBlocks.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block__GetBlocks.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Deconstruct.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Preview.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_GetShapes.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_FragmentsJoin.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_GetContents.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape__GetContents.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_Link.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf__Base.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_ChartBasic.cs" />
@@ -123,8 +124,8 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_TableFast.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Save.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_Add.cs" />
-    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_SetBlocks.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_SetShapes.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block__SetBlocks.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape__SetShapes.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddImperial.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddMetric.cs" />
     <Compile Include="Components\Write\Pages\GH_Pdf_Page_AddRectangle.cs" />
@@ -281,6 +282,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Document-Preview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Deconstruct.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Page-Deconstruct2.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

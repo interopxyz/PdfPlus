@@ -8,15 +8,15 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Block_SetBlocks : GH_Component
+    public class GH_Pdf_Shape_SetShapes : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddBlocks class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
         /// </summary>
-        public GH_Pdf_Block_SetBlocks()
-          : base("Set Blocks", "Set Blk",
-              "Sequentially place a list of Blocks into PDF Pages.",
-              Constants.ShortName, Constants.Blocks)
+        public GH_Pdf_Shape_SetShapes()
+          : base("Set Shapes", "Set Shp",
+              "Place Text, Image, Geometric, or other Shapes into a PDF Page.",
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace PdfPlus.Components
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
             pManager[0].Optional = true;
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
             pManager[1].Optional = true;
         }
 
@@ -44,8 +44,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -59,16 +58,17 @@ namespace PdfPlus.Components
             Page page = new Page();
             if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
 
-            //TRY GET BLOCKS
-            List<IGH_Goo> goos = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, goos)) return;
-            foreach (IGH_Goo g in goos) page.AddBlock(g);
+            List<IGH_Goo> geometry = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, geometry)) return;
 
-            Document document = new Document(page);
-            DA.SetData(0, document);
-            List<Page> pages = page.RenderBlocksToPages();
-            //foreach (Page pg in pages) this.PrevPageShapes(pg);
-            DA.SetDataList(1, pages);
+            foreach(IGH_Goo goos in geometry)
+            {
+                page.AddShape(goos);
+            }
+
+            this.SetPreview(page);
+
+            DA.SetData(0, page);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Add;
+                return Properties.Resources.Pdf_Shape_Add;
             }
         }
 
@@ -89,7 +89,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("d9c71778-1a53-443f-a3d3-cdc72ec5c2b1"); }
+            get { return new Guid("7e649fc6-716b-4079-90eb-9fd203298a38"); }
         }
     }
 }

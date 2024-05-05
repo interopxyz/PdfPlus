@@ -952,7 +952,7 @@ namespace PdfPlus
             double angleDeg = Rhino.RhinoMath.ToDegrees(angleRad);
             Pd.XGraphicsState state = graph.Save();
             graph.RotateAtTransform(angleDeg, new Pd.XPoint(center.X, center.Y));
-            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, Pd.XStringFormats.TopLeft);
+            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, this.ToPdfAlignment());
             graph.Restore(state);
 
             return graph;

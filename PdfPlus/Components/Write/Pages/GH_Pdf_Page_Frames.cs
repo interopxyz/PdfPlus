@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_Frames : GH_Component
+    public class GH_Pdf_Page_Frames : GH_Pdf__Base
     {
         protected List<Page> prev_pages = new List<Page>();
 

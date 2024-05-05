@@ -1,29 +1,20 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components.Write.Documents
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Doc_Preview : GH_Pdf__Base
+    public class GH_Pdf_Block_Group : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_Preview class.
+        /// Initializes a new instance of the GH_Pdf_Block_Group class.
         /// </summary>
-        public GH_Pdf_Doc_Preview()
-          : base("Preview PDF", "Prev PDF",
-              "Preview PDF Shapes, Pages, or Documents.",
-              Constants.ShortName, Constants.Documents)
+        public GH_Pdf_Block_Group()
+          : base("GH_Pdf_Block_Group", "Nickname",
+              "Description",
+              "Category", "Subcategory")
         {
-        }
-
-        /// <summary>
-        /// Set Exposure level for the component.
-        /// </summary>
-        public override GH_Exposure Exposure
-        {
-            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -31,7 +22,6 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, Text Fragment Element, or Geometry", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -47,23 +37,6 @@ namespace PdfPlus.Components.Write.Documents
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Document doc = new Document();
-            IGH_Goo goo = null;
-            if (DA.GetData(0, ref goo))
-                {
-                if(goo.TryGetDocument(ref doc))
-                {
-                    this.SetPreview(doc);
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
-            {
-                return;
-            }
         }
 
         /// <summary>
@@ -75,7 +48,7 @@ namespace PdfPlus.Components.Write.Documents
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Preview;
+                return null;
             }
         }
 
@@ -84,7 +57,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("d9baa330-a6ee-4e7a-9ddc-a4491d2be7af"); }
+            get { return new Guid("0eeb6ed0-a2fd-46cd-afd5-a92a78026099"); }
         }
     }
 }

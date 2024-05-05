@@ -23,7 +23,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image, Drawing, Dock };
+        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image, Drawing, HorizontalDock, VerticalDock };
         protected BlockTypes blockType = BlockTypes.None;
         protected List<Block> blocks = new List<Block>();
 
@@ -257,6 +257,7 @@ namespace PdfPlus
             block.width = -1;
             block.height = -1;
             block.justification = Justification.Center;
+            block.imageName = bitmap.ToBase64String("base64:");
 
             return block;
         }
@@ -288,7 +289,7 @@ namespace PdfPlus
         public static Block CreateDock(List<Block> blocks)
         {
             Block block = new Block();
-            block.blockType = BlockTypes.Dock;
+            block.blockType = BlockTypes.HorizontalDock;
             foreach (Block blk in blocks) block.blocks.Add(new Block(blk));
 
             return block;
@@ -846,11 +847,11 @@ namespace PdfPlus
             frame.Left = this.Justification.ToMigraDocShapePosition();
         }
 
-        public void RenderDock(Md.Tables.Table dock, Md.Document document, double width)
+        public void RenderDockHorizontal(Md.Tables.Table dock, Md.Document document, double width)
         {
             if (this.blocks.Count > 0)
             {
-                dock.Tag = "Dock~" + this.id;
+                dock.Tag = "DockH~" + this.id;
 
                 dock.Format.Alignment = Md.ParagraphAlignment.Justify;
 
@@ -885,15 +886,50 @@ namespace PdfPlus
                             blk.RenderDrawing(cell.AddTextFrame(), document,columnWidth);
                             break;
                         case BlockTypes.Image:
-                            string filename = blk.imageName;
-                            if (blk.imageName == string.Empty) filename = blk.imageObject.ToBase64String("base64:");
-                            blk.RenderImage(cell.AddImage(filename), document,columnWidth);
+                            blk.RenderImage(cell.AddImage(blk.imageName), document,columnWidth);
                             break;
                     }
                 }
             }
         }
-    
+
+        public void RenderDockVertical(Md.Tables.Table dock, Md.Document document, double width)
+        {
+            if (this.blocks.Count > 0)
+            {
+                dock.Tag = "DockV~" + this.id;
+
+                dock.Format.Alignment = Md.ParagraphAlignment.Justify;
+
+                Md.Tables.Column column = dock.AddColumn();
+                Md.Tables.Row row = dock.AddRow();
+                Md.Tables.Cell cell = dock.Rows[0].Cells[0];
+
+                for (int i = 0; i < this.blocks.Count; i++)
+                {
+                    Block blk = this.blocks[i];
+                    switch (blk.blockType)
+                    {
+                        case BlockTypes.Text:
+                            blk.RenderText(cell.AddParagraph(), document);
+                            break;
+                        case BlockTypes.List:
+                            blk.RenderList(cell, document);
+                            break;
+                        case BlockTypes.Chart:
+                            blk.RenderChart(cell.AddChart(), document, columnWidth);
+                            break;
+                        case BlockTypes.Drawing:
+                            blk.RenderDrawing(cell.AddTextFrame(), document, columnWidth);
+                            break;
+                        case BlockTypes.Image:
+                            blk.RenderImage(cell.AddImage(blk.imageName), document, columnWidth);
+                            break;
+                    }
+                }
+            }
+        }
+
         public Md.Document RenderToDocument(Md.Document document)
         {
             double width = 0;
@@ -917,7 +953,11 @@ namespace PdfPlus
                     break;
                 case BlockTypes.PageBreak:
                     #region pagebreak
-                    for (int i = 0; i < this.breakCount; i++) document.LastSection.AddPageBreak();
+                    for (int i = 0; i < this.breakCount; i++)
+                    {
+                        document.LastSection.AddPageBreak();
+                        document.LastSection.Elements[document.LastSection.Elements.Count-1].Tag = "Linebreak~" + this.id;
+                    }
                     #endregion
                     break;
                 case BlockTypes.Text:
@@ -947,14 +987,12 @@ namespace PdfPlus
                     break;
                 case BlockTypes.Image:
                     #region image
-                    string filename = this.imageName;
-                    if (this.imageName == string.Empty) filename = this.imageObject.ToBase64String("base64:");
-                    this.RenderImage(document.LastSection.AddImage(filename), document, width);
+                    this.RenderImage(document.LastSection.AddImage(this.imageName), document, width);
                     #endregion
                     break;
-                case BlockTypes.Dock:
+                case BlockTypes.HorizontalDock:
                     #region dock
-                    this.RenderDock(document.LastSection.AddTable(),document, width);
+                    this.RenderDockHorizontal(document.LastSection.AddTable(),document, width);
                     #endregion
                     break;
             }

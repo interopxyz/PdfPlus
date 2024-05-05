@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_ChartPie : GH_Component
+    public class GH_Pdf_Shape_ChartPie : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Shape_GraphPie class.
@@ -69,7 +69,8 @@ namespace PdfPlus.Components
             int alignment = 0;
             if (DA.GetData(2, ref alignment)) shape.Alignment = (Alignment)alignment;
 
-            //prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
 
         }

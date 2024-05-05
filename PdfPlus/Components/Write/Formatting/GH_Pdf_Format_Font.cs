@@ -9,7 +9,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Format_Font : GH_Component
+    public class GH_Pdf_Format_Font : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_EditFont class.
@@ -118,7 +118,7 @@ namespace PdfPlus.Components
                 case Element.ElementTypes.Shape:
                     goo.CastTo<Shape>(out Shape shape);
                     shape.Font = font;
-                    //prev_shapes.Add(shape);
+                    this.SetPreview(shape);
                     DA.SetData(0, shape);
                     break;
                 case Element.ElementTypes.Data:

@@ -28,9 +28,20 @@ namespace PdfPlus.Components
               Constants.ShortName, Constants.Shapes)
         {
         }
-
         public GH_Pdf__Base(string Name, string NickName, string Description, string Category, string Subcategory) : base(Name, NickName, Description, Category, Subcategory)
         {
+            //this.DisplayExpired += GH_Pdf__Base_DisplayExpired;
+        }
+
+        private void GH_Pdf__Base_DisplayExpired(IGH_DocumentObject sender, GH_DisplayExpiredEventArgs e)
+        {
+            this.ExpireSolution(true);
+        }
+
+        public override void AddedToDocument(GH_Document document)
+        {
+            base.AddedToDocument(document);
+            //this.Hidden = true;
         }
 
         protected override void BeforeSolveInstance()
@@ -83,34 +94,45 @@ namespace PdfPlus.Components
             get { return new Guid("92db2d26-2a13-4992-a450-f20704b41a73"); }
         }
 
-        protected void AddShapes(List<Shape> shapes)
-        {
-            foreach (Shape shape in shapes) this.AddShapes(shape);
-        }
-        protected void AddShapes(Page page)
-        {
-            prev_pages.Add(new Page(page));
-            this.AddShapes(page.Shapes);
-        }
 
-        protected void AddShapes(Shape shape)
+        protected void SetPreview(Shape shape)
         {
-            prev_shapes.Add(shape);
-            _displayBox.Union(shape.BoundingBox);
-        }
-
-        protected void PrevPageShapes(Page page)
-        {
-            this.AddShapes(page);
-        }
-
-        protected void PrevDocumentShapes(Document doc)
-        {
-            foreach (Page page in doc.Pages)
+            if (!this.Hidden & !this.Locked)
             {
-                foreach(Page subPage in page.RenderBlocksToPages())this.PrevPageShapes(subPage);
-                this.AddShapes(page);
+                prev_shapes.Add(shape);
+                _displayBox.Union(shape.BoundingBox);
             }
+        }
+
+        protected void SetPreview(List<Shape> shapes)
+        {
+            if (!this.Hidden & !this.Locked) foreach (Shape shape in shapes) this.SetPreview(shape);
+        }
+
+        protected void SetPreview(Page page)
+        {
+            if (!this.Hidden & !this.Locked)
+            { 
+                prev_pages.Add(new Page(page));
+            this.SetPreview(page.Shapes);
+            }
+        }
+
+        protected void SetPreview(List<Page> pages)
+        {
+            if (!this.Hidden & !this.Locked)
+            {
+                foreach (Page page in pages)
+                {
+                    prev_pages.Add(new Page(page));
+                    this.SetPreview(page.Shapes);
+                }
+            }
+        }
+
+        protected void SetPreview(Document doc)
+        {
+            if (!this.Hidden & !this.Locked) foreach (Page page in doc.RenderBlocksToPages()) this.SetPreview(page);
         }
 
         public override BoundingBox ClippingBox
@@ -216,16 +238,22 @@ namespace PdfPlus.Components
                             {
                                 Material material = new Material();
                                 material.SetBitmapTexture(shape.ImagePath);
-
                                 material.DiffuseColor = Color.White;
                                 material.AmbientColor = Color.Black;
                                 material.EmissionColor = Color.Black;
                                 material.Reflectivity = 0.0;
                                 material.ReflectionGlossiness = 0.0;
+                                Rhino.Display.DisplayMaterial dmat = new Rhino.Display.DisplayMaterial();
+
                                 args.Display.DrawMeshShaded(RectToMesh(shape.PreviewBoundary,shape.Angle), new Rhino.Display.DisplayMaterial(material));
                             }
                             else
                             {
+                                //Rhino.Display.DisplayMaterial m_material = new Rhino.Display.DisplayMaterial();
+                                //Rhino.Display.DisplayBitmap favi = new Rhino.Display.DisplayBitmap(shape.Image);
+                                
+                                //var rt = Rhino.Render.RenderTexture.NewBitmapTexture(viri, Rhino.RhinoDoc.ActiveDoc);
+                                //var text = SimulatedTexture(Rhino.Render.RenderTexture.TextureGeneration.Allow).Texture();
                                 args.Display.DrawMeshFalseColors(MeshColorByBitmap(shape.PreviewBoundary, shape.Angle, shape.Image, 2));
                             }
                         }
@@ -277,21 +305,35 @@ namespace PdfPlus.Components
 
         private Mesh MeshColorByBitmap(Rectangle3d rectangle,double angle, Bitmap bitmap, int count)
         {
-            int xStep = bitmap.Width / count;
-            int yStep = bitmap.Height / count;
+            int xCount = bitmap.Width / count;
+            int yCount = bitmap.Height / count;
 
-            Mesh mesh = RectToDenseMesh(rectangle, angle, xStep - 1, yStep - 1);
+            int xStep = count;
+            int yStep = count;
+
+            if (xCount > 100)
+            {
+                xCount = (int)rectangle.Width;
+                xStep = (int)Math.Floor((double)bitmap.Width / (double)xCount);
+            }
+
+            if (yCount > 100)
+            {
+                yCount = (int)rectangle.Height;
+                yStep = (int)Math.Floor((double)bitmap.Height / (double)yCount);
+            }
+
+            Mesh mesh = RectToDenseMesh(rectangle, angle, xCount - 1, yCount - 1);
             List<Color> colors = new List<Color>();
 
-            for (int y = 0; y < bitmap.Height; y += count)
+            for (int y = 0; y < yCount; y += 1)
             {
-                for (int x = 0; x < bitmap.Width; x += count)
+                for (int x = 0; x < xCount; x += 1)
                 {
-                    colors.Add(bitmap.GetPixel(x, y));
+                    colors.Add(bitmap.GetPixel(x*xStep, y*yStep));
                 }
             }
 
-            mesh.VertexColors.Clear();
             mesh.VertexColors.AppendColors(colors.ToArray());
 
             return mesh;

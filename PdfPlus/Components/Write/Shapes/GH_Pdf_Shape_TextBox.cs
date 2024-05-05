@@ -9,7 +9,7 @@ using Sd = System.Drawing;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Shape_TextBox : GH_Component
+    public class GH_Pdf_Shape_TextBox : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_Page_AddText class.
@@ -74,7 +74,8 @@ namespace PdfPlus.Components
 
             Shape shape = Shape.CreateText(fragment, boundary,(Alignment)alignment, new Font());
 
-            //prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
         }
 

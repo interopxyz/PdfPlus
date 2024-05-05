@@ -4,19 +4,17 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-using Sd = System.Drawing;
-
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Documents
 {
-    public class GH_Pdf_Shape_SetShapes : GH_Component
+    public class GH_Pdf_Doc_Deconstruct : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Page_AddGeometry class.
+        /// Initializes a new instance of the GH_Pdf_Doc_Pages class.
         /// </summary>
-        public GH_Pdf_Shape_SetShapes()
-          : base("Set Shapes", "Set Shp",
-              "Place Text, Image, Geometric, or other Shapes into a PDF Page.",
-              Constants.ShortName, Constants.Shapes)
+        public GH_Pdf_Doc_Deconstruct()
+          : base("Deconstruct Document", "De Doc",
+              "Deconstruct a PDF Document into its pages",
+              Constants.ShortName, Constants.Documents)
         {
         }
 
@@ -25,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quarternary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -33,10 +31,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
-            pManager[0].Optional = true;
-            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.list);
-            pManager[1].Optional = true;
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -44,7 +39,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Output, GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -53,21 +48,18 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            //TRY GET PAGES
+            //TRY GET DOCUMENT
             IGH_Goo goo = null;
-            Page page = new Page();
-            if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
+            if (!DA.GetData(0, ref goo)) return;
+            Document document = new Document();
+            if (!goo.TryGetDocument(ref document)) return;
 
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, geometry)) return;
+            List<Page> pages = document.RenderBlocksToPages();
 
-            foreach(IGH_Goo goos in geometry)
-            {
-                page.AddShape(goos);
-            }
+            this.SetPreview(pages);
 
-            //this.PrevPageShapes(page);
-            DA.SetData(0, page);
+            DA.SetDataList(0, pages);
+
         }
 
         /// <summary>
@@ -79,7 +71,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Shape_Add;
+                return Properties.Resources.Pdf_Document_Deconstruct;
             }
         }
 
@@ -88,7 +80,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("7e649fc6-716b-4079-90eb-9fd203298a38"); }
+            get { return new Guid("ebff998c-6d61-4430-a0cd-9e5d447c81ba"); }
         }
     }
 }

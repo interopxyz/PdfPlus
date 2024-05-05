@@ -22,6 +22,7 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Grasshopper.Kernel.Types;
 using System.Reflection;
+using PdfSharp.Pdf.IO;
 
 namespace PdfPlus
 {
@@ -912,6 +913,43 @@ namespace PdfPlus
 
         #region font
 
+        public static Pd.XStringFormat ToPdfAlignment(this Shape input)
+        {
+            switch (input.Alignment)
+            {
+                default:
+                    switch (input.Font.Justification)
+                    {
+                        default:
+                            return Pd.XStringFormats.TopLeft;
+                        case Justification.Center:
+                            return Pd.XStringFormats.TopCenter;
+                        case Justification.Right:
+                            return Pd.XStringFormats.TopRight;
+                    }
+                case Alignment.Center:
+                    switch (input.Font.Justification)
+                    {
+                        default:
+                            return Pd.XStringFormats.CenterLeft;
+                        case Justification.Center:
+                            return Pd.XStringFormats.Center;
+                        case Justification.Right:
+                            return Pd.XStringFormats.CenterRight;
+                    }
+                case Alignment.Bottom:
+                    switch (input.Font.Justification)
+                    {
+                        default:
+                            return Pd.XStringFormats.BottomLeft;
+                        case Justification.Center:
+                            return Pd.XStringFormats.BottomCenter;
+                        case Justification.Right:
+                            return Pd.XStringFormats.BottomRight;
+                    }
+            }
+        }
+
         public static Pd.XFont ToPdf(this Font input, double scale = 1.0)
         {
             return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf());
@@ -974,7 +1012,9 @@ namespace PdfPlus
 
         public static void RenderFragments(this Md.Paragraph input, Fragment fragment)
         {
-            foreach (Element element in fragment.Segments) input.AddFormattedText(element.Text, element.Font.ToMigraDoc());
+            input.Format.Alignment = (fragment.Font.Justification.ToMigraDocParagraphAlignment());
+
+            foreach (Element element in fragment.Segments) input.AddFormattedText( element.Text, element.Font.ToMigraDoc());
         }
 
         public static void RenderFragments(this Md.Paragraph input, List<Fragment> fragments)
