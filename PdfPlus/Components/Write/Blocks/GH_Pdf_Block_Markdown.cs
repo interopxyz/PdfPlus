@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Block_Group : GH_Component
+    public class GH_Pdf_Block_Markdown : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Block_Group class.
+        /// Initializes a new instance of the GH_Pdf_Block_Markdown class.
         /// </summary>
-        public GH_Pdf_Block_Group()
-          : base("Group Block", "Group Blk",
-              "Group a list of Blocks together vertically." + Environment.NewLine + "Compatible with Text, List, Chart, Drawing, and Image Blocks",
+        public GH_Pdf_Block_Markdown()
+          : base("Markdown Block", "Mkd Blk",
+              "Create a Markdown Block",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -31,7 +31,8 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager.AddTextParameter("Markdown", "M", "Markdown Text", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
         /// <summary>
@@ -48,22 +49,12 @@ namespace PdfPlus.Components.Write.Blocks
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<IGH_Goo> goos = new List<IGH_Goo>();
-            if (!DA.GetDataList(0, goos)) return;
+            string text = string.Empty;
+            if (!DA.GetData(0, ref text)) return;
 
-            List<Block> blocks = new List<Block>();
-            foreach (IGH_Goo goo in goos)
-            {
-                Block block = null;
-                if (goo.TryGetBlock(ref block)) blocks.Add(block);
-            }
+            Block block = Block.CreateMarkdown(text);
 
-            if (blocks.Count > 0)
-            {
-                Block output = Block.CreateGroup(blocks);
-                DA.SetData(0, output);
-            }
-
+            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -75,7 +66,7 @@ namespace PdfPlus.Components.Write.Blocks
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Vertical;
+                return null;
             }
         }
 
@@ -84,7 +75,7 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("0eeb6ed0-a2fd-46cd-afd5-a92a78026099"); }
+            get { return new Guid("af7121bf-14ab-4dce-9f29-24882f729539"); }
         }
     }
 }

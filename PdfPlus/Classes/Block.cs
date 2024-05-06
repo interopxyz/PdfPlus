@@ -12,6 +12,7 @@ using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
 
 using Md = MigraDoc.DocumentObjectModel;
+using MigraDoc.Extensions.Markdown;
 
 using Rg = Rhino.Geometry;
 using System.IO;
@@ -23,7 +24,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image, Drawing, HorizontalDock, VerticalDock };
+        public enum BlockTypes { None, LineBreak, PageBreak, Text, Markdown, List, Table, Chart, Image, Drawing, HorizontalDock, VerticalDock };
         protected BlockTypes blockType = BlockTypes.None;
         protected List<Block> blocks = new List<Block>();
 
@@ -34,6 +35,7 @@ namespace PdfPlus
         //Text
         protected Font.Presets formatType = Font.Presets.Normal;
         protected string formatName = "Normal";
+        protected string contents = string.Empty;
 
         //Break
         protected int breakCount = 1;
@@ -67,6 +69,7 @@ namespace PdfPlus
             //text
             this.formatType = block.formatType;
             this.formatName = block.formatName;
+            this.contents = block.contents;
 
             //break
             this.breakCount = block.breakCount;
@@ -137,6 +140,15 @@ namespace PdfPlus
             block.formatType = format;
             block.formatName = format.ToString();
             block.font = Fonts.GetPreset(format);
+
+            return block;
+        }
+
+        public static Block CreateMarkdown(string markdown)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Markdown;
+            block.contents = markdown;
 
             return block;
         }
@@ -295,6 +307,15 @@ namespace PdfPlus
             return block;
         }
 
+        public static Block CreateGroup(List<Block> blocks)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.VerticalDock;
+            foreach (Block blk in blocks) block.blocks.Add(new Block(blk));
+
+            return block;
+        }
+
         #endregion
 
         #endregion
@@ -361,6 +382,13 @@ namespace PdfPlus
                 paragraph.AddText(this.Text);
                 paragraph.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
             }
+        }
+
+        public void RenderMarkdown(Md.Section section, Md.Document document)
+        {
+            int count = section.Elements.Count;
+            section.AddMarkdown(this.contents);
+            for(int i = count;i<section.Elements.Count;i++) section.Elements[i].Tag = "Markdown~" + this.id;
         }
 
         public void RenderList(Md.Document document)
@@ -605,6 +633,8 @@ namespace PdfPlus
             {
                 chart.Height = this.Height;
             }
+
+            chart.Height = Math.Max(chart.Height, 75.00);
 
             if (this.graphic.HasColor) chart.FillFormat.Color = this.graphic.Color.ToMigraDoc();
 
@@ -871,24 +901,7 @@ namespace PdfPlus
                 {
                     Block blk = this.blocks[i];
                     Md.Tables.Cell cell = dock.Rows[0].Cells[i];
-                    switch (blk.blockType)
-                    {
-                        case BlockTypes.Text:
-                            blk.RenderText(cell.AddParagraph(), document);
-                            break;
-                        case BlockTypes.List:
-                            blk.RenderList(cell, document);
-                            break;
-                        case BlockTypes.Chart:
-                            blk.RenderChart(cell.AddChart(), document, columnWidth);
-                            break;
-                        case BlockTypes.Drawing:
-                            blk.RenderDrawing(cell.AddTextFrame(), document,columnWidth);
-                            break;
-                        case BlockTypes.Image:
-                            blk.RenderImage(cell.AddImage(blk.imageName), document,columnWidth);
-                            break;
-                    }
+                    RenderToCell(cell, document, blk, columnWidth);
                 }
             }
         }
@@ -898,35 +911,57 @@ namespace PdfPlus
             if (this.blocks.Count > 0)
             {
                 dock.Tag = "DockV~" + this.id;
-
                 dock.Format.Alignment = Md.ParagraphAlignment.Justify;
 
                 Md.Tables.Column column = dock.AddColumn();
                 Md.Tables.Row row = dock.AddRow();
                 Md.Tables.Cell cell = dock.Rows[0].Cells[0];
-
+                column.Width = width;
                 for (int i = 0; i < this.blocks.Count; i++)
                 {
                     Block blk = this.blocks[i];
-                    switch (blk.blockType)
-                    {
-                        case BlockTypes.Text:
-                            blk.RenderText(cell.AddParagraph(), document);
-                            break;
-                        case BlockTypes.List:
-                            blk.RenderList(cell, document);
-                            break;
-                        case BlockTypes.Chart:
-                            blk.RenderChart(cell.AddChart(), document, columnWidth);
-                            break;
-                        case BlockTypes.Drawing:
-                            blk.RenderDrawing(cell.AddTextFrame(), document, columnWidth);
-                            break;
-                        case BlockTypes.Image:
-                            blk.RenderImage(cell.AddImage(blk.imageName), document, columnWidth);
-                            break;
-                    }
+                    RenderToCell(cell, document, blk, width);
                 }
+            }
+        }
+
+        protected void RenderToCell(Md.Tables.Cell cell, Md.Document document, Block block, double width)
+        {
+            switch (block.blockType)
+            {
+                case BlockTypes.Text:
+                    block.RenderText(cell.AddParagraph(), document);
+                    break;
+                case BlockTypes.Markdown:
+                    block.RenderMarkdown(cell.Section, document);
+                    break;
+                case BlockTypes.List:
+                    block.RenderList(cell, document);
+                    break;
+                case BlockTypes.Chart:
+                    block.RenderChart(cell.AddChart(), document, width);
+                    break;
+                case BlockTypes.Drawing:
+                    block.RenderDrawing(cell.AddTextFrame(), document, width);
+                    break;
+                case BlockTypes.Image:
+                    block.RenderImage(cell.AddImage(block.imageName), document, width);
+                    break;
+                case BlockTypes.Table:
+                    cell.Elements.Add(new Md.Tables.Table());
+                    Md.Tables.Table table = (Md.Tables.Table)cell.Elements[cell.Elements.Count - 1];
+                    block.RenderTable(table, document, width);
+                    break;
+                case BlockTypes.VerticalDock:
+                    cell.Elements.Add(new Md.Tables.Table());
+                    Md.Tables.Table group = (Md.Tables.Table)cell.Elements[cell.Elements.Count - 1];
+                    block.RenderDockVertical(group, document, width);
+                    break;
+                case BlockTypes.HorizontalDock:
+                    cell.Elements.Add(new Md.Tables.Table());
+                    Md.Tables.Table dock = (Md.Tables.Table)cell.Elements[cell.Elements.Count - 1];
+                    block.RenderDockHorizontal(dock, document, width);
+                    break;
             }
         }
 
@@ -965,6 +1000,11 @@ namespace PdfPlus
                     this.RenderText(document.LastSection.AddParagraph(),document);
                     #endregion
                     break;
+                case BlockTypes.Markdown:
+                    #region markdown
+                    this.RenderMarkdown(document.LastSection, document);
+                    #endregion
+                    break;
                 case BlockTypes.List:
                     #region list
                     this.RenderList(document);
@@ -993,6 +1033,11 @@ namespace PdfPlus
                 case BlockTypes.HorizontalDock:
                     #region dock
                     this.RenderDockHorizontal(document.LastSection.AddTable(),document, width);
+                    #endregion
+                    break;
+                case BlockTypes.VerticalDock:
+                    #region group
+                    this.RenderDockVertical(document.LastSection.AddTable(), document, width);
                     #endregion
                     break;
             }

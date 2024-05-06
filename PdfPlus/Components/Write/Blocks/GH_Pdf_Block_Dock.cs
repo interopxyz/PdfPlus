@@ -61,7 +61,6 @@ namespace PdfPlus.Components.Write.Blocks
             if (blocks.Count > 0)
             {
                 Block output = Block.CreateDock(blocks);
-
                 DA.SetData(0, output);
             }
 

@@ -121,7 +121,7 @@ namespace PdfPlus
             {
                 string ln = line;
                 if (line == "\r\n ") ln = "";
-                    subLines.Add(ln);
+                subLines.Add(ln);
             }
 
             Rd.Text3d text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize* factor);

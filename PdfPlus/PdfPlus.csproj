@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,11 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PdfPlus</RootNamespace>
     <AssemblyName>PdfPlus</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -46,13 +47,36 @@
       <HintPath>packages\Grasshopper.6.18.19266.14201\lib\net45\Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="MarkdownSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MarkdownSharp.dll</HintPath>
+    </Reference>
     <Reference Include="MigraDoc.DocumentObjectModel, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\MigraDoc.DocumentObjectModel.dll</HintPath>
     </Reference>
+    <Reference Include="MigraDoc.Extensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Extensions.Html, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.Extensions.Html.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Extensions.Markdown, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\MigraDoc.Extensions.Markdown.dll</HintPath>
+    </Reference>
     <Reference Include="MigraDoc.Rendering, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>packages\MigraDoc.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.RtfRendering">
+      <HintPath>packages\MigraDoc.RtfRendering.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp, Version=1.51.5185.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -72,6 +96,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -96,6 +121,7 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Dock.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Drawing.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Group.cs" />
+    <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Markdown.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Resize.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_Image.cs" />
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block_List.cs" />
@@ -289,6 +315,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Page-Deconstruct2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Block-Vertical.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
