@@ -13,6 +13,7 @@ using Pl = PdfSharp.Drawing.Layout;
 
 using Md = MigraDoc.DocumentObjectModel;
 using MigraDoc.Extensions.Markdown;
+using MigraDoc.Extensions.Html;
 
 using Rg = Rhino.Geometry;
 using System.IO;
@@ -24,7 +25,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum BlockTypes { None, LineBreak, PageBreak, Text, Markdown, List, Table, Chart, Image, Drawing, HorizontalDock, VerticalDock };
+        public enum BlockTypes { None, LineBreak, PageBreak, Text, Markdown, Html, List, Table, Chart, Image, Drawing, HorizontalDock, VerticalDock };
         protected BlockTypes blockType = BlockTypes.None;
         protected List<Block> blocks = new List<Block>();
 
@@ -149,6 +150,15 @@ namespace PdfPlus
             Block block = new Block();
             block.blockType = BlockTypes.Markdown;
             block.contents = markdown;
+
+            return block;
+        }
+
+        public static Block CreateHtml(string html)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Html;
+            block.contents = html;
 
             return block;
         }
@@ -389,6 +399,13 @@ namespace PdfPlus
             int count = section.Elements.Count;
             section.AddMarkdown(this.contents);
             for(int i = count;i<section.Elements.Count;i++) section.Elements[i].Tag = "Markdown~" + this.id;
+        }
+
+        public void RenderHtml(Md.Section section, Md.Document document)
+        {
+            int count = section.Elements.Count;
+            section.AddHtml(this.contents);
+            for (int i = count; i < section.Elements.Count; i++) section.Elements[i].Tag = "Html~" + this.id;
         }
 
         public void RenderList(Md.Document document)
@@ -935,6 +952,9 @@ namespace PdfPlus
                 case BlockTypes.Markdown:
                     block.RenderMarkdown(cell.Section, document);
                     break;
+                case BlockTypes.Html:
+                    block.RenderHtml(cell.Section, document);
+                    break;
                 case BlockTypes.List:
                     block.RenderList(cell, document);
                     break;
@@ -1003,6 +1023,11 @@ namespace PdfPlus
                 case BlockTypes.Markdown:
                     #region markdown
                     this.RenderMarkdown(document.LastSection, document);
+                    #endregion
+                    break;
+                case BlockTypes.Html:
+                    #region html
+                    this.RenderHtml(document.LastSection, document);
                     #endregion
                     break;
                 case BlockTypes.List:
