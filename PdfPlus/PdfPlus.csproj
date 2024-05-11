@@ -133,7 +133,7 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block__GetBlocks.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Deconstruct.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Preview.cs" />
-    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape_GetShapes.cs" />
+    <Compile Include="Components\Write\Shapes\GH_Pdf_Shape__GetShapes.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSet.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_DataSetFast.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_FontPresets.cs" />
@@ -176,9 +176,11 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Resources\PdfPlus-24.png" />
   </ItemGroup>

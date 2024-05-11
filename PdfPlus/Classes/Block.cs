@@ -398,7 +398,11 @@ namespace PdfPlus
         {
             int count = section.Elements.Count;
             section.AddMarkdown(this.contents);
-            for(int i = count;i<section.Elements.Count;i++) section.Elements[i].Tag = "Markdown~" + this.id;
+            for (int i = count; i < section.Elements.Count; i++)
+            {
+                string style = ((Md.Paragraph)section.Elements[i]).Style;
+                section.Elements[i].Tag = "Markdown~" + this.id;
+            }
         }
 
         public void RenderHtml(Md.Section section, Md.Document document)

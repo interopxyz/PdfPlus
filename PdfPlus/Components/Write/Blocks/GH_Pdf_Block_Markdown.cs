@@ -13,7 +13,28 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public GH_Pdf_Block_Markdown()
           : base("Markdown Block", "Mkd Blk",
-              "Create a Markdown Block",
+              "Create a Markdown Block" + Environment.NewLine +
+                "# Heading 1" + Environment.NewLine +
+"## Heading 2" + Environment.NewLine +
+"### Heading 3" + Environment.NewLine +
+"#### Heading 4" + Environment.NewLine +
+"##### Heading 5" + Environment.NewLine +
+"###### Heading 6" + Environment.NewLine +
+"*** 'Horizontal Rule'" + Environment.NewLine +
+"--- 'Horizontal Rule'" + Environment.NewLine +
+"___ 'Horizontal Rule'" + Environment.NewLine +
+"**Bold**" + Environment.NewLine +
+"*Italic*" + Environment.NewLine +
+"***Bold & Italic***" + Environment.NewLine +
+"___Bold & Italic___" + Environment.NewLine +
+"__*Bold & Italic*__" + Environment.NewLine +
+"**_Bold & Italic_ **" + Environment.NewLine +
+"1.Numbered List Item" + Environment.NewLine +
+"- Unordered List Item" + Environment.NewLine +
+"* Unordered List Item" + Environment.NewLine +
+"+ Unordered List Item" + Environment.NewLine +
+"[Hyperlink](https://duckduckgo.com)" + Environment.NewLine +
+"\\ \\` \\* \\_ \\{ } \\[] \\<> \\() \\# \\+ \\- \\. \\! \\| ",
               Constants.ShortName, Constants.Blocks)
         {
         }

@@ -275,6 +275,64 @@ namespace PdfPlus
 
             #endregion
 
+            #region Hyperlink
+
+            var links = doc.Styles["Hyperlink"];
+            links.Font.Color = Sd.Color.CornflowerBlue.ToMigraDoc();
+
+            #endregion
+
+            #region Normal (Markdown)
+
+            var body = doc.Styles["Normal"];
+
+            body.Font.Size = Md.Unit.FromPoint(10);
+            body.Font.Color = Sd.Color.Black.ToMigraDoc();
+
+            body.ParagraphFormat.LineSpacingRule = Md.LineSpacingRule.Multiple;
+            body.ParagraphFormat.LineSpacing = 1.25;
+            body.ParagraphFormat.SpaceAfter = 10;
+
+            #endregion
+
+            #region Unordered List (Markdown)
+
+            var unorderedlist = doc.AddStyle("UnorderedList", "Normal");
+            var listInfo = new Md.ListInfo();
+            listInfo.ListType = Md.ListType.BulletList1;
+            unorderedlist.ParagraphFormat.ListInfo = listInfo;
+            unorderedlist.ParagraphFormat.LeftIndent = "1cm";
+            unorderedlist.ParagraphFormat.FirstLineIndent = "-0.5cm";
+            unorderedlist.ParagraphFormat.SpaceAfter = 0;
+
+            #endregion 
+
+            #region Ordered List (Markdown)
+
+            var orderedlist = doc.AddStyle("OrderedList", "UnorderedList");
+            orderedlist.ParagraphFormat.ListInfo.ListType = Md.ListType.NumberList1;
+
+            // for list spacing (since MigraDoc doesn't provide a list object that we can target)
+            var listStart = doc.AddStyle("ListStart", "Normal");
+            listStart.ParagraphFormat.SpaceAfter = 0;
+            listStart.ParagraphFormat.LineSpacing = 0.5;
+            var listEnd = doc.AddStyle("ListEnd", "ListStart");
+            listEnd.ParagraphFormat.LineSpacing = 1;
+
+            #endregion
+
+            #region Horizontal Rule
+
+            var hr = doc.AddStyle("HorizontalRule", "Normal");
+            var hrBorder = new Md.Border();
+            hrBorder.Width = "1pt";
+            hrBorder.Color = Sd.Color.DarkGray.ToMigraDoc();
+            hr.ParagraphFormat.Borders.Bottom = hrBorder;
+            hr.ParagraphFormat.LineSpacing = 0;
+            hr.ParagraphFormat.SpaceBefore = 15;
+
+            #endregion
+
             return doc;
         }
 

@@ -12,7 +12,21 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public GH_Pdf_Block_Html()
           : base("HTML Block", "HTML Blk",
-              "Create a HTML Block",
+              "Create a HTML Block" + Environment.NewLine +
+                "<h1>Heading 1</h1>" + Environment.NewLine +
+                "<h2>Heading 2</h2>" + Environment.NewLine +
+                "<h3>Heading 3</h3>" + Environment.NewLine +
+                "<h4>Heading 4</h4>" + Environment.NewLine +
+                "<h5>Heading 5</h5>" + Environment.NewLine +
+                "<h6>Heading 6</h6>" + Environment.NewLine +
+                "<hr /> 'Horizontal Rule'" + Environment.NewLine +
+                "<strong>Bold</strong>" + Environment.NewLine +
+                "<i>Italic</i>" + Environment.NewLine +
+                "<u>Underline</u>" + Environment.NewLine +
+                "<strong><i>Bold & Italic</i></strong>" + Environment.NewLine +
+                "<ol><li>Ordered List Item 1</li></ol>" + Environment.NewLine +
+                "<ul><li>Unordered List Item A</li></ul>" + Environment.NewLine +
+                "<a href='http://www.duckduckgo.com'>Hyperlink</a>",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -51,7 +65,7 @@ namespace PdfPlus.Components.Write.Blocks
             string text = string.Empty;
             if (!DA.GetData(0, ref text)) return;
 
-            Block block = Block.CreateMarkdown(text);
+            Block block = Block.CreateHtml(text);
 
             DA.SetData(0, block);
         }
