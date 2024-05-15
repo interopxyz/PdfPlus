@@ -423,7 +423,11 @@ namespace PdfPlus
 
         public override string ToString()
         {
-            return "Document " + this.pages.Count + "pgs";
+            string c = this.pages.Count.ToString();
+            bool status = false;
+            foreach (Page p in this.pages) if (p.Blocks.Count > 0) status = true;
+            if (status) c += "+";
+            return "Document | " + c + " Pages";
         }
 
         #endregion

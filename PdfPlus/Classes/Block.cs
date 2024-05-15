@@ -951,7 +951,7 @@ namespace PdfPlus
             switch (block.blockType)
             {
                 case BlockTypes.Text:
-                    block.RenderText(cell.AddParagraph(), document);
+                    block.RenderText(cell.AddTextFrame().AddParagraph(), document);
                     break;
                 case BlockTypes.Markdown:
                     block.RenderMarkdown(cell.Section, document);

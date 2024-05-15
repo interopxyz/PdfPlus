@@ -587,12 +587,17 @@ namespace PdfPlus
                     {
                         foreach (Block blk in block.Blocks) if (blk.BlockType == Block.BlockTypes.Drawing) subDrawings.Add(blk);
                     }
+                    if (block.BlockType == Block.BlockTypes.VerticalDock)
+                    {
+                        foreach (Block blk in block.Blocks) if (blk.BlockType == Block.BlockTypes.Drawing) subDrawings.Add(blk);
+                    }
                 }
 
                 Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
                 pdfDocumentRenderer.Document = doc;
                 pdfDocumentRenderer.PdfDocument = document;
 
+                pdfDocumentRenderer.DocumentRenderer.PrepareDocument();
                 pdfDocumentRenderer.PrepareRenderPages();
                 int count = pdfDocumentRenderer.PageCount;
                 int j = 0;
@@ -615,6 +620,48 @@ namespace PdfPlus
                             case "Drawing":
                                 drawings[j].Drawing.Render(graph, r);
                                 j++;
+                                break;
+                            case "DockV":
+                                double h = 0;
+                                Md.Tables.Table tbl = (Md.Tables.Table)info.DocumentObject;
+
+                                Mr.TableRenderInfo tinf = (Mr.TableRenderInfo)info;
+                                Md.Tables.Cell cl = tbl.Rows[0].Cells[0];
+                                for (int c = 0; c < cl.Elements.Count; c++)
+                                {
+                                    //Rg.Rectangle3d gpRect = info.LayoutInfo.ContentArea.ToRectangle3d();
+                                    string[] subtag = cl.Elements[c].Tag.ToString().Split('~');
+                                    switch (subtag[0])
+                                    {
+                                        case "Drawing":
+                                            Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cl.Elements[c];
+                                            h += frame.Height;
+                                            p.OriginX = tbl.Columns[0].Width / 2.0 - frame.Width / 2.0;
+                                            p.OriginY += tbl.Rows[0].Height / 2.0 + frame.Height / 2.0;
+                                            Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
+                                            p.OriginY += tbl.Rows[0].Height / 2.0 + frame.Height / 2.0;
+                                            subDrawings[k].Drawing.Render(graph, r2);
+                                            k++;
+                                            break;
+                                        case "Text":
+                                        case "Markdown":
+                                        case "Html":
+                                        case "List":
+                                            Md.Paragraph txt = (Md.Paragraph)cl.Elements[c];
+                                            break;
+                                        case "Table":
+                                        case "DockH":
+                                        case "DockV":
+                                            Md.Tables.Table tabl = (Md.Tables.Table)cl.Elements[c];
+                                            break;
+                                        case "Chart":
+                                            Md.Shapes.Charts.Chart chrt = (Md.Shapes.Charts.Chart)cl.Elements[c];
+                                            break;
+                                        case "Image":
+                                            Md.Shapes.TextFrame frm = (Md.Shapes.TextFrame)cl.Elements[c];
+                                            break;
+                                    }
+                                }
                                 break;
                             case "DockH":
                                 Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
@@ -726,7 +773,7 @@ namespace PdfPlus
 
         public override string ToString()
         {
-            return "Page " + Math.Round(this.Width, 2) + Unit.Abbreviation() + "," + Math.Round(this.Height, 2) + Unit.Abbreviation();
+            return "Page | (" + Math.Round(this.Width, 2) + Unit.Abbreviation() + "," + Math.Round(this.Height, 2) + Unit.Abbreviation()+")";
         }
 
         #endregion

@@ -889,7 +889,12 @@ namespace PdfPlus
 
         protected Pd.XGraphics RenderBezier(Pd.XGraphics graph)
         {
-            graph.DrawBeziers(graphic.ToPdf(), curve.ToBezierPolyline().ToPdf().ToArray());
+            Pd.XGraphicsPath crvPath = new Pd.XGraphicsPath();
+            crvPath.StartFigure();
+            crvPath.AddBeziers(curve.ToBezierPolyline().ToPdf().ToArray());
+            if (curve.IsClosed) crvPath.CloseFigure();
+
+            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
             return graph;
         }
 
@@ -1261,6 +1266,15 @@ namespace PdfPlus
             //chart.Legend.LineFormat.Visible = true;
 
             return chart;
+        }
+
+        #endregion
+
+        #region overrides
+
+        public override string ToString()
+        {
+            return "Shape | " + this.shapeType;
         }
 
         #endregion

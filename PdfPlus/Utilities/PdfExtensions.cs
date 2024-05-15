@@ -211,19 +211,19 @@ namespace PdfPlus
                         switch (type)
                         {
                             default:
-                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), new Graphic());
+                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), Graphics.Outline);
                                 break;
                             case "Polyline Curve":
                                 Rg.Polyline pline;
-                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, new Graphic());
+                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, Graphics.Outline);
                                 break;
                             case "Line-like Curve":
-                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
+                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), Graphics.Outline);
                                 break;
                             case "Elliptical Curve":
                                 Rg.Ellipse ellipse;
                                 curve.TryGetEllipse(out ellipse);
-                                shape = Shape.CreateGeometry(ellipse, new Graphic());
+                                shape = Shape.CreateGeometry(ellipse, Graphics.Outline);
                                 break;
                         }
                         isValid = true;
@@ -234,7 +234,7 @@ namespace PdfPlus
 
                     if (goo.CastTo<Rg.Arc>(out arc))
                     {
-                        shape = Shape.CreateGeometry(arc, new Graphic());
+                        shape = Shape.CreateGeometry(arc, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -243,7 +243,7 @@ namespace PdfPlus
 
                     if (goo.CastTo<Rg.Circle>(out circle))
                     {
-                        shape = Shape.CreateGeometry(circle, new Graphic());
+                        shape = Shape.CreateGeometry(circle, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -252,7 +252,7 @@ namespace PdfPlus
 
                     if (goo.CastTo<Rg.Line>(out line))
                     {
-                        shape = Shape.CreateGeometry(line, new Graphic());
+                        shape = Shape.CreateGeometry(line, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -260,7 +260,7 @@ namespace PdfPlus
                     Rg.Rectangle3d rect;
                     if (goo.CastTo<Rg.Rectangle3d>(out rect))
                     {
-                        shape = Shape.CreateGeometry(rect, new Graphic());
+                        shape = Shape.CreateGeometry(rect, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -269,7 +269,7 @@ namespace PdfPlus
                     if (goo.CastTo<Rg.Surface>(out surface))
                     {
                         Rg.Brep srfBrep = surface.ToBrep();
-                        shape = Shape.CreateGeometry(srfBrep, new Graphic());
+                        shape = Shape.CreateGeometry(srfBrep, Graphics.Solid);
                         isValid = true;
                     }
                     break;
@@ -277,7 +277,7 @@ namespace PdfPlus
                     Rg.Brep brep;
                     if (goo.CastTo<Rg.Brep>(out brep))
                     {
-                        shape = Shape.CreateGeometry(brep, new Graphic());
+                        shape = Shape.CreateGeometry(brep, Graphics.Solid);
                         isValid = true;
                     }
                     break;
@@ -285,7 +285,7 @@ namespace PdfPlus
                     Rg.Mesh mesh;
                     if (goo.CastTo<Rg.Mesh>(out mesh))
                     {
-                        shape = Shape.CreateGeometry(mesh, new Graphic());
+                        shape = Shape.CreateGeometry(mesh, Graphics.Solid);
                         isValid = true;
                     }
                     break;
