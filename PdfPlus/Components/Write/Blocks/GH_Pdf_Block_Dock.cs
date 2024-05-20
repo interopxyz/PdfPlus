@@ -13,7 +13,9 @@ namespace PdfPlus.Components.Write.Blocks
         /// </summary>
         public GH_Pdf_Block_Dock()
           : base("Dock Block", "Dock Blk",
-              "Place a list of Blocks aligned horizontally on the page."+Environment.NewLine+"Compatible with Text, List, Chart, Drawing, and Image Blocks",
+              "Place a list of Blocks aligned horizontally on the page."+Environment.NewLine+"Compatible with Text, List, Chart, Drawing, Table, and Image Blocks. Vertical Groups and nested Docks and Groups are supported" + 
+                Environment.NewLine + "(NOTE 1: Vertical Groups do not currently support drawings and adding a Group with Drawing to a Dock or a Dock with a Drawing to a Group will invalidate the drawing.)" + Environment.NewLine+
+                Environment.NewLine + "(NOTE 2: Rhino Previews for Docks and their content is not yet fully supported. The overall boundary will be returned.)",
               Constants.ShortName, Constants.Blocks)
         {
         }

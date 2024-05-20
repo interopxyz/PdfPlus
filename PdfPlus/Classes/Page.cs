@@ -647,7 +647,6 @@ namespace PdfPlus
                         t += 1;
                     }
 
-
                     graph.Dispose();
                 }
 
@@ -669,17 +668,19 @@ namespace PdfPlus
                 switch (tag[0])
                 {
                     case "Drawing":
+                        if (renderDrawing) { 
                         Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cell.Elements[0];
                         plane.OriginX = x + table.Columns[i].Width / 2.0 - frame.Width / 2.0;
                         plane.OriginY = y +table.Rows[0].Height / 2.0 - frame.Height / 2.0;
                         Rg.Rectangle3d r2 = new Rg.Rectangle3d(plane, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
                         drawings[tag[1]].Drawing.Render(graph, r2);
+                        }
                         break;
                     case "DockH":
                         RenderDockH((Md.Tables.Table)cell.Elements[0], info, graph, drawings, plane, renderDrawing);
                         break;
                     case "DockV":
-                        RenderDockV((Md.Tables.Table)cell.Elements[0],info, graph, drawings, plane, renderDrawing,false);
+                        RenderDockV((Md.Tables.Table)cell.Elements[0],info, graph, drawings, plane);
                         break;
                 }
                 x += table.Columns[i].Width;
@@ -688,8 +689,8 @@ namespace PdfPlus
 
         public void RenderDockV(Md.Tables.Table table, Mr.RenderInfo info, Pd.XGraphics graph, Dictionary<string, Block> drawings, Rg.Plane plane)
         {
-            double x = info.LayoutInfo.ContentArea.X;
-            double y = info.LayoutInfo.ContentArea.Y;
+            //double x = info.LayoutInfo.ContentArea.X;
+            //double y = info.LayoutInfo.ContentArea.Y;
 
             for (int i = 0; i < table.Rows.Count; i++)
             {
@@ -699,11 +700,11 @@ namespace PdfPlus
                 switch (tag[0])
                 {
                     case "Drawing":
-                        Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cell.Elements[0];
-                        plane.OriginX = x+table.Columns[0].Width / 2.0 - frame.Width / 2.0;
-                        plane.OriginY = y+table.Rows[0].Height / 2.0;
-                        Rg.Rectangle3d r2 = new Rg.Rectangle3d(plane, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
-                        drawings[tag[1]].Drawing.Render(graph, r2);
+                        //Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cell.Elements[0];
+                        //plane.OriginX = x+table.Columns[0].Width / 2.0 - frame.Width / 2.0;
+                        //plane.OriginY = y+table.Rows[0].Height / 2.0;
+                        //Rg.Rectangle3d r2 = new Rg.Rectangle3d(plane, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
+                        //drawings[tag[1]].Drawing.Render(graph, r2);
                         break;
                     case "DockH":
                         RenderDockH((Md.Tables.Table)cell.Elements[0], info, graph, drawings, plane,false);
