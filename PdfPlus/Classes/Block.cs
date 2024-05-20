@@ -420,6 +420,7 @@ namespace PdfPlus
                 Md.ListInfo listinfo = new Md.ListInfo();
                 listinfo.ContinuePreviousList = i > 0;
                 listinfo.ListType = listType;
+
                 Md.Paragraph listItem = document.LastSection.AddParagraph();
                 listItem.Tag = "List~" + this.id;
                 listItem.Format.KeepTogether = true;
@@ -444,8 +445,10 @@ namespace PdfPlus
                 Md.ListInfo listinfo = new Md.ListInfo();
                 listinfo.ContinuePreviousList = i > 0;
                 listinfo.ListType = listType;
-                listinfo.Tag = "List~" + this.id;
+
                 Md.Paragraph listItem = cell.AddParagraph();
+                listItem.Tag = "List~" + this.id;
+                listItem.Format.KeepTogether = true;
                 if (this.formatType == Font.Presets.None)
                 {
                     listItem.RenderFragments(this.fragments[i]);
@@ -935,11 +938,11 @@ namespace PdfPlus
                 dock.Format.Alignment = Md.ParagraphAlignment.Justify;
 
                 Md.Tables.Column column = dock.AddColumn();
-                Md.Tables.Row row = dock.AddRow();
-                Md.Tables.Cell cell = dock.Rows[0].Cells[0];
                 column.Width = width;
                 for (int i = 0; i < this.blocks.Count; i++)
                 {
+                dock.AddRow();
+                Md.Tables.Cell cell = dock.Rows[i].Cells[0];
                     Block blk = this.blocks[i];
                     RenderToCell(cell, document, blk, width);
                 }
@@ -951,7 +954,7 @@ namespace PdfPlus
             switch (block.blockType)
             {
                 case BlockTypes.Text:
-                    block.RenderText(cell.AddTextFrame().AddParagraph(), document);
+                    block.RenderText(cell.AddParagraph(), document);
                     break;
                 case BlockTypes.Markdown:
                     block.RenderMarkdown(cell.Section, document);

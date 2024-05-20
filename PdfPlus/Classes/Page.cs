@@ -577,20 +577,36 @@ namespace PdfPlus
                 doc.Sections.AddSection();
                 doc = this.SetPage(doc);
 
-                List<Block> drawings = new List<Block>();
-                List<Block> subDrawings = new List<Block>();
-                foreach (Block block in blocks)
+                Dictionary<string,Block> drawings = new Dictionary<string, Block>();
+                List<Block> testBlocks = new List<Block>();
+                foreach (Block block in this.blocks)
                 {
                     block.RenderToDocument(doc);
-                    if (block.BlockType == Block.BlockTypes.Drawing) drawings.Add(block);
-                    if(block.BlockType == Block.BlockTypes.HorizontalDock)
+                    testBlocks.Add(new Block(block));
+                }
+
+                while(testBlocks.Count>0) 
+                {
+                    Block block = testBlocks[0];
+                    if (block.BlockType == Block.BlockTypes.Drawing) if (!drawings.ContainsKey(block.ID)) drawings.Add(block.ID,block);
+                    switch (block.BlockType)
                     {
-                        foreach (Block blk in block.Blocks) if (blk.BlockType == Block.BlockTypes.Drawing) subDrawings.Add(blk);
+                        case Block.BlockTypes.HorizontalDock:
+                        case Block.BlockTypes.VerticalDock:
+                            foreach (Block blk in block.Blocks)
+                            {
+                                if (blk.BlockType == Block.BlockTypes.Drawing) if (!drawings.ContainsKey(blk.ID)) drawings.Add(blk.ID, blk);
+                                switch (blk.BlockType)
+                                {
+                                    case Block.BlockTypes.HorizontalDock:
+                                    case Block.BlockTypes.VerticalDock:
+                                        testBlocks.Add(blk);
+                                        break;
+                                }
+                        }
+                            break;
                     }
-                    if (block.BlockType == Block.BlockTypes.VerticalDock)
-                    {
-                        foreach (Block blk in block.Blocks) if (blk.BlockType == Block.BlockTypes.Drawing) subDrawings.Add(blk);
-                    }
+                    testBlocks.RemoveAt(0);
                 }
 
                 Mr.PdfDocumentRenderer pdfDocumentRenderer = new Mr.PdfDocumentRenderer();
@@ -601,13 +617,12 @@ namespace PdfPlus
                 pdfDocumentRenderer.PrepareRenderPages();
                 int count = pdfDocumentRenderer.PageCount;
                 int j = 0;
-                int k = 0;
                 for (int i = 0; i < count; i++)
                 {
                     pdfDocumentRenderer.RenderPages(i + 1, i + 1);
                     Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i + 1);
                     Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
-
+                    
                     int t = 0;
                     foreach (Mr.RenderInfo info in infos)
                     {
@@ -618,71 +633,14 @@ namespace PdfPlus
                         switch (tag[0])
                         {
                             case "Drawing":
-                                drawings[j].Drawing.Render(graph, r);
+                                drawings[tag[1]].Drawing.Render(graph, r);
                                 j++;
                                 break;
-                            case "DockV":
-                                double h = 0;
-                                Md.Tables.Table tbl = (Md.Tables.Table)info.DocumentObject;
-
-                                Mr.TableRenderInfo tinf = (Mr.TableRenderInfo)info;
-                                Md.Tables.Cell cl = tbl.Rows[0].Cells[0];
-                                for (int c = 0; c < cl.Elements.Count; c++)
-                                {
-                                    //Rg.Rectangle3d gpRect = info.LayoutInfo.ContentArea.ToRectangle3d();
-                                    string[] subtag = cl.Elements[c].Tag.ToString().Split('~');
-                                    switch (subtag[0])
-                                    {
-                                        case "Drawing":
-                                            Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cl.Elements[c];
-                                            h += frame.Height;
-                                            p.OriginX = tbl.Columns[0].Width / 2.0 - frame.Width / 2.0;
-                                            p.OriginY += tbl.Rows[0].Height / 2.0 + frame.Height / 2.0;
-                                            Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
-                                            p.OriginY += tbl.Rows[0].Height / 2.0 + frame.Height / 2.0;
-                                            subDrawings[k].Drawing.Render(graph, r2);
-                                            k++;
-                                            break;
-                                        case "Text":
-                                        case "Markdown":
-                                        case "Html":
-                                        case "List":
-                                            Md.Paragraph txt = (Md.Paragraph)cl.Elements[c];
-                                            break;
-                                        case "Table":
-                                        case "DockH":
-                                        case "DockV":
-                                            Md.Tables.Table tabl = (Md.Tables.Table)cl.Elements[c];
-                                            break;
-                                        case "Chart":
-                                            Md.Shapes.Charts.Chart chrt = (Md.Shapes.Charts.Chart)cl.Elements[c];
-                                            break;
-                                        case "Image":
-                                            Md.Shapes.TextFrame frm = (Md.Shapes.TextFrame)cl.Elements[c];
-                                            break;
-                                    }
-                                }
-                                break;
                             case "DockH":
-                                Md.Tables.Table table = (Md.Tables.Table)info.DocumentObject;
-
-                                //p.OriginY+=table.Rows[0].Height / 2.0;
-                                for (int c = 0; c < table.Columns.Count; c++)
-                                {
-                                    Mr.TableRenderInfo tinfo = (Mr.TableRenderInfo)info;
-                                    Md.Tables.Cell cell = table.Rows[0].Cells[0];
-
-                                    string[] subtag = cell.Elements[0].Tag.ToString().Split('~');
-                                    if (subtag[0] == "Drawing")
-                                    {
-                                        Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)table.Rows[0].Cells[0].Elements[0];
-                                        p.OriginX += table.Columns[c].Width / 2.0 - frame.Width / 2.0;
-                                        Rg.Rectangle3d r2 = new Rg.Rectangle3d(p, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
-                                        p.OriginX += table.Columns[c].Width / 2.0 + frame.Width / 2.0;
-                                        subDrawings[k].Drawing.Render(graph, r2);
-                                        k++;
-                                    }
-                                }
+                                RenderDockH((Md.Tables.Table)info.DocumentObject, info, graph, drawings, p,true);
+                                break;
+                            case "DockV":
+                                RenderDockV((Md.Tables.Table)info.DocumentObject, info, graph, drawings, p);
                                 break;
                         }
 
@@ -697,6 +655,64 @@ namespace PdfPlus
             }
 
             return document;
+        }
+
+        public void RenderDockH(Md.Tables.Table table, Mr.RenderInfo info, Pd.XGraphics graph, Dictionary<string, Block> drawings, Rg.Plane plane, bool renderDrawing)
+        {
+            double x = info.LayoutInfo.ContentArea.X + 3;
+            double y = info.LayoutInfo.ContentArea.Y;
+
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                Md.Tables.Cell cell = table.Rows[0].Cells[i];
+                string[] tag = cell.Elements[0].Tag.ToString().Split('~');
+                switch (tag[0])
+                {
+                    case "Drawing":
+                        Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cell.Elements[0];
+                        plane.OriginX = x + table.Columns[i].Width / 2.0 - frame.Width / 2.0;
+                        plane.OriginY = y +table.Rows[0].Height / 2.0 - frame.Height / 2.0;
+                        Rg.Rectangle3d r2 = new Rg.Rectangle3d(plane, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
+                        drawings[tag[1]].Drawing.Render(graph, r2);
+                        break;
+                    case "DockH":
+                        RenderDockH((Md.Tables.Table)cell.Elements[0], info, graph, drawings, plane, renderDrawing);
+                        break;
+                    case "DockV":
+                        RenderDockV((Md.Tables.Table)cell.Elements[0],info, graph, drawings, plane, renderDrawing,false);
+                        break;
+                }
+                x += table.Columns[i].Width;
+            }
+        }
+
+        public void RenderDockV(Md.Tables.Table table, Mr.RenderInfo info, Pd.XGraphics graph, Dictionary<string, Block> drawings, Rg.Plane plane)
+        {
+            double x = info.LayoutInfo.ContentArea.X;
+            double y = info.LayoutInfo.ContentArea.Y;
+
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+            Md.Tables.Cell cell = table.Rows[i].Cells[0];
+                //Rg.Rectangle3d gpRect = info.LayoutInfo.ContentArea.ToRectangle3d();
+                string[] tag = cell.Elements[0].Tag.ToString().Split('~');
+                switch (tag[0])
+                {
+                    case "Drawing":
+                        Md.Shapes.TextFrame frame = (Md.Shapes.TextFrame)cell.Elements[0];
+                        plane.OriginX = x+table.Columns[0].Width / 2.0 - frame.Width / 2.0;
+                        plane.OriginY = y+table.Rows[0].Height / 2.0;
+                        Rg.Rectangle3d r2 = new Rg.Rectangle3d(plane, new Rg.Interval(0, frame.Width), new Rg.Interval(0, frame.Height));
+                        drawings[tag[1]].Drawing.Render(graph, r2);
+                        break;
+                    case "DockH":
+                        RenderDockH((Md.Tables.Table)cell.Elements[0], info, graph, drawings, plane,false);
+                        break;
+                    case "DockV":
+                        RenderDockV((Md.Tables.Table)cell.Elements[0], info, graph, drawings, plane);
+                        break;
+                }
+            }
         }
 
         protected void Render(Pf.PdfPage page)

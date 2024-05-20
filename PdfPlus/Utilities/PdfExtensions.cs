@@ -117,6 +117,9 @@ namespace PdfPlus
             plane.Origin = c[3] + new Rg.Vector3d(0, -input.Font.Size/5, 0) ;
             List<string> lines = input.BreakLines(input.Text, input.Boundary.Width + 18);
             List<string> subLines = new List<string>();
+            Rd.Text3d text = new Rd.Text3d("", plane, input.FontSize * factor);
+
+            if (lines != null) {
             foreach (string line in lines)
             {
                 string ln = line;
@@ -124,7 +127,8 @@ namespace PdfPlus
                 subLines.Add(ln);
             }
 
-            Rd.Text3d text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize* factor);
+                text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize * factor);
+            }
             text.HorizontalAlignment = input.Font.Justification.ToRhHorizontalAlignment();
             text.VerticalAlignment = Rhino.DocObjects.TextVerticalAlignment.Top;
             text.FontFace = input.FontFamily;
