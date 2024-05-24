@@ -23,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.secondary; }
+            get { return GH_Exposure.quarternary; }
         }
 
         /// <summary>
@@ -69,7 +69,8 @@ namespace PdfPlus.Components
             int alignment = 0;
             if (DA.GetData(2, ref alignment)) shape.Alignment = (Alignment)alignment;
 
-            prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
 
         }

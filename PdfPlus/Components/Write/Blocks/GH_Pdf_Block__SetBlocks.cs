@@ -4,16 +4,18 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
+using Sd = System.Drawing;
+
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Block_GetBlocks : GH_Pdf__Base
+    public class GH_Pdf_Block_SetBlocks : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_GetBlocks class.
+        /// Initializes a new instance of the GH_Pdf_Page_AddBlocks class.
         /// </summary>
-        public GH_Pdf_Block_GetBlocks()
-          : base("Get Blocks", "Get Blk",
-              "Get the Blocks from Pages or Documents.",
+        public GH_Pdf_Block_SetBlocks()
+          : base("Set Blocks", "Set Blk",
+              "Sequentially place a list of Blocks into PDF Pages.",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -23,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quinary; }
+            get { return GH_Exposure.septenary; }
         }
 
         /// <summary>
@@ -32,6 +34,9 @@ namespace PdfPlus.Components
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Page.Name, Constants.Page.NickName, Constants.Page.Input, GH_ParamAccess.item);
+            pManager[0].Optional = true;
+            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -39,7 +44,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Input, GH_ParamAccess.list);
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -48,13 +53,23 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            //TRY GET DOCUMENT
+            //TRY GET PAGES
             IGH_Goo goo = null;
-            if (!DA.GetData(0, ref goo)) return;
-            Document document = new Document();
-            if (!goo.TryGetDocument(ref document)) return;
+            Page page = new Page();
+            if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
 
-            DA.SetDataList(0, document.Blocks);
+            //TRY GET BLOCKS
+            List<IGH_Goo> goos = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, goos)) return;
+            foreach (IGH_Goo g in goos) page.AddBlock(g);
+
+            Document document = new Document(page);
+            DA.SetData(0, document);
+
+            if ((!this.Hidden) & (!this.Locked))
+            {
+                this.SetPreview(page.RenderBlocksToPages());
+            }
         }
 
         /// <summary>
@@ -66,7 +81,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Deconstruct;
+                return Properties.Resources.Pdf_Block_Add;
             }
         }
 
@@ -75,7 +90,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("ef1ea0e4-0378-462d-9ec2-58d579848650"); }
+            get { return new Guid("d9c71778-1a53-443f-a3d3-cdc72ec5c2b1"); }
         }
     }
 }

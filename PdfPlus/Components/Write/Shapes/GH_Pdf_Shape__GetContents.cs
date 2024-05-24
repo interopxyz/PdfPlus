@@ -1,20 +1,20 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Shapes
 {
-    public class GH_Pdf_Block_ChartPie : GH_Component
+    public class GH_Pdf_Shape__GetContents : GH_Pdf__Base
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_ChartPie class.
+        /// Initializes a new instance of the GH_Pdf_Shape_GetContents class.
         /// </summary>
-        public GH_Pdf_Block_ChartPie()
-          : base("Pie Chart Block", "Pie Blk",
-              "Create a Pie Chart Block.",
-              Constants.ShortName, Constants.Blocks)
+        public GH_Pdf_Shape__GetContents()
+          : base("Get Shape Contents", "Contents",
+              "Get geometric, text, and other Shape contents",
+              Constants.ShortName, Constants.Shapes)
         {
         }
 
@@ -23,7 +23,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quarternary; }
+            get { return GH_Exposure.quinary; }
         }
 
         /// <summary>
@@ -31,15 +31,7 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("DataSet", "Ds", "A single Chart Data Set to visualize", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
-            pManager[1].Optional = true;
-
-            Param_Integer paramC = (Param_Integer)pManager[1];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
-            {
-                paramC.AddNamedValue(value.ToString(), (int)value);
-            }
+            pManager.AddGenericParameter(Constants.Shape.Name, Constants.Shape.NickName, Constants.Shape.Input, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -47,7 +39,10 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Block.Name, Constants.Block.NickName, Constants.Block.Output, GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "Shape Boundary", GH_ParamAccess.item);
+            pManager.AddPointParameter("Location", "L", "Shape Location Point", GH_ParamAccess.item);
+            pManager.AddTextParameter("Text", "T", "Text contents when applicable", GH_ParamAccess.item);
+            pManager.AddGeometryParameter("Geometry", "G", "Geometry contents when applicable", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -56,15 +51,16 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            DataSet data =null;
-            if (!DA.GetData(0, ref data)) return;
+            IGH_Goo goo = null;
+            if (!DA.GetData(0, ref goo)) return;
+            Shape shape = null;
+            if(!goo.TryGetShape(ref shape))return;
 
-            Block block = Block.CreateChart(data, ObjectAssembly.ChartTypes.Pie);
+            if(shape.Boundary.IsValid) DA.SetData(0, shape.Boundary);
+            if (shape.Location.IsValid) DA.SetData(1, shape.Location);
+            if(shape.Text!="") DA.SetData(2, shape.Text);
+            if (shape.Geometry!=null) DA.SetData(3, shape.Geometry);
 
-            int alignment = 0;
-            if (DA.GetData(1, ref alignment)) block.Alignment = (Alignment)alignment;
-
-            DA.SetData(0, block);
         }
 
         /// <summary>
@@ -76,7 +72,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Chart_Pie;
+                return Properties.Resources.Pdf_Shape_Contents;
             }
         }
 
@@ -85,7 +81,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("f959474e-0a17-44d8-9ae3-dd921e5a94db"); }
+            get { return new Guid("8632b176-4bfa-4df5-ac1e-4c6796c2bd17"); }
         }
     }
 }

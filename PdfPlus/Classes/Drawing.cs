@@ -103,5 +103,14 @@ namespace PdfPlus
 
         #endregion
 
+        #region override
+
+        public override string ToString()
+        {
+            return "Drawing | "+shapes.Count+" Shapes";
+        }
+
+        #endregion
+
     }
 }

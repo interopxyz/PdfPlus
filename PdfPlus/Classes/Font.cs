@@ -14,7 +14,7 @@ namespace PdfPlus
     public class Font
     {
         #region members
-        public enum Presets { None,Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption };
+        public enum Presets { None, Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption, List };
 
         protected bool isModified = false;
 
@@ -284,6 +284,8 @@ namespace PdfPlus
                     return Fonts.Footnote;
                 case Font.Presets.Caption:
                     return Fonts.Caption;
+                case Font.Presets.List:
+                    return Fonts.List;
             }
         }
 
@@ -291,7 +293,7 @@ namespace PdfPlus
         public static Font Title { get { return new Font("Title", "Arial", 26, Sd.Color.Black); } }
         public static Font Subtitle { get { return new Font("Subtitle", "Arial", 15, Sd.Color.DarkGray); } }
         public static Font Heading1 { get { return new Font("Heading1", "Arial", 20, Sd.Color.Black); } }
-        public static Font Heading2 { get { return new Font("Heading2", "Arial", 18, Sd.Color.Black); } }
+        public static Font Heading2 { get { return new Font("Heading2", "Arial", 16, Sd.Color.Black); } }
         public static Font Heading3 { get { return new Font("Heading3", "Arial", 14, Sd.Color.Gray); } }
         public static Font Heading4 { get { return new Font("Heading4", "Arial", 12, Sd.Color.Gray); } }
         public static Font Heading5 { get { return new Font("Heading5", "Arial", 11, Sd.Color.Gray); } }
@@ -301,7 +303,7 @@ namespace PdfPlus
         public static Font Caption { get { return new Font("Caption", "Arial", 8, Sd.Color.Black); } }
         public static Font List { get { return new Font("List", "Arial", 11, Sd.Color.Black); } }
         public static Font Table { get { return new Font("Table", "Arial", 9, Sd.Color.Black, FontStyle.Regular, Justification.Center); } }
-        public static Font Preview { get { return new Font("Preview", "Arial", 4, Sd.Color.Black, FontStyle.Italic); } }
+        public static Font Preview { get { return new Font("List", "Arial", 4, Sd.Color.Red, FontStyle.Italic); } }
 
     }
 }

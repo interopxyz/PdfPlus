@@ -71,7 +71,8 @@ namespace PdfPlus.Components
 
             Shape shape = Shape.CreateLink(link, boundary, (Shape.LinkTypes)type);
 
-            prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
         }
 

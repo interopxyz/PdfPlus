@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quarternary; }
+            get { return GH_Exposure.quinary; }
         }
 
         /// <summary>
@@ -66,7 +66,8 @@ namespace PdfPlus.Components
                 page.AddShape(goos);
             }
 
-            this.PrevPageShapes(page);
+            this.SetPreview(page);
+
             DA.SetData(0, page);
         }
 

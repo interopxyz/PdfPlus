@@ -63,7 +63,8 @@ namespace PdfPlus.Components
 
             shape.Angle = Vector3d.VectorAngle(Vector3d.XAxis, plane.XAxis,Plane.WorldXY)/Math.PI*180.0;
 
-            prev_shapes.Add(shape);
+                this.SetPreview(shape);
+
             DA.SetData(0, shape);
         }
 

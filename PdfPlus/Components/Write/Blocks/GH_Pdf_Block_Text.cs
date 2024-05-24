@@ -41,7 +41,7 @@ namespace PdfPlus.Components
             Param_Integer paramA = (Param_Integer)pManager[1];
             foreach (Font.Presets value in Enum.GetValues(typeof(Font.Presets)))
             {
-                paramA.AddNamedValue(value.ToString(), (int)value);
+                paramA.AddNamedValue((int)value+" | "+value.ToString(), (int)value);
             }
         }
 

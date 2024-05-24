@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace PdfPlus.Components
             Document document = new Document();
             if(!goo.TryGetDocument(ref document))return;
 
-            PrevDocumentShapes(document);
+            this.SetPreview(document);
 
             bool save = false;
             DA.GetData(3, ref save);

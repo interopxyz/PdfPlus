@@ -22,6 +22,7 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Grasshopper.Kernel.Types;
 using System.Reflection;
+using PdfSharp.Pdf.IO;
 
 namespace PdfPlus
 {
@@ -116,14 +117,18 @@ namespace PdfPlus
             plane.Origin = c[3] + new Rg.Vector3d(0, -input.Font.Size/5, 0) ;
             List<string> lines = input.BreakLines(input.Text, input.Boundary.Width + 18);
             List<string> subLines = new List<string>();
+            Rd.Text3d text = new Rd.Text3d("", plane, input.FontSize * factor);
+
+            if (lines != null) {
             foreach (string line in lines)
             {
                 string ln = line;
                 if (line == "\r\n ") ln = "";
-                    subLines.Add(ln);
+                subLines.Add(ln);
             }
 
-            Rd.Text3d text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize* factor);
+                text = new Rd.Text3d(string.Join(Environment.NewLine, subLines), plane, input.FontSize * factor);
+            }
             text.HorizontalAlignment = input.Font.Justification.ToRhHorizontalAlignment();
             text.VerticalAlignment = Rhino.DocObjects.TextVerticalAlignment.Top;
             text.FontFace = input.FontFamily;
@@ -210,19 +215,19 @@ namespace PdfPlus
                         switch (type)
                         {
                             default:
-                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), new Graphic());
+                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), Graphics.Outline);
                                 break;
                             case "Polyline Curve":
                                 Rg.Polyline pline;
-                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, new Graphic());
+                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, Graphics.Outline);
                                 break;
                             case "Line-like Curve":
-                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), new Graphic());
+                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), Graphics.Outline);
                                 break;
                             case "Elliptical Curve":
                                 Rg.Ellipse ellipse;
                                 curve.TryGetEllipse(out ellipse);
-                                shape = Shape.CreateGeometry(ellipse, new Graphic());
+                                shape = Shape.CreateGeometry(ellipse, Graphics.Outline);
                                 break;
                         }
                         isValid = true;
@@ -233,7 +238,7 @@ namespace PdfPlus
 
                     if (goo.CastTo<Rg.Arc>(out arc))
                     {
-                        shape = Shape.CreateGeometry(arc, new Graphic());
+                        shape = Shape.CreateGeometry(arc, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -242,7 +247,7 @@ namespace PdfPlus
 
                     if (goo.CastTo<Rg.Circle>(out circle))
                     {
-                        shape = Shape.CreateGeometry(circle, new Graphic());
+                        shape = Shape.CreateGeometry(circle, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -251,7 +256,7 @@ namespace PdfPlus
 
                     if (goo.CastTo<Rg.Line>(out line))
                     {
-                        shape = Shape.CreateGeometry(line, new Graphic());
+                        shape = Shape.CreateGeometry(line, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -259,7 +264,7 @@ namespace PdfPlus
                     Rg.Rectangle3d rect;
                     if (goo.CastTo<Rg.Rectangle3d>(out rect))
                     {
-                        shape = Shape.CreateGeometry(rect, new Graphic());
+                        shape = Shape.CreateGeometry(rect, Graphics.Outline);
                         isValid = true;
                     }
                     break;
@@ -268,7 +273,7 @@ namespace PdfPlus
                     if (goo.CastTo<Rg.Surface>(out surface))
                     {
                         Rg.Brep srfBrep = surface.ToBrep();
-                        shape = Shape.CreateGeometry(srfBrep, new Graphic());
+                        shape = Shape.CreateGeometry(srfBrep, Graphics.Solid);
                         isValid = true;
                     }
                     break;
@@ -276,7 +281,7 @@ namespace PdfPlus
                     Rg.Brep brep;
                     if (goo.CastTo<Rg.Brep>(out brep))
                     {
-                        shape = Shape.CreateGeometry(brep, new Graphic());
+                        shape = Shape.CreateGeometry(brep, Graphics.Solid);
                         isValid = true;
                     }
                     break;
@@ -284,7 +289,7 @@ namespace PdfPlus
                     Rg.Mesh mesh;
                     if (goo.CastTo<Rg.Mesh>(out mesh))
                     {
-                        shape = Shape.CreateGeometry(mesh, new Graphic());
+                        shape = Shape.CreateGeometry(mesh, Graphics.Solid);
                         isValid = true;
                     }
                     break;
@@ -912,6 +917,43 @@ namespace PdfPlus
 
         #region font
 
+        public static Pd.XStringFormat ToPdfAlignment(this Shape input)
+        {
+            switch (input.Alignment)
+            {
+                default:
+                    switch (input.Font.Justification)
+                    {
+                        default:
+                            return Pd.XStringFormats.TopLeft;
+                        case Justification.Center:
+                            return Pd.XStringFormats.TopCenter;
+                        case Justification.Right:
+                            return Pd.XStringFormats.TopRight;
+                    }
+                case Alignment.Center:
+                    switch (input.Font.Justification)
+                    {
+                        default:
+                            return Pd.XStringFormats.CenterLeft;
+                        case Justification.Center:
+                            return Pd.XStringFormats.Center;
+                        case Justification.Right:
+                            return Pd.XStringFormats.CenterRight;
+                    }
+                case Alignment.Bottom:
+                    switch (input.Font.Justification)
+                    {
+                        default:
+                            return Pd.XStringFormats.BottomLeft;
+                        case Justification.Center:
+                            return Pd.XStringFormats.BottomCenter;
+                        case Justification.Right:
+                            return Pd.XStringFormats.BottomRight;
+                    }
+            }
+        }
+
         public static Pd.XFont ToPdf(this Font input, double scale = 1.0)
         {
             return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf());
@@ -974,7 +1016,9 @@ namespace PdfPlus
 
         public static void RenderFragments(this Md.Paragraph input, Fragment fragment)
         {
-            foreach (Element element in fragment.Segments) input.AddFormattedText(element.Text, element.Font.ToMigraDoc());
+            input.Format.Alignment = (fragment.Font.Justification.ToMigraDocParagraphAlignment());
+
+            foreach (Element element in fragment.Segments) input.AddFormattedText( element.Text, element.Font.ToMigraDoc());
         }
 
         public static void RenderFragments(this Md.Paragraph input, List<Fragment> fragments)

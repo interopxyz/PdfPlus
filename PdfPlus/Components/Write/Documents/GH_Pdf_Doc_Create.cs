@@ -75,7 +75,8 @@ namespace PdfPlus.Components.Write.Documents
 
             document.AddPages(pages);
 
-            PrevDocumentShapes(document);
+            this.SetPreview(document);
+
             DA.SetData(0, document);
         }
 

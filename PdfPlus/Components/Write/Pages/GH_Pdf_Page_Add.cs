@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace PdfPlus.Components
 {
-    public class GH_Pdf_Page_Add : GH_Component
+    public class GH_Pdf_Page_Add : GH_Pdf__Base
     {
         /// <summary>
         /// Initializes a new instance of the GH_Pdf_AddPage class.

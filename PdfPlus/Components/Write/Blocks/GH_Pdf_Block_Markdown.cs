@@ -1,19 +1,40 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Block_ChartPie : GH_Component
+    public class GH_Pdf_Block_Markdown : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_ChartPie class.
+        /// Initializes a new instance of the GH_Pdf_Block_Markdown class.
         /// </summary>
-        public GH_Pdf_Block_ChartPie()
-          : base("Pie Chart Block", "Pie Blk",
-              "Create a Pie Chart Block.",
+        public GH_Pdf_Block_Markdown()
+          : base("Markdown Block", "Mkd Blk",
+              "Create a Markdown Block" + Environment.NewLine +
+                "# Heading 1" + Environment.NewLine +
+"## Heading 2" + Environment.NewLine +
+"### Heading 3" + Environment.NewLine +
+"#### Heading 4" + Environment.NewLine +
+"##### Heading 5" + Environment.NewLine +
+"###### Heading 6" + Environment.NewLine +
+"*** 'Horizontal Rule'" + Environment.NewLine +
+"--- 'Horizontal Rule'" + Environment.NewLine +
+"___ 'Horizontal Rule'" + Environment.NewLine +
+"**Bold**" + Environment.NewLine +
+"*Italic*" + Environment.NewLine +
+"***Bold & Italic***" + Environment.NewLine +
+"___Bold & Italic___" + Environment.NewLine +
+"__*Bold & Italic*__" + Environment.NewLine +
+"**_Bold & Italic_ **" + Environment.NewLine +
+"1.Numbered List Item" + Environment.NewLine +
+"- Unordered List Item" + Environment.NewLine +
+"* Unordered List Item" + Environment.NewLine +
+"+ Unordered List Item" + Environment.NewLine +
+"[Hyperlink](https://duckduckgo.com)" + Environment.NewLine +
+"\\ \\` \\* \\_ \\{ } \\[] \\<> \\() \\# \\+ \\- \\. \\! \\| ",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -23,7 +44,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quarternary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -31,15 +52,8 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("DataSet", "Ds", "A single Chart Data Set to visualize", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
-            pManager[1].Optional = true;
-
-            Param_Integer paramC = (Param_Integer)pManager[1];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
-            {
-                paramC.AddNamedValue(value.ToString(), (int)value);
-            }
+            pManager.AddTextParameter("Markdown", "M", "Markdown Text", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
         /// <summary>
@@ -56,13 +70,10 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            DataSet data =null;
-            if (!DA.GetData(0, ref data)) return;
+            string text = string.Empty;
+            if (!DA.GetData(0, ref text)) return;
 
-            Block block = Block.CreateChart(data, ObjectAssembly.ChartTypes.Pie);
-
-            int alignment = 0;
-            if (DA.GetData(1, ref alignment)) block.Alignment = (Alignment)alignment;
+            Block block = Block.CreateMarkdown(text);
 
             DA.SetData(0, block);
         }
@@ -76,7 +87,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Chart_Pie;
+                return Properties.Resources.Pdf_Block_MarkDown;
             }
         }
 
@@ -85,7 +96,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("f959474e-0a17-44d8-9ae3-dd921e5a94db"); }
+            get { return new Guid("af7121bf-14ab-4dce-9f29-24882f729539"); }
         }
     }
 }

@@ -118,7 +118,7 @@ namespace PdfPlus.Components
                 case Element.ElementTypes.Shape:
                     goo.CastTo<Shape>(out Shape shape);
                     shape.Font = font;
-                    prev_shapes.Add(shape);
+                    this.SetPreview(shape);
                     DA.SetData(0, shape);
                     break;
                 case Element.ElementTypes.Data:

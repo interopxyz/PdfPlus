@@ -74,7 +74,8 @@ namespace PdfPlus.Components
 
             Shape shape = Shape.CreateText(fragment, boundary,(Alignment)alignment, new Font());
 
-            prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
         }
 

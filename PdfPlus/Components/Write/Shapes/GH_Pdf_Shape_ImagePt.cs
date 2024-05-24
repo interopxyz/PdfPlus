@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -77,7 +77,8 @@ namespace PdfPlus.Components
             Rectangle3d bnd = new Rectangle3d(Plane.WorldXY, p.Origin, new Point3d(p.OriginX + w, p.OriginY + h, 0));
             bnd.Transform(Transform.Rotation(shape.Angle / 180.0 * Math.PI, p.Origin));
 
-            prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
             DA.SetData(1, bnd);
         }

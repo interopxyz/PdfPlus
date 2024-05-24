@@ -1,19 +1,32 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Blocks
 {
-    public class GH_Pdf_Block_ChartPie : GH_Component
+    public class GH_Pdf_Block_Html : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Blk_ChartPie class.
+        /// Initializes a new instance of the GH_Pdf_Block_Html class.
         /// </summary>
-        public GH_Pdf_Block_ChartPie()
-          : base("Pie Chart Block", "Pie Blk",
-              "Create a Pie Chart Block.",
+        public GH_Pdf_Block_Html()
+          : base("HTML Block", "HTML Blk",
+              "Create a HTML Block" + Environment.NewLine +
+                "<h1>Heading 1</h1>" + Environment.NewLine +
+                "<h2>Heading 2</h2>" + Environment.NewLine +
+                "<h3>Heading 3</h3>" + Environment.NewLine +
+                "<h4>Heading 4</h4>" + Environment.NewLine +
+                "<h5>Heading 5</h5>" + Environment.NewLine +
+                "<h6>Heading 6</h6>" + Environment.NewLine +
+                "<hr /> 'Horizontal Rule'" + Environment.NewLine +
+                "<strong>Bold</strong>" + Environment.NewLine +
+                "<i>Italic</i>" + Environment.NewLine +
+                "<u>Underline</u>" + Environment.NewLine +
+                "<strong><i>Bold & Italic</i></strong>" + Environment.NewLine +
+                "<ol><li>Ordered List Item 1</li></ol>" + Environment.NewLine +
+                "<ul><li>Unordered List Item A</li></ul>" + Environment.NewLine +
+                "<a href='http://www.duckduckgo.com'>Hyperlink</a>",
               Constants.ShortName, Constants.Blocks)
         {
         }
@@ -23,7 +36,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.quarternary; }
+            get { return GH_Exposure.primary; }
         }
 
         /// <summary>
@@ -31,15 +44,8 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("DataSet", "Ds", "A single Chart Data Set to visualize", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Legend Location", "L", "Optional Legend location", GH_ParamAccess.item, 0);
-            pManager[1].Optional = true;
-
-            Param_Integer paramC = (Param_Integer)pManager[1];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
-            {
-                paramC.AddNamedValue(value.ToString(), (int)value);
-            }
+            pManager.AddTextParameter("HTML", "H", "HTML Text", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
         /// <summary>
@@ -56,13 +62,10 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            DataSet data =null;
-            if (!DA.GetData(0, ref data)) return;
+            string text = string.Empty;
+            if (!DA.GetData(0, ref text)) return;
 
-            Block block = Block.CreateChart(data, ObjectAssembly.ChartTypes.Pie);
-
-            int alignment = 0;
-            if (DA.GetData(1, ref alignment)) block.Alignment = (Alignment)alignment;
+            Block block = Block.CreateHtml(text);
 
             DA.SetData(0, block);
         }
@@ -76,7 +79,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Block_Chart_Pie;
+                return Properties.Resources.Pdf_Block_Html;
             }
         }
 
@@ -85,7 +88,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("f959474e-0a17-44d8-9ae3-dd921e5a94db"); }
+            get { return new Guid("8e59f222-ccc5-46c0-a0f1-e0c9026bf65b"); }
         }
     }
 }

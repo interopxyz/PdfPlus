@@ -25,7 +25,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.primary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -63,7 +63,8 @@ namespace PdfPlus.Components
 
             Shape shape = Shape.CreateImage(bitmap, boundary, path);
 
-            prev_shapes.Add(shape);
+            this.SetPreview(shape);
+
             DA.SetData(0, shape);
         }
 

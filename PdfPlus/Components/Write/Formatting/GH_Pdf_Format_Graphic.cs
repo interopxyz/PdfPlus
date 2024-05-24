@@ -93,7 +93,7 @@ namespace PdfPlus.Components
             if (goo.TryGetShape(ref shape))
             {
                 shape.Graphic = graphic;
-                prev_shapes.Add(shape);
+                this.SetPreview(shape);
                 DA.SetData(0, shape);
             }
             else if (goo.TryGetBlock(ref block))

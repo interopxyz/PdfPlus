@@ -12,6 +12,8 @@ using Pd = PdfSharp.Drawing;
 using Pl = PdfSharp.Drawing.Layout;
 
 using Md = MigraDoc.DocumentObjectModel;
+using MigraDoc.Extensions.Markdown;
+using MigraDoc.Extensions.Html;
 
 using Rg = Rhino.Geometry;
 using System.IO;
@@ -23,7 +25,7 @@ namespace PdfPlus
 
         #region members
 
-        public enum BlockTypes { None, LineBreak, PageBreak, Text, List, Table, Chart, Image, Drawing, Dock };
+        public enum BlockTypes { None, LineBreak, PageBreak, Text, Markdown, Html, List, Table, Chart, Image, Drawing, HorizontalDock, VerticalDock };
         protected BlockTypes blockType = BlockTypes.None;
         protected List<Block> blocks = new List<Block>();
 
@@ -34,6 +36,7 @@ namespace PdfPlus
         //Text
         protected Font.Presets formatType = Font.Presets.Normal;
         protected string formatName = "Normal";
+        protected string contents = string.Empty;
 
         //Break
         protected int breakCount = 1;
@@ -67,6 +70,7 @@ namespace PdfPlus
             //text
             this.formatType = block.formatType;
             this.formatName = block.formatName;
+            this.contents = block.contents;
 
             //break
             this.breakCount = block.breakCount;
@@ -137,6 +141,24 @@ namespace PdfPlus
             block.formatType = format;
             block.formatName = format.ToString();
             block.font = Fonts.GetPreset(format);
+
+            return block;
+        }
+
+        public static Block CreateMarkdown(string markdown)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Markdown;
+            block.contents = markdown;
+
+            return block;
+        }
+
+        public static Block CreateHtml(string html)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.Html;
+            block.contents = html;
 
             return block;
         }
@@ -257,6 +279,7 @@ namespace PdfPlus
             block.width = -1;
             block.height = -1;
             block.justification = Justification.Center;
+            block.imageName = bitmap.ToBase64String("base64:");
 
             return block;
         }
@@ -288,7 +311,16 @@ namespace PdfPlus
         public static Block CreateDock(List<Block> blocks)
         {
             Block block = new Block();
-            block.blockType = BlockTypes.Dock;
+            block.blockType = BlockTypes.HorizontalDock;
+            foreach (Block blk in blocks) block.blocks.Add(new Block(blk));
+
+            return block;
+        }
+
+        public static Block CreateGroup(List<Block> blocks)
+        {
+            Block block = new Block();
+            block.blockType = BlockTypes.VerticalDock;
             foreach (Block blk in blocks) block.blocks.Add(new Block(blk));
 
             return block;
@@ -362,6 +394,24 @@ namespace PdfPlus
             }
         }
 
+        public void RenderMarkdown(Md.Section section, Md.Document document)
+        {
+            int count = section.Elements.Count;
+            section.AddMarkdown(this.contents);
+            for (int i = count; i < section.Elements.Count; i++)
+            {
+                string style = ((Md.Paragraph)section.Elements[i]).Style;
+                section.Elements[i].Tag = "Markdown~" + this.id;
+            }
+        }
+
+        public void RenderHtml(Md.Section section, Md.Document document)
+        {
+            int count = section.Elements.Count;
+            section.AddHtml(this.contents);
+            for (int i = count; i < section.Elements.Count; i++) section.Elements[i].Tag = "Html~" + this.id;
+        }
+
         public void RenderList(Md.Document document)
         {
             Md.ListType listType = (Md.ListType)this.listType;
@@ -370,6 +420,7 @@ namespace PdfPlus
                 Md.ListInfo listinfo = new Md.ListInfo();
                 listinfo.ContinuePreviousList = i > 0;
                 listinfo.ListType = listType;
+
                 Md.Paragraph listItem = document.LastSection.AddParagraph();
                 listItem.Tag = "List~" + this.id;
                 listItem.Format.KeepTogether = true;
@@ -394,8 +445,10 @@ namespace PdfPlus
                 Md.ListInfo listinfo = new Md.ListInfo();
                 listinfo.ContinuePreviousList = i > 0;
                 listinfo.ListType = listType;
-                listinfo.Tag = "List~" + this.id;
+
                 Md.Paragraph listItem = cell.AddParagraph();
+                listItem.Tag = "List~" + this.id;
+                listItem.Format.KeepTogether = true;
                 if (this.formatType == Font.Presets.None)
                 {
                     listItem.RenderFragments(this.fragments[i]);
@@ -604,6 +657,8 @@ namespace PdfPlus
             {
                 chart.Height = this.Height;
             }
+
+            chart.Height = Math.Max(chart.Height, 75.00);
 
             if (this.graphic.HasColor) chart.FillFormat.Color = this.graphic.Color.ToMigraDoc();
 
@@ -846,11 +901,11 @@ namespace PdfPlus
             frame.Left = this.Justification.ToMigraDocShapePosition();
         }
 
-        public void RenderDock(Md.Tables.Table dock, Md.Document document, double width)
+        public void RenderDockHorizontal(Md.Tables.Table dock, Md.Document document, double width)
         {
             if (this.blocks.Count > 0)
             {
-                dock.Tag = "Dock~" + this.id;
+                dock.Tag = "DockH~" + this.id;
 
                 dock.Format.Alignment = Md.ParagraphAlignment.Justify;
 
@@ -870,30 +925,73 @@ namespace PdfPlus
                 {
                     Block blk = this.blocks[i];
                     Md.Tables.Cell cell = dock.Rows[0].Cells[i];
-                    switch (blk.blockType)
-                    {
-                        case BlockTypes.Text:
-                            blk.RenderText(cell.AddParagraph(), document);
-                            break;
-                        case BlockTypes.List:
-                            blk.RenderList(cell, document);
-                            break;
-                        case BlockTypes.Chart:
-                            blk.RenderChart(cell.AddChart(), document, columnWidth);
-                            break;
-                        case BlockTypes.Drawing:
-                            blk.RenderDrawing(cell.AddTextFrame(), document,columnWidth);
-                            break;
-                        case BlockTypes.Image:
-                            string filename = blk.imageName;
-                            if (blk.imageName == string.Empty) filename = blk.imageObject.ToBase64String("base64:");
-                            blk.RenderImage(cell.AddImage(filename), document,columnWidth);
-                            break;
-                    }
+                    RenderToCell(cell, document, blk, columnWidth);
                 }
             }
         }
-    
+
+        public void RenderDockVertical(Md.Tables.Table dock, Md.Document document, double width)
+        {
+            if (this.blocks.Count > 0)
+            {
+                dock.Tag = "DockV~" + this.id;
+                dock.Format.Alignment = Md.ParagraphAlignment.Justify;
+
+                Md.Tables.Column column = dock.AddColumn();
+                column.Width = width;
+                for (int i = 0; i < this.blocks.Count; i++)
+                {
+                dock.AddRow();
+                Md.Tables.Cell cell = dock.Rows[i].Cells[0];
+                    Block blk = this.blocks[i];
+                    RenderToCell(cell, document, blk, width);
+                }
+            }
+        }
+
+        protected void RenderToCell(Md.Tables.Cell cell, Md.Document document, Block block, double width)
+        {
+            switch (block.blockType)
+            {
+                case BlockTypes.Text:
+                    block.RenderText(cell.AddParagraph(), document);
+                    break;
+                case BlockTypes.Markdown:
+                    block.RenderMarkdown(cell.Section, document);
+                    break;
+                case BlockTypes.Html:
+                    block.RenderHtml(cell.Section, document);
+                    break;
+                case BlockTypes.List:
+                    block.RenderList(cell, document);
+                    break;
+                case BlockTypes.Chart:
+                    block.RenderChart(cell.AddChart(), document, width);
+                    break;
+                case BlockTypes.Drawing:
+                    block.RenderDrawing(cell.AddTextFrame(), document, width);
+                    break;
+                case BlockTypes.Image:
+                    block.RenderImage(cell.AddImage(block.imageName), document, width);
+                    break;
+                case BlockTypes.Table:
+                    cell.Elements.Add(new Md.Tables.Table());
+                    Md.Tables.Table table = (Md.Tables.Table)cell.Elements[cell.Elements.Count - 1];
+                    block.RenderTable(table, document, width);
+                    break;
+                case BlockTypes.VerticalDock:
+                    cell.Elements.Add(new Md.Tables.Table());
+                    Md.Tables.Table group = (Md.Tables.Table)cell.Elements[cell.Elements.Count - 1];
+                    block.RenderDockVertical(group, document, width);
+                    break;
+                case BlockTypes.HorizontalDock:
+                    cell.Elements.Add(new Md.Tables.Table());
+                    Md.Tables.Table dock = (Md.Tables.Table)cell.Elements[cell.Elements.Count - 1];
+                    block.RenderDockHorizontal(dock, document, width);
+                    break;
+            }
+        }
+
         public Md.Document RenderToDocument(Md.Document document)
         {
             double width = 0;
@@ -917,12 +1015,26 @@ namespace PdfPlus
                     break;
                 case BlockTypes.PageBreak:
                     #region pagebreak
-                    for (int i = 0; i < this.breakCount; i++) document.LastSection.AddPageBreak();
+                    for (int i = 0; i < this.breakCount; i++)
+                    {
+                        document.LastSection.AddPageBreak();
+                        document.LastSection.Elements[document.LastSection.Elements.Count-1].Tag = "Linebreak~" + this.id;
+                    }
                     #endregion
                     break;
                 case BlockTypes.Text:
                     #region text
                     this.RenderText(document.LastSection.AddParagraph(),document);
+                    #endregion
+                    break;
+                case BlockTypes.Markdown:
+                    #region markdown
+                    this.RenderMarkdown(document.LastSection, document);
+                    #endregion
+                    break;
+                case BlockTypes.Html:
+                    #region html
+                    this.RenderHtml(document.LastSection, document);
                     #endregion
                     break;
                 case BlockTypes.List:
@@ -947,14 +1059,17 @@ namespace PdfPlus
                     break;
                 case BlockTypes.Image:
                     #region image
-                    string filename = this.imageName;
-                    if (this.imageName == string.Empty) filename = this.imageObject.ToBase64String("base64:");
-                    this.RenderImage(document.LastSection.AddImage(filename), document, width);
+                    this.RenderImage(document.LastSection.AddImage(this.imageName), document, width);
                     #endregion
                     break;
-                case BlockTypes.Dock:
+                case BlockTypes.HorizontalDock:
                     #region dock
-                    this.RenderDock(document.LastSection.AddTable(),document, width);
+                    this.RenderDockHorizontal(document.LastSection.AddTable(),document, width);
+                    #endregion
+                    break;
+                case BlockTypes.VerticalDock:
+                    #region group
+                    this.RenderDockVertical(document.LastSection.AddTable(), document, width);
                     #endregion
                     break;
             }
