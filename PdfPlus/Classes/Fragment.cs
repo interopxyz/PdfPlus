@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PdfPlus
 {
-    public class Fragment:Element
+    public class Fragment : Element
     {
 
         #region members
@@ -17,12 +17,12 @@ namespace PdfPlus
 
         #region constructors
 
-        public Fragment():base()
+        public Fragment() : base()
         {
             this.elementType = ElementTypes.Fragment;
         }
 
-        public Fragment(Fragment fragment):base(fragment)
+        public Fragment(Fragment fragment) : base(fragment)
         {
             foreach (Element element in fragment.segments) this.segments.Add(new Element(element));
         }
@@ -36,11 +36,11 @@ namespace PdfPlus
         {
             foreach (Fragment fragment in fragments)
             {
-                foreach(Element element in fragment.segments) this.segments.Add(new Element(element));
+                foreach (Element element in fragment.segments) this.segments.Add(new Element(element));
             }
         }
 
-        public Fragment(string content):base()
+        public Fragment(string content) : base()
         {
             this.elementType = ElementTypes.Fragment;
             Element element = new Element();
@@ -51,7 +51,7 @@ namespace PdfPlus
         public Fragment(List<string> content) : base()
         {
             this.elementType = ElementTypes.Fragment;
-            foreach(string text in content)
+            foreach (string text in content)
             {
                 Element element = new Element();
                 element.Text = text;
@@ -59,7 +59,7 @@ namespace PdfPlus
             }
         }
 
-        public Fragment(string content, Font font):base()
+        public Fragment(string content, Font font) : base()
         {
             this.elementType = ElementTypes.Fragment;
             Element element = new Element();
@@ -89,7 +89,7 @@ namespace PdfPlus
             {
                 Element element = new Element();
                 element.Text = text;
-                element.Font = fonts[i%c];
+                element.Font = fonts[i % c];
                 this.segments.Add(element);
                 i++;
             }
@@ -129,12 +129,32 @@ namespace PdfPlus
             }
         }
 
+        public override Font Font
+        { 
+            get { return new Font(this.font); }
+            set
+            {
+                for (int i = 0; i < this.segments.Count; i++) segments[i].Font = new Font(value);
+                this.font = new Font(value); 
+            }
+    }
+
+        public override Graphic Graphic
+        {
+            get { return new Graphic(this.graphic); }
+            set
+            {
+                for (int i = 0; i < this.segments.Count; i++) segments[i].Graphic = new Graphic(value);
+                this.graphic = new Graphic(value);
+            }
+        }
+
         public virtual List<Font> Fonts
         {
             get
             {
                 List<Font> output = new List<Font>();
-                foreach (Element element in this.segments) output.Add(element.Font);
+                foreach (Element element in this.segments) output.Add(new Font(element.Font));
                 return output;
             }
         }
@@ -142,12 +162,6 @@ namespace PdfPlus
         #endregion
 
         #region methods
-
-        public void SetFonts(Font font)
-        {
-            this.Font = font;
-            for (int i = 0; i < this.segments.Count; i++) segments[i].Font = font;
-        }
 
         public void AddFragments(Fragment fragment)
         {

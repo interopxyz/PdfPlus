@@ -59,7 +59,7 @@ namespace PdfPlus
         public ObjectAssembly(ObjectAssembly assembly):base(assembly)
         {
             //Text
-            foreach (Fragment fragment in assembly.fragments) this.fragments.Add(fragment);
+            foreach (Fragment fragment in assembly.fragments) this.fragments.Add(new Fragment(fragment));
 
             //DataSet
             SetData(assembly.data);
@@ -99,8 +99,16 @@ namespace PdfPlus
         {
             get { return new Font(this.font); }
             set {
-                for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].SetFonts(value);
+                for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].Font = value;
                 this.font = new Font(value); 
+            }
+        }
+        public override Graphic Graphic
+        {
+            get { return this.graphic; }
+            set {
+                for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].Graphic = value;
+                this.graphic = new Graphic(value); 
             }
         }
 

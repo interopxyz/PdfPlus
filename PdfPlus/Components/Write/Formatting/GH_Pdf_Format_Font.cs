@@ -43,19 +43,11 @@ namespace PdfPlus.Components
             pManager[3].Optional = true;
             pManager.AddIntegerParameter("Styling", "T", "Options Text styling type", GH_ParamAccess.item);
             pManager[4].Optional = true;
-            pManager.AddIntegerParameter("Justification", "J", "Text justification", GH_ParamAccess.item);
-            pManager[5].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[4];
             foreach (FontStyle value in Enum.GetValues(typeof(FontStyle)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
-            }
-
-            Param_Integer paramB = (Param_Integer)pManager[5];
-            foreach (Justification value in Enum.GetValues(typeof(Justification)))
-            {
-                paramB.AddNamedValue(value.ToString(), (int)value);
             }
 
         }
@@ -70,7 +62,6 @@ namespace PdfPlus.Components
             pManager.AddNumberParameter("Size", "S", "Text size", GH_ParamAccess.item);
             pManager.AddColourParameter("Color", "C", "Text color", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Styling", "T", "Text styling type", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Justification", "J", "Text justification", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -104,32 +95,28 @@ namespace PdfPlus.Components
             if (DA.GetData(4, ref style)) font.Style = (FontStyle)style;
             DA.SetData(4, font.Style);
 
-            int justification = 0;
-            if (DA.GetData(5, ref justification)) font.Justification = (Justification)justification;
-            DA.SetData(5, font.Justification);
-
             switch (elem.ElementType)
             {
                 case Element.ElementTypes.Block:
-                    goo.CastTo<Block>(out Block block);
+                    Block block = goo.CastToBlock();
                     block.Font = font;
                     DA.SetData(0, block);
                     break;
                 case Element.ElementTypes.Shape:
-                    goo.CastTo<Shape>(out Shape shape);
+                    Shape shape = goo.CastToShape();
                     shape.Font = font;
                     this.SetPreview(shape);
                     DA.SetData(0, shape);
                     break;
                 case Element.ElementTypes.Data:
-                    goo.CastTo<DataSet>(out DataSet dataSet);
+                    DataSet dataSet = goo.CastToDataSet();
                     dataSet.Font = font;
                     DA.SetData(0, dataSet);
                     break;
-                case Element.ElementTypes.Fragment:
+                default:
                     Fragment fragment = null;
-                    goo.TryGetFragment(ref fragment);
-                    fragment.SetFonts(font);
+                    if (!goo.TryGetFragment(ref fragment)) return;
+                    fragment.Font = font;
                     DA.SetData(0, fragment);
                     break;
             }

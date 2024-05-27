@@ -159,7 +159,6 @@ namespace PdfPlus
             return isValid;
         }
 
-
         public static bool TryGetPage(this IGH_Goo goo, ref Page page)
         {
                 Page pg = new Page();
@@ -318,7 +317,7 @@ namespace PdfPlus
         public static bool TryGetBlock(this IGH_Goo goo, ref Block block)
         {
             Block blk;
-                Shape shp = null;
+            Shape shp = null;
             Fragment fragment = null;
             bool isValid = false;
 
@@ -341,6 +340,36 @@ namespace PdfPlus
             return isValid;
         }
 
+        public static Fragment CastToFragment(this IGH_Goo goo)
+        {
+            goo.CastTo<Fragment>(out Fragment output);
+            return new Fragment(output);
+        }
+
+        public static Element CastToElement(this IGH_Goo goo)
+        {
+            goo.CastTo<Element>(out Element output);
+            return new Element(output);
+        }
+
+        public static Shape CastToShape(this IGH_Goo goo)
+        {
+            goo.CastTo<Shape>(out Shape output);
+            return new Shape(output);
+        }
+
+        public static Block CastToBlock(this IGH_Goo goo)
+        {
+            goo.CastTo<Block>(out Block output);
+            return new Block(output);
+        }
+
+        public static DataSet CastToDataSet(this IGH_Goo goo)
+        {
+            goo.CastTo<DataSet>(out DataSet output);
+            return new DataSet(output);
+        }
+
         public static bool TryGetElement(this IGH_Goo goo, ref Element element)
         {
             Element elem;
@@ -355,7 +384,7 @@ namespace PdfPlus
             }
             else if(goo.TryGetGeometricShape(ref shp))
             {
-                element = shp;
+                element = new Shape(shp);
                 isValid = true;
             }
             else if (goo.TryGetFragment(ref frg))
@@ -1018,7 +1047,11 @@ namespace PdfPlus
         {
             input.Format.Alignment = (fragment.Font.Justification.ToMigraDocParagraphAlignment());
 
-            foreach (Element element in fragment.Segments) input.AddFormattedText( element.Text, element.Font.ToMigraDoc());
+            foreach (Element element in fragment.Segments)
+            {
+                input.AddFormattedText(element.Text, element.Font.ToMigraDoc());
+            }
+            if(fragment.Segments.Count>0)input.ApplyParagraph(fragment.Segments[fragment.Segments.Count - 1]);
         }
 
         public static void RenderFragments(this Md.Paragraph input, List<Fragment> fragments)
@@ -1079,6 +1112,65 @@ namespace PdfPlus
 
         #endregion
 
+        #region paragraph
+
+        public static void ApplyParagraph(this Md.Paragraph input, Element element)
+        {
+            input.Format.Alignment = element.Font.Justification.ToMigraDocParagraphAlignment();
+            if (element.Font.HasSpaceBefore) input.Format.SpaceBefore = element.Font.SpaceBefore;
+            if (element.Font.HasSpaceAfter) input.Format.SpaceAfter = element.Font.SpaceAfter;
+            if (element.Font.HasLineSpacing) input.Format.LineSpacing = element.Font.LineSpacing;
+            if (element.Font.HasIndentLeft) input.Format.LeftIndent = element.Font.IndentLeft;
+            if (element.Font.HasIndentRight) input.Format.RightIndent = element.Font.IndentRight;
+
+            if (element.Graphic.HasColor) input.Format.Shading.Color = element.Graphic.Color.ToMigraDoc();
+            if (element.Graphic.HasColor) input.Format.Shading.Color = element.Graphic.Color.ToMigraDoc();
+            if (element.Graphic.HasStroke) input.Format.Borders.Width = element.Graphic.Weight;
+
+            switch (element.HorizontalBorderStyle)
+            {
+                default:
+                    input.Format.Borders.Left.Visible = false;
+                    input.Format.Borders.Right.Visible = false;
+                    break;
+                case Element.BorderStyles.All:
+                    input.Format.Borders.Left.Visible = true;
+                    input.Format.Borders.Right.Visible = true;
+                    break;
+                case Element.BorderStyles.Start:
+                    input.Format.Borders.Left.Visible = true;
+                    input.Format.Borders.Right.Visible = false;
+                    break;
+                case Element.BorderStyles.End:
+                    input.Format.Borders.Left.Visible = false;
+                    input.Format.Borders.Right.Visible = true;
+                    break;
+            }
+
+            switch (element.VerticalBorderStyle)
+            {
+                default:
+                    input.Format.Borders.Top.Visible = false;
+                    input.Format.Borders.Bottom.Visible = false;
+                    break;
+                case Element.BorderStyles.All:
+                    input.Format.Borders.Top.Visible = true;
+                    input.Format.Borders.Bottom.Visible = true;
+                    break;
+                case Element.BorderStyles.Start:
+                    input.Format.Borders.Top.Visible = true;
+                    input.Format.Borders.Bottom.Visible = false;
+                    break;
+                case Element.BorderStyles.End:
+                    input.Format.Borders.Top.Visible = false;
+                    input.Format.Borders.Bottom.Visible = true;
+                    break;
+            }
+
+        }
+
+        #endregion
+
         #region font
 
         public static Md.Font ToMigraDoc(this Font input)
@@ -1095,12 +1187,12 @@ namespace PdfPlus
             return font;
         }
 
-            public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
+        public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
         {
             if (input.IsModified)
             {
                 if (input.HasFamily) format.Font.Name = input.Family;
-                if (input.HasSize)format.Font.Size = input.Size;
+                if (input.HasSize) format.Font.Size = input.Size;
                 if (input.HasColor) format.Font.Color = input.Color.ToMigraDoc();
                 if (input.HasJustification) format.Alignment = input.Justification.ToMigraDocParagraphAlignment();
                 if (input.HasStyle)

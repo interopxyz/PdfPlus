@@ -392,6 +392,7 @@ namespace PdfPlus
                 paragraph.AddText(this.Text);
                 paragraph.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
             }
+
         }
 
         public void RenderMarkdown(Md.Section section, Md.Document document)
