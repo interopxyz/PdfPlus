@@ -1124,46 +1124,46 @@ namespace PdfPlus
             if (element.Font.HasIndentRight) input.Format.RightIndent = element.Font.IndentRight;
 
             if (element.Graphic.HasColor) input.Format.Shading.Color = element.Graphic.Color.ToMigraDoc();
-            if (element.Graphic.HasColor) input.Format.Shading.Color = element.Graphic.Color.ToMigraDoc();
+            if (element.Graphic.HasStroke) input.Format.Borders.Color = element.Graphic.Stroke.ToMigraDoc();
             if (element.Graphic.HasStroke) input.Format.Borders.Width = element.Graphic.Weight;
 
             switch (element.HorizontalBorderStyle)
             {
                 default:
-                    input.Format.Borders.Left.Visible = false;
-                    input.Format.Borders.Right.Visible = false;
+                    input.Format.Borders.Top.Visible = false;
+                    input.Format.Borders.Bottom.Visible = false;
                     break;
                 case Element.BorderStyles.All:
-                    input.Format.Borders.Left.Visible = true;
-                    input.Format.Borders.Right.Visible = true;
+                    input.Format.Borders.Top.Visible = true;
+                    input.Format.Borders.Bottom.Visible = true;
                     break;
                 case Element.BorderStyles.Start:
-                    input.Format.Borders.Left.Visible = true;
-                    input.Format.Borders.Right.Visible = false;
+                    input.Format.Borders.Top.Visible = true;
+                    input.Format.Borders.Bottom.Visible = false;
                     break;
                 case Element.BorderStyles.End:
-                    input.Format.Borders.Left.Visible = false;
-                    input.Format.Borders.Right.Visible = true;
+                    input.Format.Borders.Top.Visible = false;
+                    input.Format.Borders.Bottom.Visible = true;
                     break;
             }
 
             switch (element.VerticalBorderStyle)
             {
                 default:
-                    input.Format.Borders.Top.Visible = false;
-                    input.Format.Borders.Bottom.Visible = false;
+                    input.Format.Borders.Left.Visible = false;
+                    input.Format.Borders.Right.Visible = false;
                     break;
                 case Element.BorderStyles.All:
-                    input.Format.Borders.Top.Visible = true;
-                    input.Format.Borders.Bottom.Visible = true;
+                    input.Format.Borders.Left.Visible = true;
+                    input.Format.Borders.Right.Visible = true;
                     break;
                 case Element.BorderStyles.Start:
-                    input.Format.Borders.Top.Visible = true;
-                    input.Format.Borders.Bottom.Visible = false;
+                    input.Format.Borders.Left.Visible = true;
+                    input.Format.Borders.Right.Visible = false;
                     break;
                 case Element.BorderStyles.End:
-                    input.Format.Borders.Top.Visible = false;
-                    input.Format.Borders.Bottom.Visible = true;
+                    input.Format.Borders.Left.Visible = false;
+                    input.Format.Borders.Right.Visible = true;
                     break;
             }
 

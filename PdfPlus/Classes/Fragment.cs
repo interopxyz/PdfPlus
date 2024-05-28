@@ -149,6 +149,26 @@ namespace PdfPlus
             }
         }
 
+        public override BorderStyles HorizontalBorderStyle
+        {
+            get { return this.horizontalBorderStyle; }
+            set
+            {
+                for (int i = 0; i < this.segments.Count; i++) segments[i].HorizontalBorderStyle = value;
+                this.horizontalBorderStyle = value; 
+            }
+        }
+
+        public override BorderStyles VerticalBorderStyle
+        {
+            get { return this.verticalBorderStyle; }
+            set
+            {
+                for (int i = 0; i < this.segments.Count; i++) segments[i].VerticalBorderStyle = value;
+                this.verticalBorderStyle = value; 
+            }
+        }
+
         public virtual List<Font> Fonts
         {
             get

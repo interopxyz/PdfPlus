@@ -60,14 +60,14 @@ namespace PdfPlus.Components.Write.Formatting
 
             Param_Integer paramB = (Param_Integer)pManager[7];
             paramB.AddNamedValue("Both", 0);
-            paramB.AddNamedValue("Left", 1);
-            paramB.AddNamedValue("Right", 2);
+            paramB.AddNamedValue("Top", 1);
+            paramB.AddNamedValue("Bottom", 2);
             paramB.AddNamedValue("None", 3);
 
             Param_Integer paramC = (Param_Integer)pManager[8];
             paramC.AddNamedValue("Both", 0);
-            paramC.AddNamedValue("Top", 1);
-            paramC.AddNamedValue("Bottom", 2);
+            paramC.AddNamedValue("Left", 1);
+            paramC.AddNamedValue("Right", 2);
             paramC.AddNamedValue("None", 3);
 
         }

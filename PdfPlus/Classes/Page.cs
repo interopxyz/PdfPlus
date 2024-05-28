@@ -347,12 +347,12 @@ namespace PdfPlus
                 string lastTag = "";
                 int tableRowIndex = 0;
                 int textLineIndex = 0;
-                int listIndex = 0;
 
                 double spacing = 0;
                 string newId= Guid.NewGuid().ToString();
                 for (int i = 0; i < count; i++)
                 {
+                int listIndex = 0;
                     pdfDocumentRenderer.RenderPages(i + 1, i + 1);
                     Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i + 1);
                     Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
@@ -765,6 +765,7 @@ namespace PdfPlus
         {
             Block block = null;
             bool isValid = goo.TryGetBlock(ref block);
+            block.id = Guid.NewGuid().ToString();
             this.blocks.Add(block);
 
             return isValid;

@@ -433,6 +433,8 @@ namespace PdfPlus
                 {
                     listItem.AddText(this.fragments[i].FullText);
                     listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                    listItem.ApplyParagraph(this);
+
                 }
                 listItem.Format.ListInfo = listinfo;
             }
@@ -458,6 +460,7 @@ namespace PdfPlus
                 {
                     listItem.AddText(this.fragments[i].FullText);
                     listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                    listItem.ApplyParagraph(this);
                 }
                 listItem.Format.ListInfo = listinfo;
             }
