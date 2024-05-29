@@ -36,7 +36,7 @@ namespace PdfPlus.Components
             pManager[1].Optional = true;
 
             Param_Integer paramC = (Param_Integer)pManager[1];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
+            foreach (Location value in Enum.GetValues(typeof(Location)))
             {
                 paramC.AddNamedValue(value.ToString(), (int)value);
             }
@@ -62,7 +62,7 @@ namespace PdfPlus.Components
             Block block = Block.CreateChart(data, ObjectAssembly.ChartTypes.Pie);
 
             int alignment = 0;
-            if (DA.GetData(1, ref alignment)) block.Alignment = (Alignment)alignment;
+            if (DA.GetData(1, ref alignment)) block.Alignment = (Location)alignment;
 
             DA.SetData(0, block);
         }

@@ -53,7 +53,7 @@ namespace PdfPlus.Components.Write.Formatting
             pManager[8].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
-            foreach (Justification value in Enum.GetValues(typeof(Justification)))
+            foreach (Position value in Enum.GetValues(typeof(Position)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
             }
@@ -103,9 +103,13 @@ namespace PdfPlus.Components.Write.Formatting
             bool isElement = goo.TryGetElement(ref elem);
             if (isElement) font = new Font(elem.Font);
 
-            int justification = 0;
-            if (DA.GetData(1, ref justification)) font.Justification = (Justification)justification;
-            DA.SetData(1, font.Justification);
+            int position = 0;
+            if (DA.GetData(1, ref position))
+            {
+                font.Position = (Position)position;
+            }
+
+            DA.SetData(1, font.Position);
 
             double linespacing= 1.0;
             if (DA.GetData(2, ref linespacing)) font.LineSpacing = linespacing;
@@ -135,6 +139,18 @@ namespace PdfPlus.Components.Write.Formatting
 
             switch (elem.ElementType)
             {
+                case Element.ElementTypes.Shape:
+                    Shape shape = null;
+                    goo.TryGetShape(ref shape);
+                    shape.Font = font;
+
+                    if (hasBorderH) shape.HorizontalBorderStyle = GetStyle(borderhorizontal);
+                    DA.SetData(7, (int)shape.HorizontalBorderStyle);
+                    if (hasBorderV) shape.VerticalBorderStyle = GetStyle(bordervertical);
+                    DA.SetData(8, (int)shape.VerticalBorderStyle);
+
+                    DA.SetData(0, shape);
+                    break;
                 case Element.ElementTypes.Block:
                     Block block = null;
                     goo.TryGetBlock(ref block);

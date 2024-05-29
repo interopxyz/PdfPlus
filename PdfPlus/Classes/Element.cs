@@ -27,7 +27,7 @@ namespace PdfPlus
         protected Graphic graphic = new Graphic();
         protected Font font = new Font();
 
-        protected Alignment alignment = Alignment.None;
+        protected Location alignment = PdfPlus.Location.None;
         protected Justification justification = Justification.Left;
 
         protected double angle = 0;
@@ -91,7 +91,7 @@ namespace PdfPlus
 
         public virtual ElementTypes ElementType { get { return elementType; } }
 
-        public virtual Alignment Alignment
+        public virtual Location Alignment
         {
             get { return this.alignment; }
             set { this.alignment = value; }

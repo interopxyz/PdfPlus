@@ -30,6 +30,9 @@ namespace PdfPlus
         protected bool hasStyle = false;
 
         //Paragraph Formatting
+        protected Alignment alignment = Alignment.None;
+        protected bool hasAlignment = false;
+
         protected Justification justification = Justification.Left;
         protected bool hasJustification = false;
 
@@ -70,9 +73,13 @@ namespace PdfPlus
             this.hasSize = font.hasSize;
             this.color = font.color;
             this.hasColor = font.hasColor;
+
+
+            this.alignment = font.alignment;
+            this.hasAlignment = font.hasAlignment;
+
             this.justification = font.justification;
             this.hasJustification = font.hasJustification;
-
 
             this.lineSpacing = font.lineSpacing;
             this.hasLineSpacing = font.hasLineSpacing;
@@ -163,6 +170,7 @@ namespace PdfPlus
         public virtual bool HasSize { get { return this.hasSize; } }
         public virtual bool HasColor { get { return this.hasColor; } }
         public virtual bool HasStyle { get { return this.hasStyle; } }
+        public virtual bool HasAlignment { get { return this.hasAlignment; } }
         public virtual bool HasJustification { get { return this.hasJustification; } }
         public virtual bool HasLineSpacing { get { return this.hasLineSpacing; } }
         public virtual bool HasSpaceBefore { get { return this.hasSpaceBefore; } }
@@ -220,6 +228,17 @@ namespace PdfPlus
             }
         }
 
+        public virtual Alignment Alignment
+        {
+            get { return this.alignment; }
+            set
+            {
+                this.isModified = true;
+                this.hasAlignment = true;
+                this.alignment = value;
+            }
+        }
+
         public virtual Justification Justification
         {
             get { return this.justification; }
@@ -228,6 +247,53 @@ namespace PdfPlus
                 this.isModified = true;
                 this.hasJustification = true;
                 this.justification = value;
+            }
+        }
+
+        public virtual Position Position
+        {
+            get
+            {
+                switch (Justification)
+                {
+                    default:
+                        switch (Alignment)
+                        {
+                            default:
+                                return Position.TopLeft;
+                            case Alignment.Middle:
+                                return Position.MiddleLeft;
+                            case Alignment.Bottom:
+                                return Position.BottomLeft;
+                        }
+                    case Justification.Center:
+                        switch (Alignment)
+                        {
+                            default:
+                                return Position.TopCenter;
+                            case Alignment.Middle:
+                                return Position.MiddleCenter;
+                            case Alignment.Bottom:
+                                return Position.BottomCenter;
+                        }
+                    case Justification.Right:
+                        switch (Alignment)
+                        {
+                            default:
+                                return Position.TopRight;
+                            case Alignment.Middle:
+                                return Position.MiddleRight;
+                            case Alignment.Bottom:
+                                return Position.BottomRight;
+                        }
+                }
+            }
+            set
+            {
+                this.justification = value.ToJustication();
+                this.hasJustification = true;
+                this.alignment = value.ToAlignment();
+                this.hasAlignment = true;
             }
         }
 

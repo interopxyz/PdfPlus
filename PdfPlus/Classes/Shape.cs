@@ -96,7 +96,7 @@ namespace PdfPlus
 
         #region text
 
-        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Location alignment, Font font)
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
@@ -109,7 +109,7 @@ namespace PdfPlus
             return shape;
         }
 
-        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Location alignment, Font font)
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
@@ -742,7 +742,6 @@ namespace PdfPlus
             Rg.Plane plane = Rg.Plane.WorldZX;
             plane.OriginY = page.BaseObject.Height.Point / 2.0;
 
-
             Rg.Plane frame = Rg.Plane.WorldXY;
             frame.OriginY = page.BaseObject.Height.Point;
             Rg.Vector3d yaxis = frame.YAxis;
@@ -932,7 +931,7 @@ namespace PdfPlus
         protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
         {
             Pd.XStringFormat format = new Pd.XStringFormat();
-            format.Alignment = font.Justification.ToPdfLine();
+            format.Alignment = font.Justification.ToPdfXAlign();
             format.LineAlignment = Pd.XLineAlignment.BaseLine;
             graph.RotateAtTransform(-this.Angle, location.ToPdf());
             graph.DrawString(this.Text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
@@ -944,20 +943,19 @@ namespace PdfPlus
         {
             Pd.XFont pdfFont = font.ToPdf(this.scale);
 
-            Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
-            textFormatter.Alignment = this.Font.Justification.ToPdf();
-
             Rg.Point2d center = new Rg.Point2d(this.boundary.Center.X, this.boundary.Center.Y);
             Rg.Point2d bottomLeft = center - 0.5 * new Rg.Vector2d(this.boundary.Width, this.boundary.Height);
             Pd.XRect layoutRect = new Pd.XRect(new Pd.XPoint(bottomLeft.X, bottomLeft.Y), new Pd.XSize(this.boundary.Width, this.boundary.Height));
 
-            textFormatter.LayoutRectangle = layoutRect;
+            Pd.XStringFormat format = new Pd.XStringFormat();
+            format.Alignment = font.Justification.ToPdfXAlign();
+            format.LineAlignment = font.Alignment.ToPdfYAlign();
 
             double angleRad = Rg.Vector3d.VectorAngle(Rg.Vector3d.XAxis, this.boundary.Plane.XAxis, Rg.Plane.WorldXY);
             double angleDeg = Rhino.RhinoMath.ToDegrees(angleRad);
             Pd.XGraphicsState state = graph.Save();
             graph.RotateAtTransform(angleDeg, new Pd.XPoint(center.X, center.Y));
-            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, this.ToPdfAlignment());
+            graph.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, format);
             graph.Restore(state);
 
             return graph;
@@ -967,7 +965,7 @@ namespace PdfPlus
         {
             Pc.Chart chart = CombinationChart();
 
-            if (this.alignment != Alignment.None)
+            if (this.alignment != PdfPlus.Location.None)
             {
                 chart.Legend.Docking = this.alignment.ToPdf();
 

@@ -38,15 +38,15 @@ namespace PdfPlus
             }
         }
 
-        public static Ro.TextVerticalAlignment ToRhVerticalAlignment(this Alignment input)
+        public static Ro.TextVerticalAlignment ToRhVerticalAlignment(this Location input)
         {
             switch (input)
             {
                 default:
                     return Ro.TextVerticalAlignment.Bottom;
-                case Alignment.Top:
+                case Location.Top:
                     return Ro.TextVerticalAlignment.Top;
-                case Alignment.Center:
+                case Location.Center:
                     return Ro.TextVerticalAlignment.Middle;
             }
         }

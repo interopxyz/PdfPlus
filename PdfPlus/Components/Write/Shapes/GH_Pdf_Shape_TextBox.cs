@@ -34,13 +34,13 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
             pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, Constants.Fragment.Input, GH_ParamAccess.item);
+            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Alignment", "A", "The paragraph alignment", GH_ParamAccess.item,0);
             pManager[2].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[2];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
+            foreach (Location value in Enum.GetValues(typeof(Location)))
             {
                 paramA.AddNamedValue(value.ToString(), (int)value);
             }
@@ -60,19 +60,18 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Rectangle3d boundary = new Rectangle3d();
-            if (!DA.GetData(0, ref boundary)) return;
-
             IGH_Goo goo = null;
-            if (!DA.GetData(1, ref goo)) return;
+            if (!DA.GetData(0, ref goo)) return;
             Fragment fragment = null;
             if (!goo.TryGetFragment(ref fragment)) return;
+
+            Rectangle3d boundary = new Rectangle3d();
+            if (!DA.GetData(1, ref boundary)) return;
 
             int alignment = 0;
             if (!DA.GetData(2, ref alignment)) return;
 
-
-            Shape shape = Shape.CreateText(fragment, boundary,(Alignment)alignment, new Font());
+            Shape shape = Shape.CreateText(fragment, boundary,(Location)alignment, new Font());
 
             this.SetPreview(shape);
 
