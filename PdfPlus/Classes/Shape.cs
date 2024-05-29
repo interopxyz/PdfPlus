@@ -96,26 +96,24 @@ namespace PdfPlus
 
         #region text
 
-        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Location alignment, Font font)
+        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Font font)
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
             shape.fragments.Add(new Fragment(content,font));
-            shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
 
             return shape;
         }
 
-        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Location alignment, Font font)
+        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Font font)
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
             shape.fragments.Add(new Fragment(content));
-            shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
 
@@ -930,9 +928,11 @@ namespace PdfPlus
 
         protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
         {
+
             Pd.XStringFormat format = new Pd.XStringFormat();
             format.Alignment = font.Justification.ToPdfXAlign();
-            format.LineAlignment = Pd.XLineAlignment.BaseLine;
+            format.LineAlignment = font.Alignment.ToPdfYAlign();
+
             graph.RotateAtTransform(-this.Angle, location.ToPdf());
             graph.DrawString(this.Text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
             graph.RotateAtTransform(this.Angle, location.ToPdf());
@@ -947,15 +947,15 @@ namespace PdfPlus
             Rg.Point2d bottomLeft = center - 0.5 * new Rg.Vector2d(this.boundary.Width, this.boundary.Height);
             Pd.XRect layoutRect = new Pd.XRect(new Pd.XPoint(bottomLeft.X, bottomLeft.Y), new Pd.XSize(this.boundary.Width, this.boundary.Height));
 
-            Pd.XStringFormat format = new Pd.XStringFormat();
-            format.Alignment = font.Justification.ToPdfXAlign();
-            format.LineAlignment = font.Alignment.ToPdfYAlign();
-
-            double angleRad = Rg.Vector3d.VectorAngle(Rg.Vector3d.XAxis, this.boundary.Plane.XAxis, Rg.Plane.WorldXY);
-            double angleDeg = Rhino.RhinoMath.ToDegrees(angleRad);
             Pd.XGraphicsState state = graph.Save();
+
+            double angleDeg = Rhino.RhinoMath.ToDegrees(Rg.Vector3d.VectorAngle(Rg.Vector3d.XAxis, this.boundary.Plane.XAxis, Rg.Plane.WorldXY));
             graph.RotateAtTransform(angleDeg, new Pd.XPoint(center.X, center.Y));
-            graph.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, format);
+
+            Pl.XTextFormatter tf = new Pl.XTextFormatter(graph);
+            tf.Alignment = this.Font.Justification.ToPdf();
+
+            tf.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, Pd.XStringFormats.TopLeft);
             graph.Restore(state);
 
             return graph;

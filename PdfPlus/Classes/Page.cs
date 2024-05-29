@@ -478,7 +478,7 @@ namespace PdfPlus
 
         public Shape PreviewText(List<string> lines, Block block, Rg.Rectangle3d boundary)
         {
-            Shape shape = Shape.CreateText( string.Join("",lines), boundary, block.Alignment, block.Font);
+            Shape shape = Shape.CreateText( string.Join("",lines), boundary, block.Font);
             shape.Renderable = false;
             return shape;
         }

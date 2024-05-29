@@ -36,14 +36,7 @@ namespace PdfPlus.Components
         {
             pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, Constants.Fragment.Input, GH_ParamAccess.item);
             pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Alignment", "A", "The paragraph alignment", GH_ParamAccess.item,0);
-            pManager[2].Optional = true;
 
-            Param_Integer paramA = (Param_Integer)pManager[2];
-            foreach (Location value in Enum.GetValues(typeof(Location)))
-            {
-                paramA.AddNamedValue(value.ToString(), (int)value);
-            }
         }
 
         /// <summary>
@@ -68,10 +61,7 @@ namespace PdfPlus.Components
             Rectangle3d boundary = new Rectangle3d();
             if (!DA.GetData(1, ref boundary)) return;
 
-            int alignment = 0;
-            if (!DA.GetData(2, ref alignment)) return;
-
-            Shape shape = Shape.CreateText(fragment, boundary,(Location)alignment, new Font());
+            Shape shape = Shape.CreateText(fragment, boundary, new Font());
 
             this.SetPreview(shape);
 
