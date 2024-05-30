@@ -53,10 +53,9 @@ namespace PdfPlus.Components.Write.Formatting
             pManager[8].Optional = true;
 
             Param_Integer paramA = (Param_Integer)pManager[1];
-            foreach (Position value in Enum.GetValues(typeof(Position)))
-            {
-                paramA.AddNamedValue(value.ToString(), (int)value);
-            }
+            paramA.AddNamedValue("Left", 0);
+            paramA.AddNamedValue("Center", 1);
+            paramA.AddNamedValue("Right", 2);
 
             Param_Integer paramB = (Param_Integer)pManager[7];
             paramB.AddNamedValue("Both", 0);

@@ -103,7 +103,8 @@ namespace PdfPlus.Components
                     DA.SetData(0, block);
                     break;
                 case Element.ElementTypes.Shape:
-                    Shape shape = goo.CastToShape();
+                    Shape shape = null;
+                    goo.TryGetShape(ref shape);
                     shape.Font = font;
                     this.SetPreview(shape);
                     DA.SetData(0, shape);

@@ -47,13 +47,12 @@ namespace PdfPlus
         {
             this.Stroke = stroke;
             this.Weight = weight;
+            this.hasColor = false;
         }
 
         public Graphic(Sd.Color stroke, Sd.Color fillColor)
         {
             this.Stroke = stroke;
-            this.Weight = weight;
-            this.Pattern = pattern;
             this.Color = fillColor;
         }
 
@@ -62,6 +61,7 @@ namespace PdfPlus
             this.Stroke = stroke;
             this.Weight = weight;
             this.Pattern = pattern;
+            this.hasColor = false;
         }
 
         public Graphic(Sd.Color stroke, double weight, List<double> pattern, Sd.Color fillColor)
@@ -78,6 +78,7 @@ namespace PdfPlus
 
             this.Stroke = Sd.Color.Transparent;
             this.Weight = 0.0;
+            this.hasStroke = false;
         }
 
         public void SetPattern(string pattern)

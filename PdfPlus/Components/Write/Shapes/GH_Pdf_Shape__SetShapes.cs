@@ -58,10 +58,10 @@ namespace PdfPlus.Components
             Page page = new Page();
             if (DA.GetData(0, ref goo)) goo.TryGetPage(ref page);
 
-            List<IGH_Goo> geometry = new List<IGH_Goo>();
-            if (!DA.GetDataList(1, geometry)) return;
+            List<IGH_Goo> pgGoos = new List<IGH_Goo>();
+            if (!DA.GetDataList(1, pgGoos)) return;
 
-            foreach(IGH_Goo goos in geometry)
+            foreach(IGH_Goo goos in pgGoos)
             {
                 page.AddShape(goos);
             }
