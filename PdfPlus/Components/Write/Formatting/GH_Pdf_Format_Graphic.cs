@@ -87,25 +87,33 @@ namespace PdfPlus.Components
             if (DA.GetData(4, ref pattern)) graphic.SetPattern(pattern);
             DA.SetData(4, graphic.Pattern);
 
-            Shape shape = null;
-            Block block = null;
-            DataSet dataSet = null;
-            if (goo.TryGetShape(ref shape))
+            switch (elem.ElementType)
             {
-                shape.Graphic = graphic;
-                this.SetPreview(shape);
-                DA.SetData(0, shape);
+                case Element.ElementTypes.Block:
+                    Block block = goo.CastToBlock();
+                    block.Graphic = graphic;
+                    DA.SetData(0, block);
+                    break;
+                case Element.ElementTypes.Shape:
+                    Shape shape = null;
+                    goo.TryGetShape(ref shape);
+                    shape.Graphic = graphic;
+                    this.SetPreview(shape);
+                    DA.SetData(0, shape);
+                    break;
+                case Element.ElementTypes.Data:
+                    DataSet dataSet = goo.CastToDataSet();
+                    dataSet.Graphic = graphic;
+                    DA.SetData(0, dataSet);
+                    break;
+                default:
+                    Fragment fragment = null;
+                    if (!goo.TryGetFragment(ref fragment)) return;
+                    fragment.Graphic = graphic;
+                    DA.SetData(0, fragment);
+                    break;
             }
-            else if (goo.TryGetBlock(ref block))
-            {
-                block.Graphic = graphic;
-                DA.SetData(0, block);
-            }
-            else if (goo.TryGetDataSet(ref dataSet))
-            {
-                dataSet.Graphic = graphic;
-                DA.SetData(0, dataSet);
-            }
+
         }
 
         /// <summary>

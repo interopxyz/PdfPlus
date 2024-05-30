@@ -111,25 +111,26 @@ namespace PdfPlus.Components
             switch (elem.ElementType)
             {
                 case Element.ElementTypes.Block:
-                    goo.CastTo<Block>(out Block block);
+                    Block block = goo.CastToBlock();
                     block.Font = font;
                     DA.SetData(0, block);
                     break;
                 case Element.ElementTypes.Shape:
-                    goo.CastTo<Shape>(out Shape shape);
+                    Shape shape = null;
+                    goo.TryGetShape(ref shape);
                     shape.Font = font;
                     this.SetPreview(shape);
                     DA.SetData(0, shape);
                     break;
                 case Element.ElementTypes.Data:
-                    goo.CastTo<DataSet>(out DataSet dataSet);
+                    DataSet dataSet = goo.CastToDataSet();
                     dataSet.Font = font;
                     DA.SetData(0, dataSet);
                     break;
-                case Element.ElementTypes.Fragment:
+                default:
                     Fragment fragment = null;
-                    goo.TryGetFragment(ref fragment);
-                    fragment.SetFonts(font);
+                    if (!goo.TryGetFragment(ref fragment)) return;
+                    fragment.Font = font;
                     DA.SetData(0, fragment);
                     break;
             }

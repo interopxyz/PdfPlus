@@ -58,7 +58,7 @@ namespace PdfPlus.Components
             paramB.AddNamedValue("Horizontal / Vertical", 3);
 
             Param_Integer paramC = (Param_Integer)pManager[5];
-            foreach (Alignment value in Enum.GetValues(typeof(Alignment)))
+            foreach (Location value in Enum.GetValues(typeof(Location)))
             {
                 paramC.AddNamedValue(value.ToString(), (int)value);
             }
@@ -98,7 +98,7 @@ namespace PdfPlus.Components
             if (grid > 1) block.VerticalBorderStyle = Element.BorderStyles.All;
 
             int alignment = 0;
-            if (DA.GetData(5, ref alignment)) block.Alignment = (Alignment)alignment;
+            if (DA.GetData(5, ref alignment)) block.Alignment = (Location)alignment;
 
             DA.SetData(0, block);
         }

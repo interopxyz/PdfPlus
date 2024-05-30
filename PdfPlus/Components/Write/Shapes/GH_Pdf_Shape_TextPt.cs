@@ -33,8 +33,8 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName, Constants.Fragment.Input, GH_ParamAccess.item);
             pManager.AddPlaneParameter("Frame", "F", "The placement plane for the text. The Origin of the plane and XL Plane rotation angle will apply to the text", GH_ParamAccess.item);
-            pManager.AddGenericParameter(Constants.Fragment.Name, Constants.Fragment.NickName,Constants.Fragment.Input, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,13 +51,13 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Plane plane = new Plane();
-            if (!DA.GetData(0, ref plane)) return;
-
             IGH_Goo goo = null;
-            if (!DA.GetData(1, ref goo)) return;
+            if (!DA.GetData(0, ref goo)) return;
                 Fragment fragment = null;
             if (!goo.TryGetFragment(ref fragment)) return;
+
+            Plane plane = new Plane();
+            if (!DA.GetData(1, ref plane)) return;
 
             Shape shape = Shape.CreateText(fragment, plane.Origin, new Font());
 

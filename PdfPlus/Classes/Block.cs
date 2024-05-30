@@ -392,6 +392,7 @@ namespace PdfPlus
                 paragraph.AddText(this.Text);
                 paragraph.Format = this.font.ToMigraDocParagraphFormat(document.Styles[this.formatName].ParagraphFormat.Clone());
             }
+
         }
 
         public void RenderMarkdown(Md.Section section, Md.Document document)
@@ -432,6 +433,8 @@ namespace PdfPlus
                 {
                     listItem.AddText(this.fragments[i].FullText);
                     listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                    listItem.ApplyParagraph(this);
+
                 }
                 listItem.Format.ListInfo = listinfo;
             }
@@ -457,6 +460,7 @@ namespace PdfPlus
                 {
                     listItem.AddText(this.fragments[i].FullText);
                     listItem.Format = this.font.ToMigraDocParagraphFormat(document.Styles["List"].ParagraphFormat.Clone());
+                    listItem.ApplyParagraph(this);
                 }
                 listItem.Format.ListInfo = listinfo;
             }
@@ -814,7 +818,7 @@ namespace PdfPlus
             }
 
             //Legend
-            if (this.alignment != Alignment.None)
+            if (this.alignment != PdfPlus.Location.None)
             {
                 Md.Shapes.Charts.Legend legend = null;
 
@@ -823,13 +827,13 @@ namespace PdfPlus
                     default:
                         legend = chart.LeftArea.AddLegend();
                         break;
-                    case Alignment.Right:
+                    case PdfPlus.Location.Right:
                         legend = chart.RightArea.AddLegend();
                         break;
-                    case Alignment.Bottom:
+                    case PdfPlus.Location.Bottom:
                         legend = chart.BottomArea.AddLegend();
                         break;
-                    case Alignment.Top:
+                    case PdfPlus.Location.Top:
                         legend = chart.TopArea.AddLegend();
                         break;
                 }

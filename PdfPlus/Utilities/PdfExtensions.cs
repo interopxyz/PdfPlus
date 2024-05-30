@@ -140,61 +140,66 @@ namespace PdfPlus
 
         public static bool TryGetDocument(this IGH_Goo goo, ref Document document)
         {
-            Document doc = new Document();
-            Page page = new Page();
             bool isValid = false;
-
-            if (goo.TypeName == "PdfPlus")
+            if (goo != null)
             {
-                doc = (Document)goo;
-                document = new Document(doc);
-                isValid = true;
-            }
-            else if (goo.TryGetPage(ref page))
-            {
-                doc.AddPages(page);
-                document = doc;
-                isValid = true;
+                Document doc = new Document();
+                Page page = new Page();
+                if (goo.TypeName == "PdfPlus")
+                {
+                    doc = (Document)goo;
+                    document = new Document(doc);
+                    isValid = true;
+                }
+                else if (goo.TryGetPage(ref page))
+                {
+                    doc.AddPages(page);
+                    document = doc;
+                    isValid = true;
+                }
             }
             return isValid;
         }
 
-
         public static bool TryGetPage(this IGH_Goo goo, ref Page page)
         {
-                Page pg = new Page();
-            Shape shape = null;
-            Fragment fragment = new Fragment();
-            Block block = new Block();
             bool isValid = false;
+            if (goo != null)
+            {
+                Page pg = new Page();
+                Shape shape = null;
+                Fragment fragment = new Fragment();
+                Block block = new Block();
 
-            if (goo.CastTo<Page>(out pg))
-            {
-                page = new Page(pg);
-                isValid = true;
-            }
-            else if (goo.TryGetShape(ref shape))
-            {
-                pg.AddShape(shape);
-                page = pg;
-                isValid = true;
-            }
-            else if(goo.TryGetBlock(ref block))
-            {
-                pg.AddBlock(block);
-                page = pg;
-                isValid = true;
-            }
-            else if( goo.TryGetGeometricShape(ref shape)) { 
-                pg.AddShape(shape);
-                page = pg;
-                isValid = true;
-            }
-            else if(goo.TryGetFragment(ref fragment))
-            {
-                pg.AddBlock(Block.CreateText(fragment));
-                page = pg;
-                isValid = true;
+                if (goo.CastTo<Page>(out pg))
+                {
+                    page = new Page(pg);
+                    isValid = true;
+                }
+                else if (goo.TryGetShape(ref shape))
+                {
+                    pg.AddShape(shape);
+                    page = pg;
+                    isValid = true;
+                }
+                else if (goo.TryGetBlock(ref block))
+                {
+                    pg.AddBlock(block);
+                    page = pg;
+                    isValid = true;
+                }
+                else if (goo.TryGetGeometricShape(ref shape))
+                {
+                    pg.AddShape(shape);
+                    page = pg;
+                    isValid = true;
+                }
+                else if (goo.TryGetFragment(ref fragment))
+                {
+                    pg.AddBlock(Block.CreateText(fragment));
+                    page = pg;
+                    isValid = true;
+                }
             }
             return isValid;
         }
@@ -202,247 +207,311 @@ namespace PdfPlus
         public static bool TryGetGeometricShape(this IGH_Goo goo, ref Shape shape)
         {
             bool isValid = false;
-            switch (goo.TypeName)
+            if (goo != null)
             {
-                case "Curve":
-                    Rg.Curve curve;
-                    isValid = true;
+                switch (goo.TypeName)
+                {
+                    case "Curve":
+                        Rg.Curve curve;
+                        isValid = true;
 
-                    if (goo.CastTo<Rg.Curve>(out curve))
-                    {
-                        string type = goo.ToString();
-
-                        switch (type)
+                        if (goo.CastTo<Rg.Curve>(out curve))
                         {
-                            default:
-                                shape = Shape.CreateGeometry(curve.ToNurbsCurve(), Graphics.Outline);
-                                break;
-                            case "Polyline Curve":
-                                Rg.Polyline pline;
-                                if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, Graphics.Outline);
-                                break;
-                            case "Line-like Curve":
-                                shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), Graphics.Outline);
-                                break;
-                            case "Elliptical Curve":
-                                Rg.Ellipse ellipse;
-                                curve.TryGetEllipse(out ellipse);
-                                shape = Shape.CreateGeometry(ellipse, Graphics.Outline);
-                                break;
+                            string type = goo.ToString();
+
+                            switch (type)
+                            {
+                                default:
+                                    shape = Shape.CreateGeometry(curve.ToNurbsCurve(), Graphics.Outline);
+                                    break;
+                                case "Polyline Curve":
+                                    Rg.Polyline pline;
+                                    if (curve.TryGetPolyline(out pline)) shape = Shape.CreateGeometry(pline, Graphics.Outline);
+                                    break;
+                                case "Line-like Curve":
+                                    shape = Shape.CreateGeometry(new Rg.Line(curve.PointAtStart, curve.PointAtEnd), Graphics.Outline);
+                                    break;
+                                case "Elliptical Curve":
+                                    Rg.Ellipse ellipse;
+                                    curve.TryGetEllipse(out ellipse);
+                                    shape = Shape.CreateGeometry(ellipse, Graphics.Outline);
+                                    break;
+                            }
+                            isValid = true;
                         }
-                        isValid = true;
-                    }
-                    break;
-                case "Arc":
-                    Rg.Arc arc;
+                        break;
+                    case "Arc":
+                        Rg.Arc arc;
 
-                    if (goo.CastTo<Rg.Arc>(out arc))
-                    {
-                        shape = Shape.CreateGeometry(arc, Graphics.Outline);
-                        isValid = true;
-                    }
-                    break;
-                case "Circle":
-                    Rg.Circle circle;
+                        if (goo.CastTo<Rg.Arc>(out arc))
+                        {
+                            shape = Shape.CreateGeometry(arc, Graphics.Outline);
+                            isValid = true;
+                        }
+                        break;
+                    case "Circle":
+                        Rg.Circle circle;
 
-                    if (goo.CastTo<Rg.Circle>(out circle))
-                    {
-                        shape = Shape.CreateGeometry(circle, Graphics.Outline);
-                        isValid = true;
-                    }
-                    break;
-                case "Line":
-                    Rg.Line line;
+                        if (goo.CastTo<Rg.Circle>(out circle))
+                        {
+                            shape = Shape.CreateGeometry(circle, Graphics.Outline);
+                            isValid = true;
+                        }
+                        break;
+                    case "Line":
+                        Rg.Line line;
 
-                    if (goo.CastTo<Rg.Line>(out line))
-                    {
-                        shape = Shape.CreateGeometry(line, Graphics.Outline);
-                        isValid = true;
-                    }
-                    break;
-                case "Rectangle":
-                    Rg.Rectangle3d rect;
-                    if (goo.CastTo<Rg.Rectangle3d>(out rect))
-                    {
-                        shape = Shape.CreateGeometry(rect, Graphics.Outline);
-                        isValid = true;
-                    }
-                    break;
-                case "Surface":
-                    Rg.Surface surface;
-                    if (goo.CastTo<Rg.Surface>(out surface))
-                    {
-                        Rg.Brep srfBrep = surface.ToBrep();
-                        shape = Shape.CreateGeometry(srfBrep, Graphics.Solid);
-                        isValid = true;
-                    }
-                    break;
-                case "Brep":
-                    Rg.Brep brep;
-                    if (goo.CastTo<Rg.Brep>(out brep))
-                    {
-                        shape = Shape.CreateGeometry(brep, Graphics.Solid);
-                        isValid = true;
-                    }
-                    break;
-                case "Mesh":
-                    Rg.Mesh mesh;
-                    if (goo.CastTo<Rg.Mesh>(out mesh))
-                    {
-                        shape = Shape.CreateGeometry(mesh, Graphics.Solid);
-                        isValid = true;
-                    }
-                    break;
+                        if (goo.CastTo<Rg.Line>(out line))
+                        {
+                            shape = Shape.CreateGeometry(line, Graphics.Outline);
+                            isValid = true;
+                        }
+                        break;
+                    case "Rectangle":
+                        Rg.Rectangle3d rect;
+                        if (goo.CastTo<Rg.Rectangle3d>(out rect))
+                        {
+                            shape = Shape.CreateGeometry(rect, Graphics.Outline);
+                            isValid = true;
+                        }
+                        break;
+                    case "Surface":
+                        Rg.Surface surface;
+                        if (goo.CastTo<Rg.Surface>(out surface))
+                        {
+                            Rg.Brep srfBrep = surface.ToBrep();
+                            shape = Shape.CreateGeometry(srfBrep, Graphics.Solid);
+                            isValid = true;
+                        }
+                        break;
+                    case "Brep":
+                        Rg.Brep brep;
+                        if (goo.CastTo<Rg.Brep>(out brep))
+                        {
+                            shape = Shape.CreateGeometry(brep, Graphics.Solid);
+                            isValid = true;
+                        }
+                        break;
+                    case "Mesh":
+                        Rg.Mesh mesh;
+                        if (goo.CastTo<Rg.Mesh>(out mesh))
+                        {
+                            shape = Shape.CreateGeometry(mesh, Graphics.Solid);
+                            isValid = true;
+                        }
+                        break;
+                }
             }
             return isValid;
         }
 
         public static bool TryGetShape(this IGH_Goo goo, ref Shape shape)
         {
-            Shape shp;
             bool isValid = false;
-
-            if (goo.CastTo<Shape>(out shp))
+            if (goo != null)
             {
-                shape = new Shape(shp);
-                isValid = true;
-            }
-            else
-            {
-                isValid = goo.TryGetGeometricShape(ref shp);
-                if (isValid) shape = new Shape(shp);
+                Shape shp;
+                if (goo.CastTo<Shape>(out shp))
+                {
+                    shape = new Shape(shp);
+                    isValid = true;
+                }
+                else
+                {
+                    isValid = goo.TryGetGeometricShape(ref shp);
+                    if (isValid) shape = new Shape(shp);
+                }
             }
             return isValid;
         }
 
         public static bool TryGetBlock(this IGH_Goo goo, ref Block block)
         {
-            Block blk;
-                Shape shp = null;
-            Fragment fragment = null;
             bool isValid = false;
+            if (goo != null)
+            {
+                Block blk;
+                Shape shp = null;
+                Fragment fragment = null;
 
-            if (goo.CastTo<Block>(out blk))
-            {
-                block = new Block(blk);
-                isValid = true;
+                if (goo.CastTo<Block>(out blk))
+                {
+                    block = new Block(blk);
+                    isValid = true;
+                }
+                else if (goo.TryGetGeometricShape(ref shp))
+                {
+                    block = Block.CreateDrawing(shp);
+                    isValid = true;
+                }
+                else if (goo.TryGetFragment(ref fragment))
+                {
+                    block = Block.CreateText(fragment);
+                    isValid = true;
+                }
             }
-            else if(goo.TryGetGeometricShape(ref shp))
-            {
-                block = Block.CreateDrawing(shp);
-                isValid = true;
-            }
-            else if(goo.TryGetFragment(ref fragment))
-            {
-                block = Block.CreateText(fragment);
-                isValid = true;
-            }
-
             return isValid;
         }
 
         public static bool TryGetElement(this IGH_Goo goo, ref Element element)
         {
-            Element elem;
-            Shape shp = null;
-            Fragment frg = null;
             bool isValid = false;
+            if (goo != null)
+            {
+                Element elem;
+                Shape shp = null;
+                Fragment frg = null;
 
-            if (goo.CastTo<Element>(out elem))
-            {
-                element = new Element(elem);
-                isValid = true;
+                if (goo.CastTo<Element>(out elem))
+                {
+                    element = new Element(elem);
+                    isValid = true;
+                }
+                else if (goo.TryGetGeometricShape(ref shp))
+                {
+                    element = new Shape(shp);
+                    isValid = true;
+                }
+                else if (goo.TryGetFragment(ref frg))
+                {
+                    element = frg;
+                    isValid = true;
+                }
             }
-            else if(goo.TryGetGeometricShape(ref shp))
-            {
-                element = shp;
-                isValid = true;
-            }
-            else if (goo.TryGetFragment(ref frg))
-            {
-                element = frg;
-                isValid = true;
-            }
-
-            return isValid;
+                    return isValid;
         }
 
         public static bool TryGetFragment(this IGH_Goo goo, ref Fragment fragment)
         {
-            Fragment frag;
             bool isValid = false;
+            if (goo != null)
+            {
+                Fragment frag;
 
-            if (goo.CastTo<Fragment>(out frag))
-            {
-                fragment = new Fragment(frag);
-                isValid = true;
+                if (goo.CastTo<Fragment>(out frag))
+                {
+                    fragment = new Fragment(frag);
+                    isValid = true;
+                }
+                else if (goo.CastTo<GH_String>(out GH_String ghText))
+                {
+                    fragment = new Fragment(ghText.Value);
+                    isValid = true;
+                }
+                else if (goo.CastTo<GH_Number>(out GH_Number ghNum))
+                {
+                    fragment = new Fragment(ghNum.Value.ToString());
+                    isValid = true;
+                }
+                else if (goo.CastTo<double>(out double num))
+                {
+                    fragment = new Fragment(num.ToString());
+                    isValid = true;
+                }
+                else if (goo.CastTo<int>(out int integer))
+                {
+                    fragment = new Fragment(integer.ToString());
+                    isValid = true;
+                }
+                else if (goo.CastTo<string>(out string text))
+                {
+                    fragment = new Fragment(text);
+                    isValid = true;
+                }
             }
-            else if (goo.CastTo<GH_String>(out GH_String ghText))
-            {
-                fragment = new Fragment(ghText.Value);
-                isValid = true;
-            }
-            else if (goo.CastTo<GH_Number>(out GH_Number ghNum))
-            {
-                fragment = new Fragment(ghNum.Value.ToString());
-                isValid = true;
-            }
-            else if (goo.CastTo<double>(out double num))
-            {
-                fragment = new Fragment(num.ToString());
-                isValid = true;
-            }
-            else if (goo.CastTo<int>(out int integer))
-            {
-                fragment = new Fragment(integer.ToString());
-                isValid = true;
-            }
-            else if (goo.CastTo<string>(out string text))
-            {
-                fragment = new Fragment(text);
-                isValid = true;
-            }
-
             return isValid;
         }
 
         public static bool TryGetDataSet(this IGH_Goo goo, ref DataSet dataSet)
         {
             bool isValid = false;
-
-            if (goo.CastTo<DataSet>(out dataSet))
+            if (goo != null)
             {
-                dataSet = new DataSet(dataSet);
-                isValid = true;
+                if (goo.CastTo<DataSet>(out dataSet))
+                {
+                    dataSet = new DataSet(dataSet);
+                    isValid = true;
+                }
             }
-
             return isValid;
         }
 
         public static bool TryGetBitmap(this IGH_Goo goo, ref Sd.Bitmap bitmap, ref string path)
         {
-
-            string filePath = string.Empty;
-            path = filePath;
-            goo.CastTo<string>(out filePath);
-            Sd.Bitmap bmp = null;
-
-            if (goo.CastTo<Sd.Bitmap>(out bmp))
+            if (goo != null)
             {
-                bitmap = new Sd.Bitmap(bmp);
-                return true;
-            }
-            else if (!PdfPlusEnvironment.FileIoBlocked && File.Exists(filePath))
-            {
-                if (filePath.GetBitmapFromFile(out bmp))
+                string filePath = string.Empty;
+                path = filePath;
+                goo.CastTo<string>(out filePath);
+                Sd.Bitmap bmp = null;
+
+                if (goo.CastTo<Sd.Bitmap>(out bmp))
                 {
-                    path = filePath;
-                    bitmap = bmp;
+                    bitmap = new Sd.Bitmap(bmp);
                     return true;
                 }
-                return false;
+                else if (!PdfPlusEnvironment.FileIoBlocked && File.Exists(filePath))
+                {
+                    if (filePath.GetBitmapFromFile(out bmp))
+                    {
+                        path = filePath;
+                        bitmap = bmp;
+                        return true;
+                    }
+                    return false;
+                }
             }
             return false;
+        }
+
+        public static Fragment CastToFragment(this IGH_Goo goo)
+        {
+            if (goo != null)
+            {
+                goo.CastTo<Fragment>(out Fragment output);
+                return new Fragment(output);
+            }
+            return null;
+        }
+
+        public static Element CastToElement(this IGH_Goo goo)
+        {
+            if (goo != null)
+            {
+                goo.CastTo<Element>(out Element output);
+                return new Element(output);
+            }
+            return null;
+        }
+
+        public static Shape CastToShape(this IGH_Goo goo)
+        {
+            if (goo != null)
+            {
+                goo.CastTo<Shape>(out Shape output);
+                return new Shape(output);
+            }
+            return null;
+        }
+
+        public static Block CastToBlock(this IGH_Goo goo)
+        {
+            if (goo != null)
+            {
+                goo.CastTo<Block>(out Block output);
+                return new Block(output);
+            }
+            return null;
+        }
+
+        public static DataSet CastToDataSet(this IGH_Goo goo)
+        {
+            if (goo != null)
+            {
+                goo.CastTo<DataSet>(out DataSet output);
+                return new DataSet(output);
+            }
+            return null;
         }
 
         public static bool GetBitmapFromFile(this string FilePath, out Sd.Bitmap bitmap)
@@ -565,17 +634,17 @@ namespace PdfPlus
 
         #region charts
 
-        public static Pc.DockingType ToPdf(this Alignment input)
+        public static Pc.DockingType ToPdf(this Location input)
         {
             switch (input)
             {
                 default:
                     return Pc.DockingType.Bottom;
-                case Alignment.Left:
+                case Location.Left:
                     return Pc.DockingType.Left;
-                case Alignment.Right:
+                case Location.Right:
                     return Pc.DockingType.Right;
-                case Alignment.Top:
+                case Location.Top:
                     return Pc.DockingType.Top;
             }
         }
@@ -911,7 +980,39 @@ namespace PdfPlus
 
         #region text
 
+        public static Justification ToJustication(this Position input)
+        {
+            switch (input)
+            {
+                default:
+                    return Justification.Left;
+                case Position.BottomCenter:
+                case Position.MiddleCenter:
+                case Position.TopCenter:
+                    return Justification.Center;
+                case Position.BottomRight:
+                case Position.MiddleRight:
+                case Position.TopRight:
+                    return Justification.Right;
+            }
+        }
 
+        public static Alignment ToAlignment(this Position input)
+        {
+            switch (input)
+            {
+                default:
+                    return Alignment.Top;
+                case Position.MiddleLeft:
+                case Position.MiddleCenter:
+                case Position.MiddleRight:
+                    return Alignment.Middle;
+                case Position.BottomLeft:
+                case Position.BottomCenter:
+                case Position.BottomRight:
+                    return Alignment.Bottom;
+            }
+        }
 
         #endregion
 
@@ -931,7 +1032,7 @@ namespace PdfPlus
                         case Justification.Right:
                             return Pd.XStringFormats.TopRight;
                     }
-                case Alignment.Center:
+                case Location.Center:
                     switch (input.Font.Justification)
                     {
                         default:
@@ -941,7 +1042,7 @@ namespace PdfPlus
                         case Justification.Right:
                             return Pd.XStringFormats.CenterRight;
                     }
-                case Alignment.Bottom:
+                case Location.Bottom:
                     switch (input.Font.Justification)
                     {
                         default:
@@ -959,7 +1060,7 @@ namespace PdfPlus
             return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf());
         }
 
-        public static Pd.XStringAlignment ToPdfLine(this Justification input)
+        public static Pd.XStringAlignment ToPdfXAlign(this Justification input)
         {
             switch (input)
             {
@@ -969,6 +1070,19 @@ namespace PdfPlus
                     return Pd.XStringAlignment.Center;
                 case Justification.Right:
                     return Pd.XStringAlignment.Far;
+            }
+        }
+
+        public static Pd.XLineAlignment ToPdfYAlign(this Alignment input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pd.XLineAlignment.Near;
+                case Alignment.Middle:
+                    return Pd.XLineAlignment.Center;
+                case Alignment.Bottom:
+                    return Pd.XLineAlignment.Far;
             }
         }
 
@@ -1018,7 +1132,11 @@ namespace PdfPlus
         {
             input.Format.Alignment = (fragment.Font.Justification.ToMigraDocParagraphAlignment());
 
-            foreach (Element element in fragment.Segments) input.AddFormattedText( element.Text, element.Font.ToMigraDoc());
+            foreach (Element element in fragment.Segments)
+            {
+                input.AddFormattedText(element.Text, element.Font.ToMigraDoc());
+            }
+            if(fragment.Segments.Count>0)input.ApplyParagraph(fragment.Segments[fragment.Segments.Count - 1]);
         }
 
         public static void RenderFragments(this Md.Paragraph input, List<Fragment> fragments)
@@ -1079,6 +1197,65 @@ namespace PdfPlus
 
         #endregion
 
+        #region paragraph
+
+        public static void ApplyParagraph(this Md.Paragraph input, Element element)
+        {
+            input.Format.Alignment = element.Font.Justification.ToMigraDocParagraphAlignment();
+            if (element.Font.HasSpaceBefore) input.Format.SpaceBefore = element.Font.SpaceBefore;
+            if (element.Font.HasSpaceAfter) input.Format.SpaceAfter = element.Font.SpaceAfter;
+            if (element.Font.HasLineSpacing) input.Format.LineSpacing = element.Font.LineSpacing;
+            if (element.Font.HasIndentLeft) input.Format.LeftIndent = element.Font.IndentLeft;
+            if (element.Font.HasIndentRight) input.Format.RightIndent = element.Font.IndentRight;
+
+            if (element.Graphic.HasColor) input.Format.Shading.Color = element.Graphic.Color.ToMigraDoc();
+            if (element.Graphic.HasStroke) input.Format.Borders.Color = element.Graphic.Stroke.ToMigraDoc();
+            if (element.Graphic.HasStroke) input.Format.Borders.Width = element.Graphic.Weight;
+
+            switch (element.HorizontalBorderStyle)
+            {
+                default:
+                    input.Format.Borders.Top.Visible = false;
+                    input.Format.Borders.Bottom.Visible = false;
+                    break;
+                case Element.BorderStyles.All:
+                    input.Format.Borders.Top.Visible = true;
+                    input.Format.Borders.Bottom.Visible = true;
+                    break;
+                case Element.BorderStyles.Start:
+                    input.Format.Borders.Top.Visible = true;
+                    input.Format.Borders.Bottom.Visible = false;
+                    break;
+                case Element.BorderStyles.End:
+                    input.Format.Borders.Top.Visible = false;
+                    input.Format.Borders.Bottom.Visible = true;
+                    break;
+            }
+
+            switch (element.VerticalBorderStyle)
+            {
+                default:
+                    input.Format.Borders.Left.Visible = false;
+                    input.Format.Borders.Right.Visible = false;
+                    break;
+                case Element.BorderStyles.All:
+                    input.Format.Borders.Left.Visible = true;
+                    input.Format.Borders.Right.Visible = true;
+                    break;
+                case Element.BorderStyles.Start:
+                    input.Format.Borders.Left.Visible = true;
+                    input.Format.Borders.Right.Visible = false;
+                    break;
+                case Element.BorderStyles.End:
+                    input.Format.Borders.Left.Visible = false;
+                    input.Format.Borders.Right.Visible = true;
+                    break;
+            }
+
+        }
+
+        #endregion
+
         #region font
 
         public static Md.Font ToMigraDoc(this Font input)
@@ -1095,12 +1272,12 @@ namespace PdfPlus
             return font;
         }
 
-            public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
+        public static Md.ParagraphFormat ToMigraDocParagraphFormat(this Font input, Md.ParagraphFormat format)
         {
             if (input.IsModified)
             {
                 if (input.HasFamily) format.Font.Name = input.Family;
-                if (input.HasSize)format.Font.Size = input.Size;
+                if (input.HasSize) format.Font.Size = input.Size;
                 if (input.HasColor) format.Font.Color = input.Color.ToMigraDoc();
                 if (input.HasJustification) format.Alignment = input.Justification.ToMigraDocParagraphAlignment();
                 if (input.HasStyle)

@@ -59,7 +59,7 @@ namespace PdfPlus
         public ObjectAssembly(ObjectAssembly assembly):base(assembly)
         {
             //Text
-            foreach (Fragment fragment in assembly.fragments) this.fragments.Add(fragment);
+            foreach (Fragment fragment in assembly.fragments) this.fragments.Add(new Fragment(fragment));
 
             //DataSet
             SetData(assembly.data);
@@ -95,12 +95,42 @@ namespace PdfPlus
         //Text
         public override string Text { get => this.FragmentText(); set => this.fragments = new List<Fragment> { new Fragment(value) }; }
 
+
+
         public override Font Font
         {
             get { return new Font(this.font); }
             set {
-                for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].SetFonts(value);
+                for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].Font = value;
                 this.font = new Font(value); 
+            }
+        }
+        public override Graphic Graphic
+        {
+            get { return this.graphic; }
+            set {
+                for (int i = 0; i < this.fragments.Count; i++) this.fragments[i].Graphic = value;
+                this.graphic = new Graphic(value); 
+            }
+        }
+
+        public override BorderStyles HorizontalBorderStyle
+        {
+            get { return this.horizontalBorderStyle; }
+            set
+            {
+                for (int i = 0; i < this.fragments.Count; i++) fragments[i].HorizontalBorderStyle = value;
+                this.horizontalBorderStyle = value;
+            }
+        }
+
+        public override BorderStyles VerticalBorderStyle
+        {
+            get { return this.verticalBorderStyle; }
+            set
+            {
+                for (int i = 0; i < this.fragments.Count; i++) fragments[i].VerticalBorderStyle = value;
+                this.verticalBorderStyle = value;
             }
         }
 

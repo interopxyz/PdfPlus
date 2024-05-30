@@ -347,12 +347,12 @@ namespace PdfPlus
                 string lastTag = "";
                 int tableRowIndex = 0;
                 int textLineIndex = 0;
-                int listIndex = 0;
 
                 double spacing = 0;
                 string newId= Guid.NewGuid().ToString();
                 for (int i = 0; i < count; i++)
                 {
+                int listIndex = 0;
                     pdfDocumentRenderer.RenderPages(i + 1, i + 1);
                     Mr.RenderInfo[] infos = pdfDocumentRenderer.DocumentRenderer.GetRenderInfoFromPage(i + 1);
                     Pd.XGraphics graph = Pd.XGraphics.FromPdfPage(pdfDocumentRenderer.PdfDocument.Pages[i]);
@@ -478,7 +478,7 @@ namespace PdfPlus
 
         public Shape PreviewText(List<string> lines, Block block, Rg.Rectangle3d boundary)
         {
-            Shape shape = Shape.CreateText( string.Join("",lines), boundary, block.Alignment, block.Font);
+            Shape shape = Shape.CreateText( string.Join("",lines), boundary, block.Font);
             shape.Renderable = false;
             return shape;
         }
@@ -516,7 +516,7 @@ namespace PdfPlus
                     cw = table.Columns[c].Width.Point;
 
                     Shape tableContent = Shape.CreateText(block.Data[c].Contents[r], frame.Origin + new Rg.Point3d(cw / 2.0, rh / 2.0, 0), block.Font);
-                    tableContent.Alignment = Alignment.Center;
+                    tableContent.Alignment = Location.Middle;
                     output.Add(tableContent);
                     frame.OriginX += cw;
                 }
@@ -732,11 +732,14 @@ namespace PdfPlus
 
         public bool AddShape(IGH_Goo goo)
         {
-            Shape shape = null;
-            bool isValid = goo.TryGetShape(ref shape);
-            shape.AlignContent(this, false);
-            this.shapes.Add(shape);
-
+            bool isValid = false;
+            if (goo != null)
+            {
+                Shape shape = null;
+                isValid = goo.TryGetShape(ref shape);
+                shape.AlignContent(this, false);
+                this.shapes.Add(shape);
+            }
             return isValid;
         }
 
@@ -765,6 +768,7 @@ namespace PdfPlus
         {
             Block block = null;
             bool isValid = goo.TryGetBlock(ref block);
+            block.id = Guid.NewGuid().ToString();
             this.blocks.Add(block);
 
             return isValid;

@@ -17,9 +17,9 @@ namespace PdfPlus
         public enum Presets { None, Normal, Title, Subtitle, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Quote, Footnote, Caption, List };
 
         protected bool isModified = false;
-
         protected string name = "None";
 
+        //Font Formatting
         protected string family = "Arial";
         protected bool hasFamily = false;
         protected double size = 11.0;
@@ -28,8 +28,28 @@ namespace PdfPlus
         protected bool hasColor = false;
         protected FontStyle style = FontStyle.Regular;
         protected bool hasStyle = false;
+
+        //Paragraph Formatting
+        protected Alignment alignment = Alignment.None;
+        protected bool hasAlignment = false;
+
         protected Justification justification = Justification.Left;
         protected bool hasJustification = false;
+
+        protected double lineSpacing = 1.0;
+        protected bool hasLineSpacing = false;
+
+        protected double spaceBefore = 0.0;
+        protected bool hasSpaceBefore = false;
+
+        protected double spaceAfter = 0.0;
+        protected bool hasSpaceAfter = false;
+
+        protected double indentLeft = 0.0;
+        protected bool hasIndentLeft = false;
+
+        protected double indentRight = 0.0;
+        protected bool hasIndentRight = false;
 
         #endregion
 
@@ -46,14 +66,35 @@ namespace PdfPlus
 
             this.name = font.name;
 
+
             this.family = font.family;
             this.hasFamily = font.hasFamily;
             this.size = font.size;
             this.hasSize = font.hasSize;
             this.color = font.color;
             this.hasColor = font.hasColor;
+
+
+            this.alignment = font.alignment;
+            this.hasAlignment = font.hasAlignment;
+
             this.justification = font.justification;
             this.hasJustification = font.hasJustification;
+
+            this.lineSpacing = font.lineSpacing;
+            this.hasLineSpacing = font.hasLineSpacing;
+
+            this.spaceBefore = font.spaceBefore;
+            this.hasSpaceBefore = font.hasSpaceBefore;
+
+            this.spaceAfter = font.spaceAfter;
+            this.hasSpaceAfter = font.hasSpaceAfter;
+
+            this.indentLeft = font.indentLeft;
+            this.hasIndentLeft = font.hasIndentLeft;
+
+            this.indentRight = font.indentRight;
+            this.hasIndentRight = font.hasIndentRight;
 
             this.style = font.style;
             this.hasStyle = font.hasStyle;
@@ -83,7 +124,6 @@ namespace PdfPlus
             this.hasFamily = true;
             this.size = size;
             this.hasSize = true;
-            this.style = style;
             this.hasStyle = true;
         }
 
@@ -130,7 +170,13 @@ namespace PdfPlus
         public virtual bool HasSize { get { return this.hasSize; } }
         public virtual bool HasColor { get { return this.hasColor; } }
         public virtual bool HasStyle { get { return this.hasStyle; } }
+        public virtual bool HasAlignment { get { return this.hasAlignment; } }
         public virtual bool HasJustification { get { return this.hasJustification; } }
+        public virtual bool HasLineSpacing { get { return this.hasLineSpacing; } }
+        public virtual bool HasSpaceBefore { get { return this.hasSpaceBefore; } }
+        public virtual bool HasSpaceAfter { get { return this.hasSpaceAfter; } }
+        public virtual bool HasIndentLeft { get { return this.hasIndentLeft; } }
+        public virtual bool HasIndentRight { get { return this.hasIndentRight; } }
 
         public virtual string Name
         {
@@ -182,6 +228,17 @@ namespace PdfPlus
             }
         }
 
+        public virtual Alignment Alignment
+        {
+            get { return this.alignment; }
+            set
+            {
+                this.isModified = true;
+                this.hasAlignment = true;
+                this.alignment = value;
+            }
+        }
+
         public virtual Justification Justification
         {
             get { return this.justification; }
@@ -190,6 +247,53 @@ namespace PdfPlus
                 this.isModified = true;
                 this.hasJustification = true;
                 this.justification = value;
+            }
+        }
+
+        public virtual Position Position
+        {
+            get
+            {
+                switch (Justification)
+                {
+                    default:
+                        switch (Alignment)
+                        {
+                            default:
+                                return Position.TopLeft;
+                            case Alignment.Middle:
+                                return Position.MiddleLeft;
+                            case Alignment.Bottom:
+                                return Position.BottomLeft;
+                        }
+                    case Justification.Center:
+                        switch (Alignment)
+                        {
+                            default:
+                                return Position.TopCenter;
+                            case Alignment.Middle:
+                                return Position.MiddleCenter;
+                            case Alignment.Bottom:
+                                return Position.BottomCenter;
+                        }
+                    case Justification.Right:
+                        switch (Alignment)
+                        {
+                            default:
+                                return Position.TopRight;
+                            case Alignment.Middle:
+                                return Position.MiddleRight;
+                            case Alignment.Bottom:
+                                return Position.BottomRight;
+                        }
+                }
+            }
+            set
+            {
+                this.justification = value.ToJustication();
+                this.hasJustification = true;
+                this.alignment = value.ToAlignment();
+                this.hasAlignment = true;
             }
         }
 
@@ -236,6 +340,56 @@ namespace PdfPlus
                 if (this.style == FontStyle.Underline) isUnderlined = true;
 
                 return isUnderlined;
+            }
+        }
+
+        public virtual double LineSpacing
+        {
+            get { return this.lineSpacing; }
+            set
+            {
+                this.lineSpacing = value;
+                this.hasLineSpacing = true;
+            }
+        }
+
+        public virtual double SpaceBefore
+        {
+            get { return this.spaceBefore; }
+            set
+            {
+                this.spaceBefore = value;
+                this.hasSpaceBefore = true;
+            }
+        }
+
+        public virtual double SpaceAfter
+        {
+            get { return this.spaceAfter; }
+            set
+            {
+                this.spaceAfter = value;
+                this.hasSpaceAfter = true;
+            }
+        }
+
+        public virtual double IndentLeft
+        {
+            get { return this.indentLeft; }
+            set
+            {
+                this.indentLeft = value;
+                this.hasIndentLeft = true;
+            }
+        }
+
+        public virtual double IndentRight
+        {
+            get { return this.indentRight; }
+            set
+            {
+                this.indentRight = value;
+                this.hasIndentRight = true;
             }
         }
 

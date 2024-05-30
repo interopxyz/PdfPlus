@@ -19,7 +19,7 @@ namespace PdfPlus
         public enum ElementTypes { Empty, Shape, Block, Data, Fragment};
         protected ElementTypes elementType = ElementTypes.Empty;
 
-        public enum BorderStyles { None, Interior, All};
+        public enum BorderStyles { None, Interior, All,Start,End};
         protected BorderStyles horizontalBorderStyle = BorderStyles.None;
         protected BorderStyles verticalBorderStyle = BorderStyles.None;
 
@@ -27,7 +27,7 @@ namespace PdfPlus
         protected Graphic graphic = new Graphic();
         protected Font font = new Font();
 
-        protected Alignment alignment = Alignment.None;
+        protected Location alignment = PdfPlus.Location.None;
         protected Justification justification = Justification.Left;
 
         protected double angle = 0;
@@ -91,7 +91,7 @@ namespace PdfPlus
 
         public virtual ElementTypes ElementType { get { return elementType; } }
 
-        public virtual Alignment Alignment
+        public virtual Location Alignment
         {
             get { return this.alignment; }
             set { this.alignment = value; }
@@ -112,14 +112,14 @@ namespace PdfPlus
         //Graphics
         public virtual Graphic Graphic
         {
-            get { return new Graphic(graphic); }
+            get { return new Graphic(this.graphic); }
             set { this.graphic = new Graphic(value); }
         }
 
         //Fonts
         public virtual Font Font
         {
-            get { return new Font(font); }
+            get { return new Font(this.font); }
             set { this.font = new Font(value); }
         }
 

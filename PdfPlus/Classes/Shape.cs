@@ -96,26 +96,24 @@ namespace PdfPlus
 
         #region text
 
-        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        public static Shape CreateText(string content, Rg.Rectangle3d boundary, Font font)
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
             shape.fragments.Add(new Fragment(content,font));
-            shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
 
             return shape;
         }
 
-        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Alignment alignment, Font font)
+        public static Shape CreateText(Fragment content, Rg.Rectangle3d boundary, Font font)
         {
             Shape shape = new Shape();
             shape.shapeType = ShapeType.TextBox;
 
             shape.fragments.Add(new Fragment(content));
-            shape.alignment = alignment;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.Corner(0), boundary.Corner(2));
             shape.font = new Font(font);
 
@@ -742,7 +740,6 @@ namespace PdfPlus
             Rg.Plane plane = Rg.Plane.WorldZX;
             plane.OriginY = page.BaseObject.Height.Point / 2.0;
 
-
             Rg.Plane frame = Rg.Plane.WorldXY;
             frame.OriginY = page.BaseObject.Height.Point;
             Rg.Vector3d yaxis = frame.YAxis;
@@ -877,13 +874,13 @@ namespace PdfPlus
             plinePath.StartFigure();
             plinePath.AddLines(polyline.ToPdf().ToArray());
             if (polyline.IsClosed) plinePath.CloseFigure();
-            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath);
+            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath); } else { graph.DrawPath(graphic.ToPdf(), plinePath); }
             return graph;
         }
 
         protected Pd.XGraphics RenderEllipse(Pd.XGraphics graph)
         {
-            graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+            if (this.graphic.HasColor) { graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf()); } else { graph.DrawEllipse(graphic.ToPdf(), boundary.ToPdf()); }
             return graph;
         }
 
@@ -894,7 +891,7 @@ namespace PdfPlus
             crvPath.AddBeziers(curve.ToBezierPolyline().ToPdf().ToArray());
             if (curve.IsClosed) crvPath.CloseFigure();
 
-            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
+            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath); } else { graph.DrawPath(graphic.ToPdf(),crvPath); }
             return graph;
         }
 
@@ -910,7 +907,7 @@ namespace PdfPlus
                 crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
                 if (nurbs.IsClosed) crvPath.CloseFigure();
             }
-            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath);
+            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath); } else { graph.DrawPath(graphic.ToPdf(), crvPath); }
             return graph;
         }
 
@@ -925,18 +922,40 @@ namespace PdfPlus
                 polyPath.AddLines(pline.ToPdf().ToArray());
                 if (pline.IsClosed) polyPath.CloseFigure();
             }
-            graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath);
+            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath); } else { graph.DrawPath(graphic.ToPdf(), polyPath); }
             return graph;
         }
 
         protected Pd.XGraphics RenderTextPoint(Pd.XGraphics graph)
         {
-            Pd.XStringFormat format = new Pd.XStringFormat();
-            format.Alignment = font.Justification.ToPdfLine();
-            format.LineAlignment = Pd.XLineAlignment.BaseLine;
+            Pd.XFont pdfFont = font.ToPdf(this.scale);
+
+            double width = Math.Max(graph.PdfPage.Width, graph.PdfPage.Height) * 2.0;
+            Pd.XSize size = new Pd.XSize(width, width);
+            Pd.XRect layoutRect = Pd.XRect.Empty;
+            switch (this.font.Justification)
+            {
+                default:
+                    layoutRect = new Pd.XRect(location.ToPdf(), size);
+                    break;
+                case Justification.Center:
+                    layoutRect = new Pd.XRect(new Pd.XPoint(this.location.X - width / 2.0, this.location.Y), size);
+                    break;
+                case Justification.Right:
+                    layoutRect = new Pd.XRect(new Pd.XPoint(this.location.X - width, this.location.Y), size);
+                    break;
+            }
+
+            Pd.XGraphicsState state = graph.Save();
+
             graph.RotateAtTransform(-this.Angle, location.ToPdf());
-            graph.DrawString(this.Text, font.ToPdf(this.scale), font.Color.ToPdfBrush(), location.ToPdf(), format);
-            graph.RotateAtTransform(this.Angle, location.ToPdf());
+
+            Pl.XTextFormatter tf = new Pl.XTextFormatter(graph);
+            tf.Alignment = this.Font.Justification.ToPdf();
+
+            tf.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, Pd.XStringFormats.TopLeft);
+            graph.Restore(state);
+
             return graph;
         }
 
@@ -944,20 +963,19 @@ namespace PdfPlus
         {
             Pd.XFont pdfFont = font.ToPdf(this.scale);
 
-            Pl.XTextFormatter textFormatter = new Pl.XTextFormatter(graph);
-            textFormatter.Alignment = this.Font.Justification.ToPdf();
-
             Rg.Point2d center = new Rg.Point2d(this.boundary.Center.X, this.boundary.Center.Y);
             Rg.Point2d bottomLeft = center - 0.5 * new Rg.Vector2d(this.boundary.Width, this.boundary.Height);
             Pd.XRect layoutRect = new Pd.XRect(new Pd.XPoint(bottomLeft.X, bottomLeft.Y), new Pd.XSize(this.boundary.Width, this.boundary.Height));
 
-            textFormatter.LayoutRectangle = layoutRect;
-
-            double angleRad = Rg.Vector3d.VectorAngle(Rg.Vector3d.XAxis, this.boundary.Plane.XAxis, Rg.Plane.WorldXY);
-            double angleDeg = Rhino.RhinoMath.ToDegrees(angleRad);
             Pd.XGraphicsState state = graph.Save();
+
+            double angleDeg = Rhino.RhinoMath.ToDegrees(Rg.Vector3d.VectorAngle(Rg.Vector3d.XAxis, this.boundary.Plane.XAxis, Rg.Plane.WorldXY));
             graph.RotateAtTransform(angleDeg, new Pd.XPoint(center.X, center.Y));
-            textFormatter.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, this.ToPdfAlignment());
+
+            Pl.XTextFormatter tf = new Pl.XTextFormatter(graph);
+            tf.Alignment = this.Font.Justification.ToPdf();
+
+            tf.DrawString(this.Text, pdfFont, font.Color.ToPdfBrush(), layoutRect, Pd.XStringFormats.TopLeft);
             graph.Restore(state);
 
             return graph;
@@ -967,7 +985,7 @@ namespace PdfPlus
         {
             Pc.Chart chart = CombinationChart();
 
-            if (this.alignment != Alignment.None)
+            if (this.alignment != PdfPlus.Location.None)
             {
                 chart.Legend.Docking = this.alignment.ToPdf();
 
@@ -1085,31 +1103,31 @@ namespace PdfPlus
             switch (this.shapeType)
             {
                 case ShapeType.Line:
-                    graph = this.RenderLine(graph);
+                    this.RenderLine(graph);
                     break;
                 case ShapeType.Polyline:
-                    graph = this.RenderPolyline(graph);
+                    this.RenderPolyline(graph);
                     break;
                 case ShapeType.Circle:
-                    graph = this.RenderEllipse(graph);
+                    this.RenderEllipse(graph);
                     break;
                 case ShapeType.Ellipse:
-                    graph = this.RenderEllipse(graph);
+                    this.RenderEllipse(graph);
                     break;
                 case ShapeType.Bezier:
-                    graph = this.RenderBezier(graph);
+                    this.RenderBezier(graph);
                     break;
                 case ShapeType.Brep:
-                    graph = this.RenderBrep(graph);
+                    this.RenderBrep(graph);
                     break;
                 case ShapeType.Mesh:
-                    graph = this.RenderMesh(graph);
+                    this.RenderMesh(graph);
                     break;
                 case ShapeType.TextObj:
-                    graph = this.RenderTextPoint(graph);
+                    this.RenderTextPoint(graph);
                     break;
                 case ShapeType.TextBox:
-                    graph = this.RenderTextBoundary(graph);
+                    this.RenderTextBoundary(graph);
                     break;
                 case ShapeType.LinkObj:
                     switch (this.linkType)
@@ -1139,7 +1157,7 @@ namespace PdfPlus
                     stream.Dispose();
                     break;
                 case ShapeType.ChartObj:
-                    graph = this.RenderChartObject(graph);
+                    this.RenderChartObject(graph);
                     break;
             }
 
