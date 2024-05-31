@@ -23,6 +23,12 @@ namespace PdfPlus
 
         protected List<Page> pages = new List<Page>();
 
+        public string Title = "";
+        public string Subject = "";
+        public string Author = "";
+        protected string creator = "Pdf+ plugin for Grasshopper 3d (https://github.com/interopxyz/PdfPlus)";
+        protected List<string> keywords = new List<string>();
+
         #endregion
 
         #region constructors
@@ -50,6 +56,22 @@ namespace PdfPlus
         #endregion
 
         #region properties
+
+        public virtual string Creator
+        {
+            get { return this.creator; }
+            set { this.creator = value; }
+        }
+
+        public virtual List<string> Keywords
+        {
+            get { 
+                List<string> output = new List<string>();
+                foreach (string keyword in this.keywords) output.Add(keyword);
+                return output;
+            }
+            set { foreach (string keyword in value) this.keywords.Add(keyword); }
+        }
 
         public virtual List<Page> Pages
         {
@@ -290,8 +312,8 @@ namespace PdfPlus
             body.Font.Color = Sd.Color.Black.ToMigraDoc();
 
             body.ParagraphFormat.LineSpacingRule = Md.LineSpacingRule.Multiple;
-            body.ParagraphFormat.LineSpacing = 1.25;
-            body.ParagraphFormat.SpaceAfter = 10;
+            body.ParagraphFormat.LineSpacing = 1.00;
+            body.ParagraphFormat.SpaceAfter = 0;
 
             #endregion
 
@@ -369,11 +391,33 @@ namespace PdfPlus
             this.pages = new List<Page>();
             AddPages(document.pages);
             this.PageLayout = document.PageLayout;
+
+            this.Title = document.Title;
+            this.Subject = document.Subject;
+            this.Author = document.Author;
+            this.Creator = document.Creator;
+            this.Keywords = document.Keywords;
+
+        }
+
+        public void SetMetaData(pdf.PdfDocument document)
+        {
+
+            document.Info.Title = this.Title;
+            document.Info.Subject = this.Subject;
+
+            document.Info.Author = this.Author;
+            document.Info.Creator = this.Creator;
+
         }
 
         protected pdf.PdfDocument Bake()
         {
             pdf.PdfDocument doc = new pdf.PdfDocument();
+
+            //Metadata
+            this.SetMetaData(doc);
+
             doc.PageLayout = this.PageLayout.ToPdf();
 
             Dictionary<string,List<Page>> clusters = new Dictionary<string,  List<Page>>();
