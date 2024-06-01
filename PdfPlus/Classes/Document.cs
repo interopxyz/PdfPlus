@@ -29,6 +29,15 @@ namespace PdfPlus
         protected string creator = "Pdf+ plugin for Grasshopper 3d (https://github.com/interopxyz/PdfPlus)";
         protected List<string> keywords = new List<string>();
 
+        private string password = "";
+        private bool hasPassword = false;
+
+        private string ownerPassword = Guid.NewGuid().ToString();
+        private bool permitExtract = true;
+        private bool permitModify = true;
+        private bool permitPrint = true;
+
+
         #endregion
 
         #region constructors
@@ -56,6 +65,41 @@ namespace PdfPlus
         #endregion
 
         #region properties
+
+        public virtual string Password
+        {
+            set
+            {
+                this.password = value;
+                this.hasPassword = true;
+            }
+        }
+
+        public virtual string OwnerPassword
+        {
+            set
+            {
+                this.ownerPassword = value;
+            }
+        }
+
+        public virtual bool PermitModify
+        {
+            set { this.permitModify = value; }
+            get { return this.permitModify; }
+        }
+
+        public virtual bool PermitExtract
+        {
+            set { this.permitExtract = value; }
+            get { return this.permitExtract; }
+        }
+
+        public virtual bool PermitPrint
+        {
+            set { this.permitPrint = value; }
+            get { return this.permitPrint; }
+        }
 
         public virtual string Creator
         {
@@ -398,25 +442,49 @@ namespace PdfPlus
             this.Creator = document.Creator;
             this.Keywords = document.Keywords;
 
+            this.password = document.password;
+            this.hasPassword = document.hasPassword;
+
+            this.ownerPassword = document.ownerPassword;
+            this.permitExtract = document.permitExtract;
+            this.permitModify = document.permitModify;
+            this.permitPrint = document.permitPrint;
         }
 
-        public void SetMetaData(pdf.PdfDocument document)
+        public void SetDocumentProperties(pdf.PdfDocument document)
         {
-
             document.Info.Title = this.Title;
             document.Info.Subject = this.Subject;
 
             document.Info.Author = this.Author;
             document.Info.Creator = this.Creator;
 
+            document.Info.Keywords = String.Join(", ", this.keywords);
+
+            if (this.hasPassword) document.SecuritySettings.UserPassword = this.password;
+
+            if (!this.permitExtract | !this.permitModify | !this.permitPrint)
+            {
+            document.SecuritySettings.OwnerPassword = this.ownerPassword;
+            document.SecuritySettings.DocumentSecurityLevel = pdf.Security.PdfDocumentSecurityLevel.Encrypted40Bit;
+
+            document.SecuritySettings.PermitExtractContent = this.permitExtract;
+            document.SecuritySettings.PermitAccessibilityExtractContent = this.permitExtract;
+            document.SecuritySettings.PermitModifyDocument = this.permitModify;
+            document.SecuritySettings.PermitPrint = this.permitPrint;
+            }
+
+            document.PageLayout = pdf.PdfPageLayout.SinglePage;
+            document.PageMode = pdf.PdfPageMode.UseNone;
+            document.Options.ColorMode = pdf.PdfColorMode.Rgb;
+            document.CustomValues.CompressionMode = pdf.PdfCustomValueCompressionMode.Default;
         }
+
+
 
         protected pdf.PdfDocument Bake()
         {
             pdf.PdfDocument doc = new pdf.PdfDocument();
-
-            //Metadata
-            this.SetMetaData(doc);
 
             doc.PageLayout = this.PageLayout.ToPdf();
 
@@ -437,6 +505,9 @@ namespace PdfPlus
             {
                 doc = pg.AddToDocument(doc);
             }
+
+            //Metadata
+            this.SetDocumentProperties(doc);
 
             return doc;
         }

@@ -133,6 +133,8 @@
     <Compile Include="Components\Write\Blocks\GH_Pdf_Block__GetBlocks.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Deconstruct.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_MetaData.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Password.cs" />
+    <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Permissions.cs" />
     <Compile Include="Components\Write\Documents\GH_Pdf_Doc_Preview.cs" />
     <Compile Include="Components\Write\Formatting\GH_Pdf_Format_Paragraph.cs" />
     <Compile Include="Components\Write\Shapes\GH_Pdf_Shape__GetShapes.cs" />
@@ -335,6 +337,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Pdf-Document-Meta.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Password.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pdf-Document-Permissions.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

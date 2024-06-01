@@ -8,14 +8,14 @@ using Grasshopper.Kernel.Types;
 
 namespace PdfPlus.Components.Write.Documents
 {
-    public class GH_Pdf_Doc_MetaData : GH_Component
+    public class GH_Pdf_Doc_Password : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_MetaData class.
+        /// Initializes a new instance of the GH_Pdf_Doc_Password class.
         /// </summary>
-        public GH_Pdf_Doc_MetaData()
-          : base("Document MetaData", "Meta",
-              "Edit the PDF Document MetaData",
+        public GH_Pdf_Doc_Password()
+          : base("Document Password", "Pass",
+              "Lock the PDF Document with a Password",
               Constants.ShortName, Constants.Documents)
         {
         }
@@ -34,14 +34,8 @@ namespace PdfPlus.Components.Write.Documents
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
-            pManager.AddTextParameter("Title", "T", "Concise title of the document "+Environment.NewLine+ "Notes:"+Environment.NewLine+"The title is not the filename and does not have to match."+Environment.NewLine+"Many search engines use the title to describe the document in their search results list.", GH_ParamAccess.item);
+            pManager.AddTextParameter("Password", "P", "Password to Lock the ", GH_ParamAccess.item);
             pManager[1].Optional = true;
-            pManager.AddTextParameter("Subject", "S", "Brief summary of the document", GH_ParamAccess.item);
-            pManager[2].Optional = true;
-            //pManager.AddTextParameter("Author", "A", "Optional name of the document's author(s)", GH_ParamAccess.item);
-            //pManager[3].Optional = true;
-            //pManager.AddTextParameter("Keywords", "K", "A list of keywords to assit in the document's discoverability in searches", GH_ParamAccess.list);
-            //pManager[4].Optional = true;
         }
 
         /// <summary>
@@ -50,10 +44,6 @@ namespace PdfPlus.Components.Write.Documents
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
-            pManager.AddTextParameter("Title", "T", "Concise title of the document", GH_ParamAccess.item);
-            pManager.AddTextParameter("Subject", "S", "Brief summary of the document", GH_ParamAccess.item);
-            //pManager.AddTextParameter("Author", "A", "Optional name of the document's author(s)", GH_ParamAccess.item);
-            //pManager.AddTextParameter("Keywords", "K", "A list of keywords to assit in the document's discoverability in searches", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -68,23 +58,10 @@ namespace PdfPlus.Components.Write.Documents
             Document document = new Document();
             if (!goo.TryGetDocument(ref document)) return;
 
-            string title = "";
-            if (DA.GetData(1, ref title)) document.Title = title;
-
-            string subject = "";
-            if (DA.GetData(2, ref subject)) document.Subject= subject;
-
-            //string author = "";
-            //if (DA.GetData(3, ref author)) document.Author = author;
-
-            //List<string> keywords = new List<string>();
-            //if (DA.GetDataList(4, keywords)) document.Keywords = keywords;
+            string password = "";
+            if (DA.GetData(1, ref password)) document.Password = password;
 
             DA.SetData(0, document);
-            DA.SetData(1, document.Title);
-            DA.SetData(2, document.Subject);
-            //DA.SetData(3, document.Author);
-            //DA.SetDataList(4, document.Keywords);
         }
 
         /// <summary>
@@ -96,7 +73,7 @@ namespace PdfPlus.Components.Write.Documents
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Meta;
+                return Properties.Resources.Pdf_Document_Password;
             }
         }
 
@@ -105,7 +82,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("c3e354ad-50dc-42d0-ae7e-47201a854eec"); }
+            get { return new Guid("df83b610-7553-4857-8f86-defb4800a0ea"); }
         }
     }
 }
