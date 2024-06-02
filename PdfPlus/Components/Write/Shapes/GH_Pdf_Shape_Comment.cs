@@ -1,21 +1,19 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Parameters;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace PdfPlus.Components
+namespace PdfPlus.Components.Write.Shapes
 {
-    public class GH_Pdf_Shape_Link : GH_Pdf__Base
+    public class GH_Pdf_Shape_Comment : GH_Component
     {
-
-        string[] descriptions = new string[] { "The hyperlink to link to", "The document name to link to", "The page index (integer only) to link to" };
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Shape_Link class.
+        /// Initializes a new instance of the GH_Pdf_Shape_Comment class.
         /// </summary>
-        public GH_Pdf_Shape_Link()
-          : base("Link Shape", "Lnk Shp",
-              "Create a link to a document, hyperlink, or page within a rectangular boundary",
+        public GH_Pdf_Shape_Comment()
+          : base("Comment Shape", "Comment Shp",
+              "Create a Comment Shape at a location",
               Constants.ShortName, Constants.Shapes)
         {
         }
@@ -33,17 +31,14 @@ namespace PdfPlus.Components
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Target", "T", "The target of the link", GH_ParamAccess.item, 0);
-            pManager[0].Optional = true;
-            pManager.AddTextParameter("Link", "L", descriptions[0], GH_ParamAccess.item,"");
-            pManager[1].Optional = true;
-            pManager.AddRectangleParameter("Boundary", "B", "The rectangular boundary of the Shape", GH_ParamAccess.item);
-
-            Param_Integer paramA = (Param_Integer)pManager[0];
-            foreach (Shape.LinkTypes value in Enum.GetValues(typeof(Shape.LinkTypes)))
-            {
-                paramA.AddNamedValue(value.ToString(), (int)value);
-            }
+            pManager.AddTextParameter("Content", "C", "The content of the comment", GH_ParamAccess.item);
+            pManager.AddPointParameter("Location", "P", "The location point of the comment", GH_ParamAccess.item);
+            pManager.AddTextParameter("Title", "T", "The title of the comment", GH_ParamAccess.item);
+            pManager[2].Optional = true;
+            pManager.AddTextParameter("Subject", "S", "The subject of the comment", GH_ParamAccess.item);
+            pManager[3].Optional = true;
+            pManager.AddIntegerParameter("Icon", "I", "The comment icon", GH_ParamAccess.item, 0);
+            pManager[4].Optional = true;
         }
 
         /// <summary>
@@ -60,20 +55,25 @@ namespace PdfPlus.Components
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int type = 0;
-            if (!DA.GetData(0, ref type)) return;
+            string content = "";
+            if (!DA.GetData(0, ref content)) return;
 
-            string link = "";
-            if (!DA.GetData(1, ref link)) return;
+            Point3d point = new Point3d();
+            if (!DA.GetData(1, ref point)) return;
 
-            Rectangle3d boundary = new Rectangle3d();
-            if (!DA.GetData(2, ref boundary)) return;
+            string title = "Unnamed";
+            DA.GetData(2, ref title);
 
-            Shape shape = Shape.CreateLink(link, boundary, (Shape.LinkTypes)type);
+            string subject = "Unspecified";
+            DA.GetData(3, ref subject);
 
-            this.SetPreview(shape);
+            int icon = 6;
+            DA.GetData(4, ref icon);
+
+            Shape shape = Shape.CreateComment(title, subject, content, point, (Shape.CommentIcons)icon);
 
             DA.SetData(0, shape);
+
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace PdfPlus.Components
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Shape_Link;
+                return Properties.Resources.Pdf_Shape_Comment;
             }
         }
 
@@ -94,7 +94,7 @@ namespace PdfPlus.Components
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("413ae7fd-0b46-4c15-b17c-dffedbe7f6c9"); }
+            get { return new Guid("6f487c10-d602-47a0-b4f9-33e3c9dcb82f"); }
         }
     }
 }

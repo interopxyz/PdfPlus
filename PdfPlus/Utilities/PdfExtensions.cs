@@ -773,22 +773,63 @@ namespace PdfPlus
 
         #region document
 
-        public static Ps.Pdf.PdfPageLayout ToPdf(this PageLayouts input)
+        public static Pf.PdfCustomValueCompressionMode ToPdf(this Document.CompressionModes input)
         {
             switch (input)
             {
                 default:
-                    return Ps.Pdf.PdfPageLayout.SinglePage;
-                case PageLayouts.SingleScroll:
-                    return Ps.Pdf.PdfPageLayout.OneColumn;
-                case PageLayouts.Double:
-                    return Ps.Pdf.PdfPageLayout.TwoPageLeft;
-                case PageLayouts.DoubleScroll:
-                    return Ps.Pdf.PdfPageLayout.TwoColumnLeft;
-                case PageLayouts.DoubleCover:
-                    return Ps.Pdf.PdfPageLayout.TwoPageRight;
-                case PageLayouts.DoubleCoverScroll:
-                    return Ps.Pdf.PdfPageLayout.TwoColumnRight;
+                    return Pf.PdfCustomValueCompressionMode.Default;
+                case Document.CompressionModes.Compressed:
+                    return Pf.PdfCustomValueCompressionMode.Compressed;
+                case Document.CompressionModes.UnCompressed:
+                    return Pf.PdfCustomValueCompressionMode.Uncompressed;
+            }
+        }
+
+        public static Pf.PdfColorMode ToPdf(this Document.ColorModes input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pf.PdfColorMode.Undefined;
+                case Document.ColorModes.RGB:
+                    return Pf.PdfColorMode.Rgb;
+                case Document.ColorModes.CMYK:
+                    return Pf.PdfColorMode.Cmyk;
+            }
+        }
+
+        public static Pf.PdfPageMode ToPdf(this Document.PageModes input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pf.PdfPageMode.UseNone;
+                case Document.PageModes.Fullscreen:
+                    return Pf.PdfPageMode.FullScreen;
+                case Document.PageModes.Outline:
+                    return Pf.PdfPageMode.UseOutlines;
+                case Document.PageModes.Thumbs:
+                    return Pf.PdfPageMode.UseThumbs;
+            }
+        }
+
+        public static Pf.PdfPageLayout ToPdf(this Document.LayoutModes input)
+        {
+            switch (input)
+            {
+                default:
+                    return Pf.PdfPageLayout.OneColumn;
+                case Document.LayoutModes.Single:
+                    return Pf.PdfPageLayout.SinglePage;
+                case Document.LayoutModes.TwoColumnLeft:
+                    return Pf.PdfPageLayout.TwoColumnLeft;
+                case Document.LayoutModes.TwoColumnRight:
+                    return Pf.PdfPageLayout.TwoColumnRight;
+                case Document.LayoutModes.TwoPageLeft:
+                    return Pf.PdfPageLayout.TwoPageLeft;
+                case Document.LayoutModes.TwoPageRight:
+                    return Pf.PdfPageLayout.TwoPageRight;
             }
         }
 
@@ -1026,11 +1067,11 @@ namespace PdfPlus
                     switch (input.Font.Justification)
                     {
                         default:
-                            return Pd.XStringFormats.TopLeft;
+                            return Pd.XStringFormats.BottomLeft;
                         case Justification.Center:
-                            return Pd.XStringFormats.TopCenter;
+                            return Pd.XStringFormats.BottomCenter;
                         case Justification.Right:
-                            return Pd.XStringFormats.TopRight;
+                            return Pd.XStringFormats.BottomRight;
                     }
                 case Location.Center:
                     switch (input.Font.Justification)
@@ -1042,22 +1083,23 @@ namespace PdfPlus
                         case Justification.Right:
                             return Pd.XStringFormats.CenterRight;
                     }
-                case Location.Bottom:
+                case Location.Top:
                     switch (input.Font.Justification)
                     {
                         default:
-                            return Pd.XStringFormats.BottomLeft;
+                            return Pd.XStringFormats.TopLeft;
                         case Justification.Center:
-                            return Pd.XStringFormats.BottomCenter;
+                            return Pd.XStringFormats.TopCenter;
                         case Justification.Right:
-                            return Pd.XStringFormats.BottomRight;
+                            return Pd.XStringFormats.TopRight;
                     }
             }
         }
 
         public static Pd.XFont ToPdf(this Font input, double scale = 1.0)
         {
-            return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf());
+            Pd.XPdfFontOptions options = new Pd.XPdfFontOptions(Pf.PdfFontEmbedding.Always);
+            return new Pd.XFont(input.Family, input.Size*scale, input.Style.ToPdf(), options);
         }
 
         public static Pd.XStringAlignment ToPdfXAlign(this Justification input)
@@ -1078,11 +1120,11 @@ namespace PdfPlus
             switch (input)
             {
                 default:
-                    return Pd.XLineAlignment.Near;
+                    return Pd.XLineAlignment.Far;
                 case Alignment.Middle:
                     return Pd.XLineAlignment.Center;
-                case Alignment.Bottom:
-                    return Pd.XLineAlignment.Far;
+                case Alignment.Top:
+                    return Pd.XLineAlignment.Near;
             }
         }
 

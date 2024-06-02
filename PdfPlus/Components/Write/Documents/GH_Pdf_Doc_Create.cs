@@ -34,8 +34,6 @@ namespace PdfPlus.Components.Write.Documents
             pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
             pManager[0].Optional = true;
             pManager.AddGenericParameter("Pages", "Pg", "Pages to add to the document", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Page Layout", "L", "The page layout", GH_ParamAccess.item, 0);
-            pManager[2].Optional = true;
 
         }
 
@@ -69,9 +67,6 @@ namespace PdfPlus.Components.Write.Documents
                 Page page = new Page();
                 if (g.TryGetPage(ref page)) pages.Add(page);
             }
-
-            int layout = 0;
-            if (DA.GetData(2, ref layout)) document.PageLayout = (PageLayouts)layout;
 
             document.AddPages(pages);
 

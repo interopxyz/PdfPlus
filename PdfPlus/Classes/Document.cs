@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 using GH_IO.Serialization;
 using Grasshopper.Kernel.Types;
 
-using pdf = PdfSharp.Pdf;
+using Pf = PdfSharp.Pdf;
 
 using Md = MigraDoc.DocumentObjectModel;
 
@@ -19,9 +19,17 @@ namespace PdfPlus
 
         #region members
 
-        public PageLayouts PageLayout = PageLayouts.Single;
+        public enum ColorModes { None, RGB, CMYK};
+        public enum PageModes { None, Fullscreen, Outline, Thumbs }
+        public enum LayoutModes { None, Single, TwoColumnLeft, TwoColumnRight,TwoPageLeft, TwoPageRight }
+        public enum CompressionModes { None, Compressed, UnCompressed}
 
         protected List<Page> pages = new List<Page>();
+
+        public ColorModes ColorMode = ColorModes.None;
+        public PageModes PageMode = PageModes.None;
+        public LayoutModes LayoutMode = LayoutModes.None;
+        public CompressionModes CompressionMode = CompressionModes.None;
 
         public string Title = "";
         public string Subject = "";
@@ -406,7 +414,7 @@ namespace PdfPlus
         {
             if (PdfPlusEnvironment.FileIoBlocked)
                 return;
-            pdf.PdfDocument doc = Bake();
+            Pf.PdfDocument doc = Bake();
             doc.Save(filepath);
         }
 
@@ -434,7 +442,6 @@ namespace PdfPlus
         {
             this.pages = new List<Page>();
             AddPages(document.pages);
-            this.PageLayout = document.PageLayout;
 
             this.Title = document.Title;
             this.Subject = document.Subject;
@@ -449,9 +456,17 @@ namespace PdfPlus
             this.permitExtract = document.permitExtract;
             this.permitModify = document.permitModify;
             this.permitPrint = document.permitPrint;
+
+            this.ColorMode = document.ColorMode;
+            this.PageMode = document.PageMode;
+            this.LayoutMode = document.LayoutMode;
+            this.CompressionMode = document.CompressionMode;
+
+
+
         }
 
-        public void SetDocumentProperties(pdf.PdfDocument document)
+        public void SetDocumentProperties(Pf.PdfDocument document)
         {
             document.Info.Title = this.Title;
             document.Info.Subject = this.Subject;
@@ -466,7 +481,7 @@ namespace PdfPlus
             if (!this.permitExtract | !this.permitModify | !this.permitPrint)
             {
             document.SecuritySettings.OwnerPassword = this.ownerPassword;
-            document.SecuritySettings.DocumentSecurityLevel = pdf.Security.PdfDocumentSecurityLevel.Encrypted40Bit;
+            document.SecuritySettings.DocumentSecurityLevel = Pf.Security.PdfDocumentSecurityLevel.Encrypted40Bit;
 
             document.SecuritySettings.PermitExtractContent = this.permitExtract;
             document.SecuritySettings.PermitAccessibilityExtractContent = this.permitExtract;
@@ -474,20 +489,17 @@ namespace PdfPlus
             document.SecuritySettings.PermitPrint = this.permitPrint;
             }
 
-            document.PageLayout = pdf.PdfPageLayout.SinglePage;
-            document.PageMode = pdf.PdfPageMode.UseNone;
-            document.Options.ColorMode = pdf.PdfColorMode.Rgb;
-            document.CustomValues.CompressionMode = pdf.PdfCustomValueCompressionMode.Default;
+            document.PageLayout = this.LayoutMode.ToPdf();
+            document.PageMode = this.PageMode.ToPdf();
+            document.Options.ColorMode = this.ColorMode.ToPdf();
+            
+            //document.CustomValues.CompressionMode = this.CompressionMode.ToPdf();
         }
 
-
-
-        protected pdf.PdfDocument Bake()
+        protected Pf.PdfDocument Bake()
         {
-            pdf.PdfDocument doc = new pdf.PdfDocument();
-
-            doc.PageLayout = this.PageLayout.ToPdf();
-
+            Pf.PdfDocument doc = new Pf.PdfDocument();
+            
             Dictionary<string,List<Page>> clusters = new Dictionary<string,  List<Page>>();
             foreach (Page pg in this.pages)
             {
@@ -604,7 +616,7 @@ namespace PdfPlus
         {
             target = default(T);
 
-            if (typeof(T).IsAssignableFrom(typeof(pdf.PdfDocument)))
+            if (typeof(T).IsAssignableFrom(typeof(Pf.PdfDocument)))
             {
                 target = (T)((object)Bake());
                 return true;

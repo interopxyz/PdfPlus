@@ -303,6 +303,16 @@ namespace PdfPlus.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Document_Settings {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Document_Settings", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Pdf_Format_DataSet {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Format_DataSet", resourceCulture);
@@ -486,6 +496,16 @@ namespace PdfPlus.Properties {
         internal static System.Drawing.Bitmap Pdf_Shape_Chart_Pie {
             get {
                 object obj = ResourceManager.GetObject("Pdf_Shape_Chart_Pie", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Pdf_Shape_Comment {
+            get {
+                object obj = ResourceManager.GetObject("Pdf_Shape_Comment", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
