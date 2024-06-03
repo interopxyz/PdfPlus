@@ -181,11 +181,23 @@
   <data name="Pdf_Document_Deconstruct" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Document-Deconstruct.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Pdf_Document_Meta" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pdf-Document-Meta.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Pdf_Document_Password" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pdf-Document-Password.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Pdf_Document_Permissions" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pdf-Document-Permissions.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Pdf_Document_Preview" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Document-Preview.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Pdf_Document_Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Document-Save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Pdf_Document_Settings" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pdf-Document-Settings.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Pdf_Format_DataSet" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Format-DataSet.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -243,6 +255,9 @@
   </data>
   <data name="Pdf_Shape_Chart_Pie" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Shape-Chart_Pie.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Pdf_Shape_Comment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pdf-Shape-Comment.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Pdf_Shape_Contents" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pdf-Shape-Contents.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -21,11 +21,14 @@ namespace PdfPlus
 
         #region members
 
-        public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj, PreviewText, PreviewBoundary };
+        public enum ShapeType { None, Line, Polyline, Bezier, Circle, Ellipse, Arc, Brep, Mesh, TextBox, ImageFrame, TextObj, ImageObj, ChartObj, LinkObj, PreviewText, PreviewBoundary, Comment };
         protected ShapeType shapeType = ShapeType.None;
 
         public enum LinkTypes { Hyperlink, Filepath, Page };
         protected LinkTypes linkType = LinkTypes.Hyperlink;
+
+        public enum CommentIcons { None, Comment, Help, Insert, Key, NewParagraph, Note, Paragraph}
+        protected CommentIcons commentIcon = CommentIcons.Note;
 
         protected double scale = 1.0;
 
@@ -44,6 +47,8 @@ namespace PdfPlus
         {
             this.shapeType = shape.shapeType;
             this.linkType = shape.linkType;
+
+            this.commentIcon = shape.commentIcon;
 
             this.scale = shape.scale;
             this.Renderable = shape.Renderable;
@@ -152,6 +157,26 @@ namespace PdfPlus
 
             shape.text = link;
             shape.boundary = new Rg.Rectangle3d(boundary.Plane, boundary.X, boundary.Y);
+
+            return shape;
+        }
+
+        #endregion
+
+        #region comment
+
+        public static Shape CreateComment(string title, string subject, string content, Rg.Point3d location, CommentIcons icon)
+        {
+            Shape shape = new Shape();
+            shape.shapeType = ShapeType.Comment;
+
+            shape.title = title;
+            shape.subject = subject;
+            shape.text = content;
+            shape.commentIcon = icon;
+            shape.location = new Rg.Point3d(location);
+
+            shape.graphic = Graphics.Solid;
 
             return shape;
         }
@@ -933,6 +958,7 @@ namespace PdfPlus
             double width = Math.Max(graph.PdfPage.Width, graph.PdfPage.Height) * 2.0;
             Pd.XSize size = new Pd.XSize(width, width);
             Pd.XRect layoutRect = Pd.XRect.Empty;
+
             switch (this.font.Justification)
             {
                 default:
@@ -1096,12 +1122,29 @@ namespace PdfPlus
             return graph;
         }
 
+        protected void RenderComment(Pf.PdfPage page)
+        {
+            Pf.Annotations.PdfTextAnnotation annotation = new Pf.Annotations.PdfTextAnnotation();
+            annotation.Rectangle = new Pf.PdfRectangle(location.ToPdf(), location.ToPdf());
+            annotation.Title = this.title;
+            annotation.Subject = this.subject;
+            annotation.Contents = this.text;
+            annotation.Icon = (Pf.Annotations.PdfTextAnnotationIcon)this.commentIcon;
+            annotation.Color = this.graphic.Color.ToPdf();
+            annotation.Flags = Pf.Annotations.PdfAnnotationFlags.Locked;
+
+            page.Annotations.Add(annotation);
+        }
+
         #endregion
 
         public void Render(Pd.XGraphics graph, Pf.PdfPage page, Rg.Plane coordinateframe)
         {
             switch (this.shapeType)
             {
+                case ShapeType.Comment:
+                    this.RenderComment(page);
+                    break;
                 case ShapeType.Line:
                     this.RenderLine(graph);
                     break;

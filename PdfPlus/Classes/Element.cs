@@ -33,6 +33,8 @@ namespace PdfPlus
         protected double angle = 0;
 
         //Text
+        protected string title = string.Empty;
+        protected string subject = string.Empty;
         protected string text = string.Empty;
 
         //Geometry
@@ -65,6 +67,8 @@ namespace PdfPlus
 
             this.angle = element.angle;
             //Text
+            this.title = element.title;
+            this.subject = element.subject;
             this.text = element.text;
 
             //Geoemtry
@@ -83,6 +87,17 @@ namespace PdfPlus
         }
 
         //Text
+
+        public virtual string Title
+        {
+            get { return this.title; }
+        }
+
+        public virtual string Subject
+        {
+            get { return this.subject; }
+        }
+
         public virtual string Text
         {
             get { return this.text; }

@@ -8,7 +8,7 @@ using Sd = System.Drawing;
 using GH_IO.Serialization;
 using Grasshopper.Kernel.Types;
 
-using pdf = PdfSharp.Pdf;
+using Pf = PdfSharp.Pdf;
 
 using Md = MigraDoc.DocumentObjectModel;
 
@@ -19,9 +19,32 @@ namespace PdfPlus
 
         #region members
 
-        public PageLayouts PageLayout = PageLayouts.Single;
+        public enum ColorModes { None, RGB, CMYK};
+        public enum PageModes { None, Fullscreen, Outline, Thumbs }
+        public enum LayoutModes { None, Single, TwoColumnLeft, TwoColumnRight,TwoPageLeft, TwoPageRight }
+        public enum CompressionModes { None, Compressed, UnCompressed}
 
         protected List<Page> pages = new List<Page>();
+
+        public ColorModes ColorMode = ColorModes.None;
+        public PageModes PageMode = PageModes.None;
+        public LayoutModes LayoutMode = LayoutModes.None;
+        public CompressionModes CompressionMode = CompressionModes.None;
+
+        public string Title = "";
+        public string Subject = "";
+        public string Author = "";
+        protected string creator = "Pdf+ plugin for Grasshopper 3d (https://github.com/interopxyz/PdfPlus)";
+        protected List<string> keywords = new List<string>();
+
+        private string password = "";
+        private bool hasPassword = false;
+
+        private string ownerPassword = Guid.NewGuid().ToString();
+        private bool permitExtract = true;
+        private bool permitModify = true;
+        private bool permitPrint = true;
+
 
         #endregion
 
@@ -50,6 +73,57 @@ namespace PdfPlus
         #endregion
 
         #region properties
+
+        public virtual string Password
+        {
+            set
+            {
+                this.password = value;
+                this.hasPassword = true;
+            }
+        }
+
+        public virtual string OwnerPassword
+        {
+            set
+            {
+                this.ownerPassword = value;
+            }
+        }
+
+        public virtual bool PermitModify
+        {
+            set { this.permitModify = value; }
+            get { return this.permitModify; }
+        }
+
+        public virtual bool PermitExtract
+        {
+            set { this.permitExtract = value; }
+            get { return this.permitExtract; }
+        }
+
+        public virtual bool PermitPrint
+        {
+            set { this.permitPrint = value; }
+            get { return this.permitPrint; }
+        }
+
+        public virtual string Creator
+        {
+            get { return this.creator; }
+            set { this.creator = value; }
+        }
+
+        public virtual List<string> Keywords
+        {
+            get { 
+                List<string> output = new List<string>();
+                foreach (string keyword in this.keywords) output.Add(keyword);
+                return output;
+            }
+            set { foreach (string keyword in value) this.keywords.Add(keyword); }
+        }
 
         public virtual List<Page> Pages
         {
@@ -290,8 +364,8 @@ namespace PdfPlus
             body.Font.Color = Sd.Color.Black.ToMigraDoc();
 
             body.ParagraphFormat.LineSpacingRule = Md.LineSpacingRule.Multiple;
-            body.ParagraphFormat.LineSpacing = 1.25;
-            body.ParagraphFormat.SpaceAfter = 10;
+            body.ParagraphFormat.LineSpacing = 1.00;
+            body.ParagraphFormat.SpaceAfter = 0;
 
             #endregion
 
@@ -340,7 +414,7 @@ namespace PdfPlus
         {
             if (PdfPlusEnvironment.FileIoBlocked)
                 return;
-            pdf.PdfDocument doc = Bake();
+            Pf.PdfDocument doc = Bake();
             doc.Save(filepath);
         }
 
@@ -368,14 +442,64 @@ namespace PdfPlus
         {
             this.pages = new List<Page>();
             AddPages(document.pages);
-            this.PageLayout = document.PageLayout;
+
+            this.Title = document.Title;
+            this.Subject = document.Subject;
+            this.Author = document.Author;
+            this.Creator = document.Creator;
+            this.Keywords = document.Keywords;
+
+            this.password = document.password;
+            this.hasPassword = document.hasPassword;
+
+            this.ownerPassword = document.ownerPassword;
+            this.permitExtract = document.permitExtract;
+            this.permitModify = document.permitModify;
+            this.permitPrint = document.permitPrint;
+
+            this.ColorMode = document.ColorMode;
+            this.PageMode = document.PageMode;
+            this.LayoutMode = document.LayoutMode;
+            this.CompressionMode = document.CompressionMode;
+
+
+
         }
 
-        protected pdf.PdfDocument Bake()
+        public void SetDocumentProperties(Pf.PdfDocument document)
         {
-            pdf.PdfDocument doc = new pdf.PdfDocument();
-            doc.PageLayout = this.PageLayout.ToPdf();
+            document.Info.Title = this.Title;
+            document.Info.Subject = this.Subject;
 
+            document.Info.Author = this.Author;
+            document.Info.Creator = this.Creator;
+
+            document.Info.Keywords = String.Join(", ", this.keywords);
+
+            if (this.hasPassword) document.SecuritySettings.UserPassword = this.password;
+
+            if (!this.permitExtract | !this.permitModify | !this.permitPrint)
+            {
+            document.SecuritySettings.OwnerPassword = this.ownerPassword;
+            document.SecuritySettings.DocumentSecurityLevel = Pf.Security.PdfDocumentSecurityLevel.Encrypted40Bit;
+
+            document.SecuritySettings.PermitExtractContent = this.permitExtract;
+            document.SecuritySettings.PermitAccessibilityExtractContent = this.permitExtract;
+            document.SecuritySettings.PermitModifyDocument = this.permitModify;
+            document.SecuritySettings.PermitPrint = this.permitPrint;
+            }
+
+            document.PageLayout = this.LayoutMode.ToPdf();
+            document.PageMode = this.PageMode.ToPdf();
+            document.Options.ColorMode = this.ColorMode.ToPdf();
+            
+            //document.CustomValues.CompressionMode = this.CompressionMode.ToPdf();
+        }
+
+        protected Pf.PdfDocument Bake()
+        {
+            Pf.PdfDocument doc = new Pf.PdfDocument();
+            
             Dictionary<string,List<Page>> clusters = new Dictionary<string,  List<Page>>();
             foreach (Page pg in this.pages)
             {
@@ -393,6 +517,9 @@ namespace PdfPlus
             {
                 doc = pg.AddToDocument(doc);
             }
+
+            //Metadata
+            this.SetDocumentProperties(doc);
 
             return doc;
         }
@@ -489,7 +616,7 @@ namespace PdfPlus
         {
             target = default(T);
 
-            if (typeof(T).IsAssignableFrom(typeof(pdf.PdfDocument)))
+            if (typeof(T).IsAssignableFrom(typeof(Pf.PdfDocument)))
             {
                 target = (T)((object)Bake());
                 return true;

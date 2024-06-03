@@ -1,19 +1,21 @@
 ﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+using Grasshopper.Kernel.Types;
 
 namespace PdfPlus.Components.Write.Documents
 {
-    public class GH_Pdf_Doc_Preview : GH_Pdf__Base
+    public class GH_Pdf_Doc_Password : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the GH_Pdf_Doc_Preview class.
+        /// Initializes a new instance of the GH_Pdf_Doc_Password class.
         /// </summary>
-        public GH_Pdf_Doc_Preview()
-          : base("Preview PDF", "Prev PDF",
-              "Preview PDF Shapes, Pages, or Documents.",
+        public GH_Pdf_Doc_Password()
+          : base("Document Password", "Pass",
+              "Lock the PDF Document with a Password",
               Constants.ShortName, Constants.Documents)
         {
         }
@@ -23,7 +25,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override GH_Exposure Exposure
         {
-            get { return GH_Exposure.tertiary; }
+            get { return GH_Exposure.secondary; }
         }
 
         /// <summary>
@@ -31,7 +33,9 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter(Constants.Element.Name, Constants.Element.NickName, "A PDF+ Shape, Block, DataSet, Text Fragment Element, or Geometry", GH_ParamAccess.item);
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Input, GH_ParamAccess.item);
+            pManager.AddTextParameter("Password", "P", "Password to Lock the ", GH_ParamAccess.item);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -39,6 +43,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
+            pManager.AddGenericParameter(Constants.Document.Name, Constants.Document.NickName, Constants.Document.Output, GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -47,23 +52,16 @@ namespace PdfPlus.Components.Write.Documents
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Document doc = new Document();
+            //TRY GET DOCUMENT
             IGH_Goo goo = null;
-            if (DA.GetData(0, ref goo))
-                {
-                if(goo.TryGetDocument(ref doc))
-                {
-                    this.SetPreview(doc);
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
-            {
-                return;
-            }
+            if (!DA.GetData(0, ref goo)) return;
+            Document document = new Document();
+            if (!goo.TryGetDocument(ref document)) return;
+
+            string password = "";
+            if (DA.GetData(1, ref password)) document.Password = password;
+
+            DA.SetData(0, document);
         }
 
         /// <summary>
@@ -75,7 +73,7 @@ namespace PdfPlus.Components.Write.Documents
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Pdf_Document_Preview;
+                return Properties.Resources.Pdf_Document_Password;
             }
         }
 
@@ -84,7 +82,7 @@ namespace PdfPlus.Components.Write.Documents
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("d9baa330-a6ee-4e7a-9ddc-a4491d2be7af"); }
+            get { return new Guid("df83b610-7553-4857-8f86-defb4800a0ea"); }
         }
     }
 }
