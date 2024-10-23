@@ -152,6 +152,39 @@ namespace PdfPlus
             get { return hasStroke; }
         }
 
+        public virtual bool NoStroke
+        {
+            get { 
+                if (this.stroke.A == 0) return true;
+                if (this.weight <= 0) return true;
+                return false;
+            }
+        }
+
+        public virtual bool NoFill
+        {
+            get { 
+                if (this.color.A == 0) return true;
+                return false;
+            }
+        }
+
+        public virtual bool OnlyStroke
+        {
+            get
+            {
+                return (this.NoFill && !this.NoStroke);
+            }
+        }
+
+        public virtual bool OnlyFill
+        {
+            get
+            {
+                return (!this.NoFill && this.NoStroke);
+            }
+        }
+
         #endregion
     }
 
