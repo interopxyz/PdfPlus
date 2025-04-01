@@ -685,12 +685,17 @@ namespace PdfPlus
             return new Pd.XSolidBrush(input.ToPdf());
         }
 
+        public static Pd.XBrush ToPdfBrush(this Graphic input)
+        {
+            return new Pd.XSolidBrush(input.Color.ToPdf());
+        }
+
         public static Pd.XColor ToPdf(this Sd.Color input)
         {
             return Pd.XColor.FromArgb(input.A, input.R, input.G, input.B);
         }
 
-        public static Pd.XPen ToPdf(this Graphic input)
+        public static Pd.XPen ToPdfPen(this Graphic input)
         {
             Pd.XPen pen = new Pd.XPen(input.Stroke.ToPdf(), input.Weight);
             if (input.HasPattern) pen.DashPattern = input.Pattern.ToArray();

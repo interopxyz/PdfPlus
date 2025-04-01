@@ -888,7 +888,7 @@ namespace PdfPlus
 
         protected Pd.XGraphics RenderLine(Pd.XGraphics graph)
         {
-            graph.DrawLine(graphic.ToPdf(), line.From.ToPdf(), line.To.ToPdf());
+            graph.DrawLine(graphic.ToPdfPen(), line.From.ToPdf(), line.To.ToPdf());
             return graph;
         }
 
@@ -899,13 +899,26 @@ namespace PdfPlus
             plinePath.StartFigure();
             plinePath.AddLines(polyline.ToPdf().ToArray());
             if (polyline.IsClosed) plinePath.CloseFigure();
-            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), plinePath); } else { graph.DrawPath(graphic.ToPdf(), plinePath); }
-            return graph;
+
+            return this.RenderPath(graph, plinePath);
         }
 
         protected Pd.XGraphics RenderEllipse(Pd.XGraphics graph)
         {
-            if (this.graphic.HasColor) { graph.DrawEllipse(graphic.ToPdf(), graphic.Color.ToPdfBrush(), boundary.ToPdf()); } else { graph.DrawEllipse(graphic.ToPdf(), boundary.ToPdf()); }
+
+            if (this.graphic.OnlyFill)
+            {
+                graph.DrawEllipse(graphic.ToPdfBrush(), boundary.ToPdf());
+            }
+            else if (this.graphic.OnlyStroke)
+            {
+                graph.DrawEllipse(graphic.ToPdfPen(), boundary.ToPdf());
+            }
+            else
+            {
+                graph.DrawEllipse(graphic.ToPdfPen(), graphic.Color.ToPdfBrush(), boundary.ToPdf());
+            }
+
             return graph;
         }
 
@@ -916,8 +929,7 @@ namespace PdfPlus
             crvPath.AddBeziers(curve.ToBezierPolyline().ToPdf().ToArray());
             if (curve.IsClosed) crvPath.CloseFigure();
 
-            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath); } else { graph.DrawPath(graphic.ToPdf(),crvPath); }
-            return graph;
+            return this.RenderPath(graph, crvPath);
         }
 
         protected Pd.XGraphics RenderBrep(Pd.XGraphics graph)
@@ -932,8 +944,8 @@ namespace PdfPlus
                 crvPath.AddBeziers(nurbs.ToBezierPolyline().ToPdf().ToArray());
                 if (nurbs.IsClosed) crvPath.CloseFigure();
             }
-            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), crvPath); } else { graph.DrawPath(graphic.ToPdf(), crvPath); }
-            return graph;
+
+            return this.RenderPath(graph, crvPath);
         }
 
         protected Pd.XGraphics RenderMesh(Pd.XGraphics graph)
@@ -947,7 +959,26 @@ namespace PdfPlus
                 polyPath.AddLines(pline.ToPdf().ToArray());
                 if (pline.IsClosed) polyPath.CloseFigure();
             }
-            if (this.graphic.HasColor) { graph.DrawPath(graphic.ToPdf(), graphic.Color.ToPdfBrush(), polyPath); } else { graph.DrawPath(graphic.ToPdf(), polyPath); }
+
+            return this.RenderPath(graph,polyPath);
+        }
+
+        private Pd.XGraphics RenderPath(Pd.XGraphics graph, Pd.XGraphicsPath path)
+        {
+
+            if (this.graphic.OnlyFill)
+            {
+                graph.DrawPath(graphic.ToPdfBrush(), path);
+            }
+            else if (this.graphic.OnlyStroke)
+            {
+                graph.DrawPath(graphic.ToPdfPen(), path);
+            }
+            else
+            {
+                graph.DrawPath(graphic.ToPdfPen(), graphic.Color.ToPdfBrush(), path);
+            }
+
             return graph;
         }
 
