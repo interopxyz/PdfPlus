@@ -283,8 +283,9 @@ namespace PdfPlus.Components
                         args.Display.DrawPolyline(shape.Polyline, strokeColor, (int)shape.StrokeWeight);
                         break;
                     case Shape.ShapeType.Brep:
-                        Curve[] brepCurves = shape.Brep.DuplicateNakedEdgeCurves(true, true);
-                        Hatch[] brepHatches = Hatch.Create(brepCurves, 0, 0, 1, mTol);
+                        Curve[] boundaryCurves = shape.Brep.DuplicateNakedEdgeCurves(true, true);
+                        Curve[] brepCurves = NurbsCurve.JoinCurves(boundaryCurves);
+                        Hatch[] brepHatches = Hatch.Create(brepCurves, 0, 0, 1, 0.1);
                         foreach (Hatch hatch in brepHatches) args.Display.DrawHatch(hatch, fillColor, shape.FillColor);
                         foreach (Curve curve in brepCurves) args.Display.DrawCurve(curve, strokeColor, (int)shape.StrokeWeight);
                         break;

@@ -59,7 +59,7 @@ namespace PdfPlus
         {
             get
             {
-                return "2.0.8.0";
+                return "2.0.9.0";
             }
         }
     }
