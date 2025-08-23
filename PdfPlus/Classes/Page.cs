@@ -500,12 +500,13 @@ namespace PdfPlus
                 output.Add(Shape.CreateGeometry(new Rg.Line(frame.Origin + new Rg.Point3d(cw, 0, 0), frame.YAxis, -boundary.Height), new Graphic(Sd.Color.Gray, 1)));
 
             }
-            for (int r = tableRowIndex; r < table.Rows.Count; r++)
+            int cr = table.Rows.Count;
+            for (int r = tableRowIndex; r < cr; r++)
             {
-                double rh = block.Font.Size + 14;
+                double rh = block.Font.Size + 13.33333;
                 frame.OriginY -= rh;
                 totalHeight += rh;
-                if (totalHeight >= (height + 1)) break;
+                if (totalHeight >= (height + height/cr/2.0)) break;
                 tableRowIndex += 1;
                 frame.OriginX = boundary.Plane.OriginX;
 

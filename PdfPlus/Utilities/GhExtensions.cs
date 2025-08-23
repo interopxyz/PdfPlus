@@ -59,7 +59,17 @@ namespace PdfPlus
         public static List<string> ToStringList(this List<GH_String> input)
         {
             List<string> output = new List<string>();
-            foreach (GH_String txt in input) output.Add(txt.Value);
+            foreach (GH_String txt in input)
+            {
+                if (txt != null)
+                {
+                    output.Add(txt.Value);
+                }
+                else
+                {
+                    output.Add("");
+                }
+            }
 
             return output;
         }
